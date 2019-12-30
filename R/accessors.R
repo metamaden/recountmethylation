@@ -25,9 +25,8 @@ hfcon = function(dbn.path = "remethdb.h5"){
 #' @param hfile Connection to an HDF5 database file.
 #' @return HDF5 database connection object.
 #' @export
-hdcon = function(dsn = "noobbeta", hfile = hfcon()){
-  hdopen = rhdf5::H5Dopen(hfile, dsn)
-  return(hdopen)
+hread = function(ri, ci, dsn = "redsignal", dbn = "remethdb.h5"){
+  return(rhdf5::h5read(dbn, dsn, index = list(ri, ci)))
 }
 
 # Access and query the metadata
@@ -196,7 +195,7 @@ grse = function(ldat, granges.obj = data("granges_minfi")){
     message("Error: invalid ldat object passed. Verify the necessary data type(s) are available.")
     return()
   }
-  nb = ldat[["noobbeta"]]
+  nb = t(ldat[["noobbeta"]]) # transpose of nb
   # check provided metadata
   if("mdpost" %in% names(ldat)){
     gsmidv = colnames(nb)
@@ -226,6 +225,7 @@ grse = function(ldat, granges.obj = data("granges_minfi")){
   # data("granges_minfi")
   anno = c("IlluminaHumanMethylation450k", "ilmn12.hg19")
   names(anno) = c("array", "annotation")
+  # match cpg order in granges and nb objects
   int.cg = intersect(names(granges.obj), rownames(nb))
   grmf = granges.obj[names(granges.obj) %in% int.cg]
   nb = nb[rownames(nb) %in% int.cg,]; nb = nb[order(match(rownames(nb), names(grmf))),]
@@ -262,13 +262,12 @@ getrg = function(gsmv, cgv, dbn = "remethdb.h5", dat.type = c("se", "df"),
     return()
   }
   ldat = list()
-  
   for(d in dsv){
     message("Working on ", d, "...")
     if(d %in% c("redsignal", "greensignal")){
       rnd = rhdf5::h5read(dbn, paste0(d, ".rownames")) # rownames, GSM IDs
       cnd = rhdf5::h5read(dbn, paste0(d, ".colnames")) # colnames, CpG addr
-      ddat = hdcon(d, hfcon(dbn))[which(rnd %in% gsmv), which(cnd %in% cgv)]
+      ddat = hread(ri = which(rnd %in% gsmv), ci = which(cnd %in% cgv), d, dbn)
       rownames(ddat) = rnd[which(rnd %in% gsmv)]
       colnames(ddat) = cnd[which(cnd %in% cgv)]
       ldat[[d]] <- ddat
@@ -321,7 +320,7 @@ getgs = function(gsmv, cgv, dbn = "remethdb.h5",
     if(d %in% c("noobbeta")){
       rnd = rhdf5::h5read(dbn, paste0(d, ".rownames")) # rownames, CpG ID
       cnd = rhdf5::h5read(dbn, paste0(d, ".colnames")) # colnames, GSM ID
-      ddat = hdcon(d, hfcon(dbn))[which(rnd %in% cgv), which(cnd %in% gsmv)]
+      ddat = hread(ri = which(rnd %in% gsmv), ci = which(cnd %in% cgv), d, dbn)
       colnames(ddat) = cnd[which(cnd %in% gsmv)]
       message("cn")
       rownames(ddat) = rnd[which(rnd %in% cgv)]
