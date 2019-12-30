@@ -2,25 +2,15 @@
 
 # Access recount-methylation HDF5 database.
 
-# HDF5 connection objects
-#
-
-#' Connection to HDF5 database file
-#'
-#' Get '.h5' file connection (db connection).
-#'
-#' @param dbn.path Path to HDF5 database file.
-#' @return An HDF5 file connection object.
-#' @export
-hfcon = function(dbn.path = "remethdb.h5"){
-  hfile = rhdf5::H5Fopen(dbn.path)
-  return(hfile)
-}
+#--------------------------
+# HDF5 connection utilities
+#--------------------------
 
 #' Connect to an HDF5 dataset file.
 #'
 #' Get a dataset connection object from an HDF5 database ('.h5') file.
-#'
+#' @param ri rows indices in dataset.
+#' @param ci columns indices in dataset.
 #' @param dsn Name of dataset or group of dataset to connect with.
 #' @param hfile Connection to an HDF5 database file.
 #' @return HDF5 database connection object.
@@ -28,8 +18,6 @@ hfcon = function(dbn.path = "remethdb.h5"){
 hread = function(ri, ci, dsn = "redsignal", dbn = "remethdb.h5"){
   return(rhdf5::h5read(dbn, dsn, index = list(ri, ci)))
 }
-
-# Access and query the metadata
 
 #---------------------------------
 # Query and retrieve HDF5 datasets
@@ -45,69 +33,6 @@ hread = function(ri, ci, dsn = "redsignal", dbn = "remethdb.h5"){
 #' @export
 data.mdpost = function(dbn.path = "remethdb.h5", dsn = "mdpost"){
   return(rhdf5::h5read(file = dbn.path, name = dsn))
-}
-
-# get noobbeta data
-
-#' Get noob-normalized Beta-values.
-#'
-#' Retrieves noob-normalized Beta-values dataset from HDF5 database file.
-#'
-#' @param dbn Name of HDF5 database ('.h5') file.
-#' @param dsn Name of HDF5 dataset containing noob-normalized Beta-values.
-#' @param which.gsm Numeric indices of samples whose data to retrieve.
-#' @param which.cg Numeric indices of CpG probes whose data to retrieve.
-#' @return Returns subset of noob-normalized Beta-values HDF5 dataset matching query.
-#' @export
-data.nb = function(dbn = "remethdb.h5", dsn = 'noobbeta',
-                  which.gsm = sample(35700, 5), which.cg = c(1:485512)){
-  message("Connecting to hdf5 entities...")
-  hfile = hfcon(dbn.path = dbn)
-  dsr = hdcon(dsn = dsn, hfile = hfile)
-  # filter rownames as necessary
-  message("subsetting and coercing data...")
-  # validate provided indices for rows and cols
-  message("Validating provided row and col indices...")
-  rn.nb = rhdf5::h5read(dbn, paste0(dsn, ".rownames")) # rows/cpgs
-  cn.nb = rhdf5::h5read(dbn, paste0(dsn, ".colnames")) # cols/samples
-  which.gsm = which.gsm[which.gsm %in% seq(1, length(cn.nb), 1)]
-  which.cg = which.cg[which.cg %in% seq(1, length(rn.nb), 1)]
-  message("Subsetting the signal matrix...")
-  sd = dsr[which.cg, which.gsm]
-  rownames(sd) = as.character(rn.nb[which.cg])
-  colnames(sd) = as.character(cn.nb[which.gsm])
-  return(sd)
-}
-
-#' Get raw probe signal plots
-#'
-#' Retrieves raw signal from either red or green array color channel HDF5 dataset.
-#'
-#' @param dbn Name of HDF5 database ('.h5') file.
-#' @param dsn Name or group path to a raw signal dataset (either 'redsignal' or 'greensignal').
-#' @param which.gsm Numeric indices of samples (signal dataset rows) whose data to retrieve.
-#' @param which.cg Numeric indices of CpG probes (signal dataset columns) whose data to retrieve.
-#' @return Returns the subset of the raw signal dataset matching the query.
-#' @export
-data.rgsignal = function(which.gsm, which.cg, 
-                         dbn = "remethdb.h5", dsn = c("redsignal", "greensignal"),
-                         rnrg = rhdf5::h5read(dbn, paste0(dsn, ".rownames")),
-                         cnrg = rhdf5::h5read(dbn, paste0(dsn, ".colnames"))){
-  message("Connecting to hdf5 entities...")
-  hfile = hfcon(dbn.path = dbn)
-  dsr = hdcon(dsn = dsn, hfile = hfile)
-  # validate provided indices for rows and cols
-  message("Validating provided row and col indices...")
-  message("Subsetting the signal matrix...")
-  # sdv = dsr[eval(which.gsm), eval(which.cg)]
-  wgsmv = eval(which.gsm); wcgv = eval(which.cgv)
-  sdv = dsr[wgsmv, wcgv]
-  rnv = eval(as.character(rnrg[eval(which.gsm)]))
-  message(length(rnv))
-  message(dim(sdv))
-  rownames(sdv) = rnv
-  # colnames(sdv) = as.character(cnrg[which.cg])
-  return(sdv)
 }
 
 #-------------------------------------------------------
@@ -129,24 +54,28 @@ rgse = function(ldat){
   # match and check CpG addresses for signal datasets
   message("Matching CpG addresses for signal matrices...")
   rga = ldat[["redsignal"]]; gga = ldat[["greensignal"]]
-  addrv = unique(c(colnames(rga), colnames(gga))) # get the unique CpG addresses
-  rgs = rga[, colnames(rga) %in% addrv]; rgs = rgs[, order(match(colnames(rgs), addrv))]
-  ggs = gga[, colnames(gga) %in% addrv]; ggs = ggs[, order(match(colnames(ggs), addrv))]
-  if(!identical(colnames(rgs), colnames(ggs))){
+  
+  # match probe IDs
+  addrv = unique(c(rownames(rga), rownames(gga))) # get the unique CpG addresses
+  rgs = rga[rownames(rga) %in% addrv, ]; rgs = rgs[order(match(rownames(rgs), addrv)), ]
+  ggs = gga[rownames(gga) %in% addrv, ]; ggs = ggs[order(match(rownames(ggs), addrv)), ]
+  if(!identical(rownames(rgs), rownames(ggs))){
     message("Error: couldn't match CpG addresses for signal data! Returning...")
     return()
   }
+  
   # match and check GMS IDs for signal datasets
   message("Matching GSM IDs for signal matrices...")
-  gsmidv = unique(c(rownames(rgs), rownames(ggs)))
-  rgf = rgs[rownames(rgs) %in% gsmidv,]
-  rgf = rgf[order(match(rownames(rgs), gsmidv)),]
-  ggf = ggs[rownames(ggs) %in% gsmidv,]
-  ggf = ggf[order(match(rownames(ggf), gsmidv)),]
-  if(!identical(rownames(rgf), rownames(ggf))){
+  gsmidv = unique(c(colnames(rgs), colnames(ggs)))
+  rgf = rgs[, colnames(rgs) %in% gsmidv]
+  ggf = ggs[, colnames(ggs) %in% gsmidv]
+  rgf = rgf[, order(match(colnames(rgf), gsmidv))]
+  ggf = ggf[, order(match(colnames(ggf), gsmidv))]
+  if(!identical(colnames(rgf), colnames(ggf))){
     message("Error: couldn't match GSM IDs for signal data! Returning...")
     return()
   }
+  
   # match and check GSM IDs for metadata
   if("mdpost" %in% names(ldat)){
     message("Checking provided postprocessed metadata...")
@@ -164,17 +93,18 @@ rgse = function(ldat){
     message("Checking metadata match...")
     mdf = mdp[mdp$gsm %in% gsmidv,]
     mdf = mdf[order(match(mdf$gsm, gsmidv)),]
-    if(!(identical(mdf$gsm, rownames(rgf)) |
-         identical(mdf$gsm, rownames(ggf)))){
+    checkid = identical(mdf$gsm, colnames(rgf)) & identical(mdf$gsm, colnames(ggf))
+    if(!checkid){
       message("Error: couldn't match metadata GSM IDs with signal ID matrices...")
       return()
     }
     rownames(mdf) = mdf$gsm
   }
+  
   message("forming the RGset...")
   anno = c("IlluminaHumanMethylation450k", "ilmn12.hg19")
   names(anno) = c("array", "annotation")
-  rgi = minfi::RGChannelSet(Green = t(ggf), Red = t(ggf),
+  rgi = minfi::RGChannelSet(Green = ggf, Red = rgf,
                      annotation = anno)
   if("mdpost" %in% names(ldat)){
     message("Adding postprocessed metadata as pheno data to SE set...")
@@ -195,7 +125,7 @@ grse = function(ldat, granges.obj = data("granges_minfi")){
     message("Error: invalid ldat object passed. Verify the necessary data type(s) are available.")
     return()
   }
-  nb = t(ldat[["noobbeta"]]) # transpose of nb
+  nb = ldat[["noobbeta"]] # transpose of nb
   # check provided metadata
   if("mdpost" %in% names(ldat)){
     gsmidv = colnames(nb)
@@ -254,7 +184,8 @@ grse = function(ldat, granges.obj = data("granges_minfi")){
 #' @param metadata Whether to access available postprocessed metadata for queries samples.
 #' @return Returns either an `RGChannelSet` or list of `data.frame` objects from dataset query matches.
 #' @export
-getrg = function(gsmv, cgv, dbn = "remethdb.h5", dat.type = c("se", "df"),
+getrg = function(gsmv = "random", cgv = "all", 
+                 dbn = "remethdb.h5", dat.type = c("se", "df"),
                  dsv = c("redsignal", "greensignal"), metadata = TRUE){
   # form the datasets list
   if(length(gsmv) == 0 | length(cgv) == 0){
@@ -267,10 +198,22 @@ getrg = function(gsmv, cgv, dbn = "remethdb.h5", dat.type = c("se", "df"),
     if(d %in% c("redsignal", "greensignal")){
       rnd = rhdf5::h5read(dbn, paste0(d, ".rownames")) # rownames, GSM IDs
       cnd = rhdf5::h5read(dbn, paste0(d, ".colnames")) # colnames, CpG addr
-      ddat = hread(ri = which(rnd %in% gsmv), ci = which(cnd %in% cgv), d, dbn)
-      rownames(ddat) = rnd[which(rnd %in% gsmv)]
-      colnames(ddat) = cnd[which(cnd %in% cgv)]
-      ldat[[d]] <- ddat
+      # parse the index values
+      if(cgv == "all"){
+        cgvp = seq(1, length(cnd), 1)
+      } else{
+        cgvp = which(cnd %in% cgv)
+      }
+      if(gsmv == "random"){
+        gsmvp = sample(length(rnd), 5)
+      } else{
+        gsmvp = which(rnd %in% gsmv)
+      }
+      # get data matrix
+      ddat = hread(ri = gsmvp, ci = cgvp, d, dbn)
+      rownames(ddat) = rnd[gsmvp]
+      colnames(ddat) = cnd[cgvp]
+      ldat[[d]] <- t(ddat) # append transpose of data
     } else{
       message("Warning: Invalid data type detected: ", d, ", continuing...")
     }
@@ -290,6 +233,7 @@ getrg = function(gsmv, cgv, dbn = "remethdb.h5", dat.type = c("se", "df"),
     message("Forming the RGChannelSet...")
     robj = rgse(ldat = ldat)
   }
+  rhdf5::h5closeAll() # close all open connections
   return(robj)
 }
 
@@ -305,10 +249,9 @@ getrg = function(gsmv, cgv, dbn = "remethdb.h5", dat.type = c("se", "df"),
 #' @param metadata Whether to access available postprocessed metadata for queries samples.
 #' @return Returns either an `GenomicRatioSet` or list of `data.frame` objects from dataset query matches.
 #' @export
-getgs = function(gsmv, cgv, dbn = "remethdb.h5", 
-                 dat.type = c("se", "df"),
-                 dsv = c("noobbeta"), metadata = TRUE, 
-                 granges.obj = data("granges_minfi")){
+getgs = function(gsmv = "random", cgv = "all", dbn = "remethdb.h5", 
+                 dat.type = c("se", "df"), dsv = c("noobbeta"), 
+                 metadata = TRUE, granges.obj = data("granges_minfi")){
   # form the datasets list
   if(length(gsmv) == 0 | length(cgv) == 0){
     message("Error: invalid GSM or CpG IDs. Check arguments for 'gsmv' and 'cgv'...")
@@ -320,11 +263,22 @@ getgs = function(gsmv, cgv, dbn = "remethdb.h5",
     if(d %in% c("noobbeta")){
       rnd = rhdf5::h5read(dbn, paste0(d, ".rownames")) # rownames, CpG ID
       cnd = rhdf5::h5read(dbn, paste0(d, ".colnames")) # colnames, GSM ID
-      ddat = hread(ri = which(rnd %in% gsmv), ci = which(cnd %in% cgv), d, dbn)
-      colnames(ddat) = cnd[which(cnd %in% gsmv)]
-      message("cn")
-      rownames(ddat) = rnd[which(rnd %in% cgv)]
-      message("rn")
+      # parse the indices
+      # parse the index values
+      if(cgv == "all"){
+        cgvp = seq(1, length(rnd))
+      } else{
+        cgvp = which(rnd %in% cgv)
+      }
+      if(gsmv == "random"){
+        gsmvp = sample(1, length(cnd), 5)
+      } else{
+        gsmvp = which(cnd %in% gsmv)
+      }
+      # get the data matrix
+      ddat = hread(ri = cgvp, ci = gsmvp, d, dbn)
+      colnames(ddat) = cnd[gsmvp]
+      rownames(ddat) = rnd[cgvp]
       ldat[[d]] <- ddat
     } else{
       message("Invalid data type detected: ", d, ", continuing...")
@@ -345,5 +299,6 @@ getgs = function(gsmv, cgv, dbn = "remethdb.h5",
     message("Forming the RGChannelSet...")
     robj = grse(ldat = ldat, granges.obj = granges.obj)
   }
+  rhdf5::h5closeAll() # close all open connections
   return(robj)
 }
