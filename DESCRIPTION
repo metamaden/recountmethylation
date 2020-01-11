@@ -23,3 +23,4 @@ Imports:
   rhdf5 (>= 2.30.0)
 Suggests:
   minfiData (>= 0.32.0)
+RoxygenNote: 7.0.2
