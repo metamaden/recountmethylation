@@ -5,20 +5,20 @@
 \title{Get raw signal data as either a list of `data.frame`'s or an `RGChannelSet` object}
 \usage{
 getrg(
-  dbn,
-  gsmv,
-  cgv,
+  gsmv = "random",
+  cgv = "all",
+  dbn = "remethdb.h5",
   dat.type = c("se", "df"),
   dsv = c("redsignal", "greensignal"),
   metadata = TRUE
 )
 }
 \arguments{
-\item{dbn}{Name of the HDF5 database file.}
-
 \item{gsmv}{Vector valid GSM IDs (rows) to query in the raw signal datasets.}
 
 \item{cgv}{Vector of valid CpG probe addresses (columns) to query in the raw signal datasets.}
+
+\item{dbn}{Name of the HDF5 database file.}
 
 \item{dsv}{Vector of raw signal datasets or group paths to query, including both the red channel 'redsignal' and green channel 'greensignal' datasets.}
 
