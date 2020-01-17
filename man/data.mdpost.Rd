@@ -4,10 +4,10 @@
 \alias{data.mdpost}
 \title{Retrieve samples metadata.}
 \usage{
-data.mdpost(dbn.path = "remethdb.h5", dsn = "mdpost")
+data.mdpost(dbn = "remethdb.h5", dsn = "metadata")
 }
 \arguments{
-\item{dbn.path}{Path to HDF5 database file.}
+\item{dbn}{Path to HDF5 database file.}
 
 \item{dsn}{Name or group path to HDF5 dataset containing postprocessed metadata.}
 }

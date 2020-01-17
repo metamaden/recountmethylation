@@ -8,9 +8,10 @@ getrg(
   gsmv = "random",
   cgv = "all",
   dbn = "remethdb.h5",
-  dat.type = c("se", "df"),
+  data.type = c("se", "df"),
   dsv = c("redsignal", "greensignal"),
-  metadata = TRUE
+  metadata = TRUE,
+  md.dsn = "metadata"
 )
 }
 \arguments{
@@ -20,11 +21,13 @@ getrg(
 
 \item{dbn}{Name of the HDF5 database file.}
 
+\item{data.type}{Format for returned query matches, either as datasets 'df' or `RGChannelSet` 'se' object.}
+
 \item{dsv}{Vector of raw signal datasets or group paths to query, including both the red channel 'redsignal' and green channel 'greensignal' datasets.}
 
 \item{metadata}{Whether to access available postprocessed metadata for queries samples.}
 
-\item{data.type}{Format for returned query matches, either as datasets 'df' or `RGChannelSet` 'se' object.}
+\item{md.dsn}{Name of metadata dataset in h5 file.}
 }
 \value{
 Returns either an `RGChannelSet` or list of `data.frame` objects from dataset query matches.

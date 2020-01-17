@@ -1,13 +1,16 @@
 ---
-title: 'Vignette for ''recountmethylation'' package: basic data retrieval, queries,
+title: 'Vignette for `recountmethylation`: basic data retrieval, queries,
   validation, and preprocessing'
 output:
+  pdf_document: default
   html_document:
     df_print: paged
+vignette: |
+  %\VignetteEngine{knitr::knitr} %\VignetteIndexEntry{Title of your vignette} %\usepackage[UTF-8]{inputenc}
 ---
 
 ```{r setup, include = FALSE, eval = TRUE}
-# library(recountmethylation)
+library(recountmethylation)
 knitr::opts_chunk$set(eval = TRUE, echo = FALSE)
 ```
 
@@ -22,11 +25,10 @@ To construct sample queries, the database includes sample metadata learned from 
 While this package can aid and expand research capabilities for published HM450k data, this resource is intended primarily for exploratory and discovery analyses. Users should cross-check their findings with study-level metadata, methods, and supplement for consistency and completion. Please see the affiliated manuscript for details and critical analysis of this dataset.
 
 # Data access
-
 We first define a pointer for the database to access. Here, we assume the `remethdb_test.h5` file is in the current working directory. We then summarize the test database contents as follows:
 
-```{r, echo = T}
-dbn = "remethdb_test.h5" # path to h5 db
+```{r h5_details, echo = T}
+dbn = "remethdbtest.h5" # path to h5 db
 rhdf5::h5ls(dbn)
 ```
 
@@ -34,15 +36,15 @@ Note datasets are stored with separate row and column name entities, denoted as 
 
 We can quickly access the entire metadata table for sample queries:
 
-```{r, echo = T}
+```{r get_gsm_metadata, echo = T}
 # get full gsm metadata
-mdp = data.mdpost(dbn.path = dbn)
+mdp = data.mdpost(dbn.path = dbn, dsn = "metadata")
 dim(mdp)
 ```
 
 The test dataset contains a small subset of the data available in recount methylation. We can check available sample types and construct a sample query as follows:
 
-```{r, echo = T}
+```{r make_gsm_query, echo = T}
 # check which samples available in h5 db
 dsn = "redsignal"
 rs.gsm = rhdf5::h5read(dbn, paste(dsn, "rownames", sep = ".")) # redsignal rownames (gsm ids)
@@ -54,7 +56,7 @@ unique(unlist(strsplit(mdf$tissue, ";"))) # available tissue terms
 # get sample id query by tissue term
 termi = "blood"
 var.query = "tissue"
-which.index = 1:5
+which.index = 1:2
 which.gsm = which(grepl(paste0(".*", termi, ".*"), 
                         mdf[,var.query]))[which.index]
 gsmvi = mdf$gsm[which.gsm]
@@ -62,7 +64,7 @@ gsmvi = mdf$gsm[which.gsm]
 
 Next, we can query a subset of the available array probes based on location. Here, our query selects only probes located on chromosome 9:
 
-```{r, echo = T}
+```{r make_cg_query, echo = F}
 anno.name = "IlluminaHumanMethylation450kanno.ilmn12.hg19"
 man = eval(parse(text = paste(anno.name, "Manifest", sep = "::")))
 loc = eval(parse(text = paste(anno.name, "Locations", sep = "::")))
@@ -76,23 +78,27 @@ cgvi = unique(c(man[cgfilt,]$AddressA, man[cgfilt,]$AddressB))
 With the queries constructed, we can proceed to extracting the methylation datasets.
 
 # Data queries
-DNA methylation signal data can be retrieved in one of two ways using the `recountmethylation::getrg()` function. First, data can be returned as an object of class `RGChannelSet`, a type of `SummarizedExperiment` object, by setting the `dat.type` argument to 'se'. 
+DNA methylation signal data can be retrieved in one of two ways using the `recountmethylation::getrg()` function. First, data can be returned as an object of class `RGChannelSet`, a type of `SummarizedExperiment` object, by setting the `data.type` argument to 'se'. 
 
-```{r, echo = T}
+```{r get_se_set}
 # make df list from h5 db query
-se.rgi = getrg(gsmv = gsmvi, cgv = cgvi, dbn = dbn, dat.type = "se")
+se.rgi = getrg(gsmv = gsmvi, cgv = cgvi, dbn = dbn, data.type = "se")
+```
+```{r check_se_set, echo = T}
 dim(se.rgi)
-dim(pData(se.rgi))
-dim(getRed(se.rgi))
-dim(getBeta(se.rgi))
+dim(minfi::pData(se.rgi))
+dim(minfi::getRed(se.rgi))
+dim(minfi::getBeta(se.rgi))
 ```
 
 This class conveniently stores signal data, sample metadata, genome annotations, and other useful metadata in a single object. 
 
 Alternatively, we can return a list of `data.frame` objects.
 
-```{r, echo = T}
-ldat.rgi = getrg(gsmv = gsmvi, dbn = dbn, dat.type = "df")
+```{r get_dflist, echo = T}
+ldat.rgi = getrg(gsmv = gsmvi, dbn = dbn, data.type = "df")
+```
+```{r check_dflist, echo = T}
 length(ldat.rgi)
 dim(ldat.rgi[["redsignal"]])
 dim(ldat.rgi[["metadata"]])
@@ -105,7 +111,7 @@ Because data is constantly being added and revised in GEO, it can be useful to v
 
 There are 2 IDATs roughly 4.5 Mb in size expected per GSM, one for each color channel. The following will perform fresh downloads of the IDATs for the queried GSMs to the current directory:
 
-```{r}
+```{r idat_dl}
 dn = "" # download idats to cwd
 bnv = c() # store the idat basenames
 for(gsmi in gsmvi){
@@ -129,7 +135,7 @@ for(gsmi in gsmvi){
 
 The IDAT basenames are the unique IDAT filenames excluding the strings "_Red.idat" and "_Grn.idat". We use the basename vector above to read downloaded IDATs into a new `RGChannelSet` object with minfi, then subset on chromosome 9 probes as above.
 
-```{r}
+```{r read_idatdl}
 rgdl = minfi::read.metharray(basenames = bnv)
 colnames(rgdl) = gsub("_.*", "", colnames(rgdl)) # extract gsm ids
 rgdl = rgdl[rownames(rgdl) %in% cgvi,]
@@ -139,21 +145,23 @@ identical(rownames(rgdl), rownames(se.rgi)) # check that cg addresses match
 
 We can then check for consistency between the methylation data returned from the `recountmethylation` query and the fresh data downloads.
 
-```{r, echo = T}
+```{r rg_validate, echo = T}
 evalv = c()
 for(c in colnames(rgdl)){
-  evalv = c(evalv, identical(as.numeric(getRed(rgdl[,c])), as.numeric(getRed(se.rgi[,c]))))
-  evalv = c(evalv, identical(as.numeric(getGreen(rgdl[,c])), as.numeric(getGreen(se.rgi[,c]))))
+  evalv = c(evalv, identical(as.numeric(minfi::getRed(rgdl[,c])), 
+                             as.numeric(minfi::getRed(se.rgi[,c]))))
+  evalv = c(evalv, identical(as.numeric(minfi::getGreen(rgdl[,c])), 
+                             as.numeric(minfi::getGreen(se.rgi[,c]))))
 }
+table(evalv==TRUE)
 ```
 
 The packages [`GEOquery`](https://bioconductor.org/packages/release/bioc/html/GEOquery.html) and [`GEOmetadb`](https://www.bioconductor.org/packages/release/bioc/html/GEOmetadb.html) provide additional utilities for data access that can aid with validation.
 
 # Basic preprocessing
-
 Basic preprocessing of the `RGChannelSet` object can be performed with functions from the `minfi` package. In general, the `RGChannelSet` is larger than derived objects of class `MethylSet`, `GenomeRatioSet`, etc. though the latter excludes full signal information such as for control probes. We can obtain the raw Beta-values and noob-normalized Beta-values in more compact `MethylSet` objects as follows.
 
-```{r}
+```{r preprocess_list}
 lpre = list(se = list(),
             mv = list(), umv = list(),
             bv = list())
@@ -170,9 +178,9 @@ lpre[["bv"]][["raw"]] = getBeta(se.raw)
 lpre[["bv"]][["nb"]] = getBeta(se.noob)
 ```
 
-We can compare raw Beta-values to noob-normalized Beta-values as follows:
+We can compare raw Beta-values to noob-normalized Beta-values:
 
-```{r}
+```{r compare_bvalmeans}
 bv.raw.means = apply(lpre$bv$raw, 1, mean)
 bv.noob.means = apply(lpre$bv$nb, 1, mean)
 bv.dif = bv.noob.means - bv.raw.means
@@ -185,5 +193,3 @@ hist(bv.dif, main = "Noob - Raw\n(mean Beta-value differences)")
 ```{r}
 sessionInfo()
 ```
-
-

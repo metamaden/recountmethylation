@@ -13,7 +13,7 @@ hread(ri, ci, dsn = "redsignal", dbn = "remethdb.h5")
 
 \item{dsn}{Name of dataset or group of dataset to connect with.}
 
-\item{hfile}{Connection to an HDF5 database file.}
+\item{dbn}{Path to h5 database file.}
 }
 \value{
 HDF5 database connection object.

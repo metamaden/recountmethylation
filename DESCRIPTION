@@ -1,26 +1,17 @@
 Package: recountmethylation
-Title: Access and analyze the recount-methylation database
-Version: 0.0.0.9000
-Authors@R: c(
-    person(given = "Sean",
-           family = "Maden",
-           role = c("aut", "cre"),
-           email = "maden.sean@gmail.com",
-           comment = c(ORCID = "0000-0002-2212-4894")),
-    person(given = "Kasper",
-           family = "Hansen",
-           role = c("aut")),
-    person(given = "Abhinav",
-           family = "Nellore",
-           role = c("aut"))
-           )
-Description: Access and analyze data from the recount-methylation database.
-License: MIT
+Version: 0.01.0
+Title: Access and analyze the recount methylation database
+Authors@R: c(person(c("Sean", "Kenneth"), "Maden", role = c("cre", "aut"),
+                    email = "maden@ohsu.edu"),
+             person("Abhi", "Nellore", role = "aut"))
+Description: Access and analyze data from the recount methylation database.
+License: Artistic-2.0
 Encoding: UTF-8
 LazyData: true
 Imports:
-  minfi (>= 1.32.0),
-  rhdf5 (>= 2.30.0)
+  minfi,
+  rhdf5
 Suggests:
-  minfiData (>= 0.32.0)
+  utils
+VignetteBuilder: utils
 RoxygenNote: 7.0.2
