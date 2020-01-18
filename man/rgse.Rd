@@ -4,10 +4,12 @@
 \alias{rgse}
 \title{Form an object of class `RGChannelSet` from a raw signal dataset query}
 \usage{
-rgse(ldat)
+rgse(ldat, verbose = FALSE)
 }
 \arguments{
 \item{ldat}{List of raw signal data query results. Must include 2 `data.frame` objects named 'redsignal' and 'greensignal'.}
+
+\item{verbose}{Whether to post status messages.}
 }
 \value{
 Returns a `RGChannelSet` object from raw signal dataset queries.

@@ -12,6 +12,6 @@ Imports:
   minfi,
   rhdf5
 Suggests:
-  utils
-VignetteBuilder: utils
+  knitr
+VignetteBuilder: knitr
 RoxygenNote: 7.0.2

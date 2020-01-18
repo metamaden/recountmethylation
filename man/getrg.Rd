@@ -11,7 +11,8 @@ getrg(
   data.type = c("se", "df"),
   dsv = c("redsignal", "greensignal"),
   metadata = TRUE,
-  md.dsn = "metadata"
+  md.dsn = "metadata",
+  verbose = FALSE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ getrg(
 \item{metadata}{Whether to access available postprocessed metadata for queries samples.}
 
 \item{md.dsn}{Name of metadata dataset in h5 file.}
+
+\item{verbose}{Whether to post status messages.}
 }
 \value{
 Returns either an `RGChannelSet` or list of `data.frame` objects from dataset query matches.

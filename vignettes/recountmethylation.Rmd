@@ -38,7 +38,7 @@ We can quickly access the entire metadata table for sample queries:
 
 ```{r get_gsm_metadata, echo = T}
 # get full gsm metadata
-mdp = data.mdpost(dbn.path = dbn, dsn = "metadata")
+mdp = data.mdpost(dbn)
 dim(mdp)
 ```
 
@@ -82,7 +82,7 @@ DNA methylation signal data can be retrieved in one of two ways using the `recou
 
 ```{r get_se_set}
 # make df list from h5 db query
-se.rgi = getrg(gsmv = gsmvi, cgv = cgvi, dbn = dbn, data.type = "se")
+se.rgi = getrg(gsmv = gsmvi, cgv = cgvi, dbn = dbn, data.type = "se", metadata = F)
 ```
 ```{r check_se_set, echo = T}
 dim(se.rgi)
@@ -95,8 +95,8 @@ This class conveniently stores signal data, sample metadata, genome annotations,
 
 Alternatively, we can return a list of `data.frame` objects.
 
-```{r get_dflist, echo = T}
-ldat.rgi = getrg(gsmv = gsmvi, dbn = dbn, data.type = "df")
+```{r get_dflist}
+ldat.rgi = getrg(gsmv = gsmvi, dbn = dbn, data.type = "df", metadata = F)
 ```
 ```{r check_dflist, echo = T}
 length(ldat.rgi)
@@ -139,13 +139,15 @@ The IDAT basenames are the unique IDAT filenames excluding the strings "_Red.ida
 rgdl = minfi::read.metharray(basenames = bnv)
 colnames(rgdl) = gsub("_.*", "", colnames(rgdl)) # extract gsm ids
 rgdl = rgdl[rownames(rgdl) %in% cgvi,]
+```
+```{r check_rgdl, echo = T}
 dim(rgdl)
 identical(rownames(rgdl), rownames(se.rgi)) # check that cg addresses match
 ```
 
 We can then check for consistency between the methylation data returned from the `recountmethylation` query and the fresh data downloads.
 
-```{r rg_validate, echo = T}
+```{r rg_validate}
 evalv = c()
 for(c in colnames(rgdl)){
   evalv = c(evalv, identical(as.numeric(minfi::getRed(rgdl[,c])), 
@@ -153,7 +155,9 @@ for(c in colnames(rgdl)){
   evalv = c(evalv, identical(as.numeric(minfi::getGreen(rgdl[,c])), 
                              as.numeric(minfi::getGreen(se.rgi[,c]))))
 }
-table(evalv==TRUE)
+```
+```{r check_rg_eval, echo = T}
+table(evalv == TRUE)
 ```
 
 The packages [`GEOquery`](https://bioconductor.org/packages/release/bioc/html/GEOquery.html) and [`GEOmetadb`](https://www.bioconductor.org/packages/release/bioc/html/GEOmetadb.html) provide additional utilities for data access that can aid with validation.
