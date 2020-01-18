@@ -50,7 +50,6 @@ dsn = "redsignal"
 rs.gsm = rhdf5::h5read(dbn, paste(dsn, "rownames", sep = ".")) # redsignal rownames (gsm ids)
 rs.gsm = gsub("\\..*", "", rs.gsm)
 mdf = mdp[mdp$gsm %in% rs.gsm,]
-unique(unlist(strsplit(mdf$disease, ";"))) # available disease terms
 unique(unlist(strsplit(mdf$tissue, ";"))) # available tissue terms
 
 # get sample id query by tissue term
@@ -82,7 +81,7 @@ DNA methylation signal data can be retrieved in one of two ways using the `recou
 
 ```{r get_se_set}
 # make df list from h5 db query
-se.rgi = getrg(gsmv = gsmvi, cgv = cgvi, dbn = dbn, data.type = "se", metadata = F)
+se.rgi = getrg(gsmv = gsmvi, cgv = cgvi, dbn = dbn, data.type = "se", metadata = T, verbose = F)
 ```
 ```{r check_se_set, echo = T}
 dim(se.rgi)

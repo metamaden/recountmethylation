@@ -178,8 +178,7 @@ getrg = function(gsmv = "random", cgv = "all",
   }
   # append metadata
   if(metadata){
-    mdpost = data.mdpost(dbn = dbn, dsn = md.dsn,
-                         verbose = verbose)
+    mdpost = data.mdpost(dbn = dbn, dsn = md.dsn)
     mdpost$gsm = as.character(mdpost$gsm)
     mdf = mdpost[mdpost$gsm %in% gsmv,]
     ldat[["metadata"]] = mdf
