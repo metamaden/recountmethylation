@@ -112,13 +112,12 @@ rgse = function(ldat, verbose = FALSE){
   }
   anno = c("IlluminaHumanMethylation450k", "ilmn12.hg19")
   names(anno) = c("array", "annotation")
-  rgi = minfi::RGChannelSetExtended(Green = ggf, Red = rgf,
-                                    annotation = anno)
+  rgi = minfi::RGChannelSet(Green = ggf, Red = rgf, annotation = anno)
   if("metadata" %in% names(ldat)){
     if(verbose){
       message("Adding postprocessed metadata as pheno data to SE set...")
     }
-    pData(rgi) = S4Vectors::DataTable(mdf)
+    pData(rgi) = DataFrame(mdf)
   return(rgi)
   }
 }
