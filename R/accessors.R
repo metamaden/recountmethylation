@@ -117,7 +117,7 @@ rgse = function(ldat, verbose = FALSE){
     if(verbose){
       message("Adding postprocessed metadata as pheno data to SE set...")
     }
-    pData(rgi) = S4Vectors::DataFrame(mdf)
+    minfi::pData(rgi) = S4Vectors::DataFrame(mdf)
   }
   return(rgi)
 }
