@@ -118,8 +118,8 @@ rgse = function(ldat, verbose = FALSE){
       message("Adding postprocessed metadata as pheno data to SE set...")
     }
     pData(rgi) = S4Vectors::DataFrame(mdf)
-  return(rgi)
   }
+  return(rgi)
 }
 
 #' Get raw signal data as either a list of `data.frame`'s or an `RGChannelSet` object
