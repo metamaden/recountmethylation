@@ -31,7 +31,7 @@ hread = function(ri, ci, dsn = "redsignal", dbn = "remethdb.h5"){
 #' @param dsn Name or group path to HDF5 dataset containing postprocessed metadata.
 #' @return Postprocessed metadata as a `data.frame`.
 #' @export
-data.mdpost = function(dbn = "remethdb.h5", dsn = "metadata"){
+data.mdpost = function(dbn = "remethdb.h5", dsn = "mdpost"){
   mdp <- as.data.frame(rhdf5::h5read(file = dbn, name = dsn), stringsAsFactors = F)
   colnames(mdp) <- rhdf5::h5read(file = dbn, name = paste(dsn, "colnames", sep = "."))
   return(mdp)
@@ -140,7 +140,7 @@ rgse = function(ldat, verbose = FALSE){
 getrg = function(gsmv = "random", cgv = "all",
                  dbn = "remethdb.h5", data.type = c("se", "df"),
                  dsv = c("redsignal", "greensignal"), metadata = TRUE,
-                 md.dsn = "metadata", verbose = FALSE){
+                 md.dsn = "mdpost", verbose = FALSE){
   # form the datasets list
   if(length(gsmv) == 0 | length(cgv) == 0){
     stop("Invalid GSM or CpG IDs. Check arguments for 'gsmv' and 'cgv'.")
