@@ -14,6 +14,7 @@ Imports:
   rhdf5,
   S4Vectors
 Suggests:
+  Rcpp
   knitr
 VignetteBuilder: knitr
 RoxygenNote: 7.0.2
