@@ -17,4 +17,5 @@ Suggests:
   Rcpp
   knitr
 VignetteBuilder: knitr
+biocViews: DNAMethylation, Epigenetics, Microarray, MethylationArray
 RoxygenNote: 7.0.2
