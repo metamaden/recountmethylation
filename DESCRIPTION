@@ -8,6 +8,7 @@ Authors@R: c(person(c("Sean", "Kenneth"), "Maden", role = c("cre", "aut"),
 Description: Access and analyze data from the recount methylation database.
 License: Artistic-2.0
 Encoding: UTF-8
+BugReports: https://github.com/metamaden/recountmethylation/issues
 LazyData: FALSE
 Imports:
   minfi,
