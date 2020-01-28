@@ -10,7 +10,8 @@ Encoding: UTF-8
 LazyData: true
 Imports:
   minfi,
-  rhdf5
+  rhdf5,
+  S4Vectors
 Suggests:
   knitr
 VignetteBuilder: knitr
