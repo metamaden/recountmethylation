@@ -128,8 +128,8 @@ rgse = function(ldat, verbose = FALSE){
 #' Retrieves query matches from raw signal HDF5 datasets. Handles identity queries to rows (GSM IDs) or columns (CpG probe addresses). Returns query matches either as a list of 2 `data.frame`s or a signle `RGChannelSet` object.
 #'
 #' @param dbn Name of the HDF5 database file.
-#' @param gsmv Vector valid GSM IDs (rows) to query in the raw signal datasets.
-#' @param cgv Vector of valid CpG probe addresses (columns) to query in the raw signal datasets.
+#' @param gsmv Vector valid GSM IDs (rows) to query in the raw signal datasets. If 'all', selects all available GSM IDs.
+#' @param cgv Vector of valid CpG probe addresses (columns) to query in the raw signal datasets. If 'all', selects all probe IDs.
 #' @param data.type Format for returned query matches, either as datasets 'df' or `RGChannelSet` 'se' object.
 #' @param dsv Vector of raw signal datasets or group paths to query, including both the red channel 'redsignal' and green channel 'greensignal' datasets.
 #' @param metadata Whether to access available postprocessed metadata for queries samples.
@@ -137,13 +137,19 @@ rgse = function(ldat, verbose = FALSE){
 #' @param verbose Whether to post status messages.
 #' @return Returns either an `RGChannelSet` or list of `data.frame` objects from dataset query matches.
 #' @export
-getrg = function(gsmv = "random", cgv = "all",
+getrg = function(gsmv = "all", cgv = "all",
                  dbn = "remethdb.h5", data.type = c("se", "df"),
                  dsv = c("redsignal", "greensignal"), metadata = TRUE,
                  md.dsn = "mdpost", verbose = FALSE){
   # form the datasets list
   if(length(gsmv) == 0 | length(cgv) == 0){
     stop("Invalid GSM or CpG IDs. Check arguments for 'gsmv' and 'cgv'.")
+  }
+  if(gsmv == "all" & cgv == "all"){
+    stop("Too many samples and probes selected, please set gsmv or cgv so that it is not 'all'."
+  }
+  if(!gsmv == "all" & length(gsmv) < 2){
+    stop("Not enough GSM IDs in query, please designate at least 2 valid IDs or set gsmv to `all`.")
   }
   ldat <- list()
   for(d in dsv){
@@ -160,10 +166,13 @@ getrg = function(gsmv = "random", cgv = "all",
       } else{
         cgvp <- which(cnd %in% cgv)
       }
-      if(gsmv == "random"){
-        gsmvp <- sample(length(rnd), 5)
+      if(gsmv == "all"){
+        gsmvp = seq(1, length(rnd), 1)
       } else{
         gsmvp <- which(rnd %in% gsmv)
+        if(length(gsmvp) < 2){
+          stop("Not enough queries GSM IDs detected in signal matrix, please query at least 2 valid IDs or set gsmv to `all`.")
+        }
       }
       # get data matrix
       ddat <- hread(ri = gsmvp, ci = cgvp, d, dbn)
