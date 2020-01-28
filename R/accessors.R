@@ -31,7 +31,7 @@ hread = function(ri, ci, dsn = "redsignal", dbn = "remethdb.h5"){
 #' @param dsn Name or group path to HDF5 dataset containing postprocessed metadata.
 #' @return Postprocessed metadata as a `data.frame`.
 #' @export
-data.mdpost = function(dbn = "remethdb.h5", dsn = "mdpost"){
+data_mdpost = function(dbn = "remethdb.h5", dsn = "mdpost"){
   mdp <- as.data.frame(rhdf5::h5read(file = dbn, name = dsn), stringsAsFactors = F)
   colnames(mdp) <- rhdf5::h5read(file = dbn, name = paste(dsn, "colnames", sep = "."))
   return(mdp)
@@ -187,7 +187,7 @@ getrg = function(gsmv = "all", cgv = "all",
   }
   # append metadata
   if(metadata){
-    mdpost <- data.mdpost(dbn = dbn, dsn = md.dsn)
+    mdpost <- data_mdpost(dbn = dbn, dsn = md.dsn)
     mdpost$gsm <- as.character(mdpost$gsm)
     mdf <- mdpost[mdpost$gsm %in% gsmv,]
     ldat[["metadata"]] <- mdf
