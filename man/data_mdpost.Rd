@@ -2,9 +2,9 @@
 % Please edit documentation in R/accessors.R
 \name{data_mdpost}
 \alias{data_mdpost}
-\title{Retrieve samples metadata.}
+\title{Query and store sample metadata.}
 \usage{
-data_mdpost(dbn = "remethdb.h5", dsn = "mdpost")
+data_mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
 }
 \arguments{
 \item{dbn}{Path to HDF5 database file.}
@@ -16,4 +16,11 @@ Postprocessed metadata as a `data.frame`.
 }
 \description{
 Retrieves sample postprocessed metadata from an HDF5 database.
+}
+\examples{
+# get all available sample metadata
+mdp <- data_mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
+}
+\seealso{
+hread()
 }

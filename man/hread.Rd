@@ -2,9 +2,9 @@
 % Please edit documentation in R/accessors.R
 \name{hread}
 \alias{hread}
-\title{Connect to an HDF5 dataset file.}
+\title{Query and store an HDF5 dataset on row and column indices.}
 \usage{
-hread(ri, ci, dsn = "redsignal", dbn = "remethdb.h5")
+hread(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5")
 }
 \arguments{
 \item{ri}{rows indices in dataset.}
@@ -19,5 +19,12 @@ hread(ri, ci, dsn = "redsignal", dbn = "remethdb.h5")
 HDF5 database connection object.
 }
 \description{
-Get a dataset connection object from an HDF5 database ('.h5') file.
+Get a dataset connection object from an HDF5 database ('.h5') file and return the indexed table subset.
+}
+\examples{
+# get red signal for first 2 probe addresses, first 3 samples
+st <- hread(1:3, 1:2, d = "redsignal", dbn = "remethdb2.h5")
+}
+\seealso{
+data_mdpost
 }

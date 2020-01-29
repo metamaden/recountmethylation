@@ -6,9 +6,9 @@
 # HDF5 connection utilities
 #--------------------------
 
-#' Connect to an HDF5 dataset file.
+#' Query and store an HDF5 dataset on row and column indices.
 #'
-#' Get a dataset connection object from an HDF5 database ('.h5') file.
+#' Get a dataset connection object from an HDF5 database ('.h5') file and return the indexed table subset.
 #' @param ri rows indices in dataset.
 #' @param ci columns indices in dataset.
 #' @param dsn Name of dataset or group of dataset to connect with.
@@ -17,16 +17,17 @@
 #' @examples 
 #' # get red signal for first 2 probe addresses, first 3 samples
 #' st <- hread(1:3, 1:2, d = "redsignal", dbn = "remethdb2.h5")
+#' @seealso data_mdpost
 #' @export
 hread = function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
   return(rhdf5::h5read(dbn, dsn, index = list(ri, ci)))
 }
 
-#---------------------------------
-# Query and retrieve HDF5 datasets
-#---------------------------------
+#--------------------------
+# Query the sample metadata
+#--------------------------
 
-#' Retrieve samples metadata.
+#' Query and store sample metadata.
 #'
 #' Retrieves sample postprocessed metadata from an HDF5 database.
 #'
@@ -36,6 +37,7 @@ hread = function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
 #' @examples 
 #' # get all available sample metadata
 #' mdp <- data_mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
+#' @seealso hread()
 #' @export
 data_mdpost = function(dbn = "remethdb2.h5", dsn = "mdpost"){
   mdp <- as.data.frame(rhdf5::h5read(file = dbn, name = dsn), stringsAsFactors = F)
@@ -47,9 +49,9 @@ data_mdpost = function(dbn = "remethdb2.h5", dsn = "mdpost"){
 # Get SummarizedExperiment objects from dataset queries
 #-------------------------------------------------------
 
-#' Form an object of class `RGChannelSet` from a raw signal dataset query
+#' Form an `RGChannelSet` from a signal table query
 #'
-#' Forms a `RGChannelSet` object from an HDF5 databse file query to the red and green raw signal tables. See `getrg()` function for implementation.
+#' Forms an object of `RGChannelSet` class from a query to the red and green signal tables.
 #'
 #' @param ldat List of raw signal data query results. Must include 2 `data.frame` objects named 'redsignal' and 'greensignal'.
 #' @param verbose Whether to post status messages.
@@ -57,8 +59,10 @@ data_mdpost = function(dbn = "remethdb2.h5", dsn = "mdpost"){
 #' @examples 
 #' # get the list of datasets for all probe addresses, 3 samples
 #' ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), data.type = "df", metadata = F)
+#' 
 #' # get the rg set object
 #' rg = rgse(ldat)
+#' @seealso getrg()
 #' @export
 rgse = function(ldat, verbose = FALSE){
   if(!("greensignal" %in% names(ldat) & "redsignal" %in% names(ldat))){
@@ -134,7 +138,7 @@ rgse = function(ldat, verbose = FALSE){
   return(rgi)
 }
 
-#' Get raw signal data as either a list of `data.frame`'s or an `RGChannelSet` object
+#' Query and store data from the signal tables
 #'
 #' Retrieves query matches from raw signal HDF5 datasets. Handles identity queries to rows (GSM IDs) or columns (CpG probe addresses). Returns query matches either as a list of 2 `data.frame`s or a signle `RGChannelSet` object.
 #'
@@ -148,10 +152,12 @@ rgse = function(ldat, verbose = FALSE){
 #' @param verbose Whether to post status messages.
 #' @return Returns either an `RGChannelSet` or list of `data.frame` objects from dataset query matches.
 #' @examples
-#' # get all probe addresses for 3 samples as a list of tables
+#' # get list of data tables for a query
 #' ldat = ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), data.type = "df", metadata = T)
-#' # get all probe addresses for 3 samples as an RGChannel set
+#' 
+#' # get the RGChannel set object for a query
 #' ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), data.type = "se", metadata = T)
+#' @seealso rgse
 #' @export
 getrg = function(gsmv = "all", cgv = "all",
                  dbn = "remethdb2.h5", data.type = c("se", "df"),

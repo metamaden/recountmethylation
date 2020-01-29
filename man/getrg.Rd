@@ -2,12 +2,12 @@
 % Please edit documentation in R/accessors.R
 \name{getrg}
 \alias{getrg}
-\title{Get raw signal data as either a list of `data.frame`'s or an `RGChannelSet` object}
+\title{Query and store data from the signal tables}
 \usage{
 getrg(
   gsmv = "all",
   cgv = "all",
-  dbn = "remethdb.h5",
+  dbn = "remethdb2.h5",
   data.type = c("se", "df"),
   dsv = c("redsignal", "greensignal"),
   metadata = TRUE,
@@ -37,4 +37,14 @@ Returns either an `RGChannelSet` or list of `data.frame` objects from dataset qu
 }
 \description{
 Retrieves query matches from raw signal HDF5 datasets. Handles identity queries to rows (GSM IDs) or columns (CpG probe addresses). Returns query matches either as a list of 2 `data.frame`s or a signle `RGChannelSet` object.
+}
+\examples{
+# get list of data tables for a query
+ldat = ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), data.type = "df", metadata = T)
+
+# get the RGChannel set object for a query
+ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), data.type = "se", metadata = T)
+}
+\seealso{
+rgse
 }
