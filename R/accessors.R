@@ -14,8 +14,11 @@
 #' @param dsn Name of dataset or group of dataset to connect with.
 #' @param dbn Path to h5 database file.
 #' @return HDF5 database connection object.
+#' @examples 
+#' # get red signal for first 2 probe addresses, first 3 samples
+#' st <- hread(1:3, 1:2, d = "redsignal", dbn = "remethdb2.h5")
 #' @export
-hread = function(ri, ci, dsn = "redsignal", dbn = "remethdb.h5"){
+hread = function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
   return(rhdf5::h5read(dbn, dsn, index = list(ri, ci)))
 }
 
@@ -30,8 +33,11 @@ hread = function(ri, ci, dsn = "redsignal", dbn = "remethdb.h5"){
 #' @param dbn Path to HDF5 database file.
 #' @param dsn Name or group path to HDF5 dataset containing postprocessed metadata.
 #' @return Postprocessed metadata as a `data.frame`.
+#' @examples 
+#' # get all available sample metadata
+#' mdp <- data_mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
 #' @export
-data_mdpost = function(dbn = "remethdb.h5", dsn = "mdpost"){
+data_mdpost = function(dbn = "remethdb2.h5", dsn = "mdpost"){
   mdp <- as.data.frame(rhdf5::h5read(file = dbn, name = dsn), stringsAsFactors = F)
   colnames(mdp) <- rhdf5::h5read(file = dbn, name = paste(dsn, "colnames", sep = "."))
   return(mdp)
@@ -48,6 +54,11 @@ data_mdpost = function(dbn = "remethdb.h5", dsn = "mdpost"){
 #' @param ldat List of raw signal data query results. Must include 2 `data.frame` objects named 'redsignal' and 'greensignal'.
 #' @param verbose Whether to post status messages.
 #' @return Returns a `RGChannelSet` object from raw signal dataset queries.
+#' @examples 
+#' # get the list of datasets for all probe addresses, 3 samples
+#' ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), data.type = "df", metadata = F)
+#' # get the rg set object
+#' rg = rgse(ldat)
 #' @export
 rgse = function(ldat, verbose = FALSE){
   if(!("greensignal" %in% names(ldat) & "redsignal" %in% names(ldat))){
@@ -136,9 +147,14 @@ rgse = function(ldat, verbose = FALSE){
 #' @param md.dsn Name of metadata dataset in h5 file.
 #' @param verbose Whether to post status messages.
 #' @return Returns either an `RGChannelSet` or list of `data.frame` objects from dataset query matches.
+#' @examples
+#' # get all probe addresses for 3 samples as a list of tables
+#' ldat = ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), data.type = "df", metadata = T)
+#' # get all probe addresses for 3 samples as an RGChannel set
+#' ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), data.type = "se", metadata = T)
 #' @export
 getrg = function(gsmv = "all", cgv = "all",
-                 dbn = "remethdb.h5", data.type = c("se", "df"),
+                 dbn = "remethdb2.h5", data.type = c("se", "df"),
                  dsv = c("redsignal", "greensignal"), metadata = TRUE,
                  md.dsn = "mdpost", verbose = FALSE){
   # form the datasets list

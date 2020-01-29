@@ -2,49 +2,65 @@
 title: 'Vignette for the `recountmethylation` R package: data retrieval, queries,
   validation, and preprocessing'
 output:
-  pdf_document: default
   html_document:
+    toc: true
     df_print: paged
+  pdf_document: default
 vignette: |
+  % \VignetteDepends{RCurl}
   %\VignetteEngine{knitr::knitr} %\VignetteIndexEntry{Title of your vignette} %\usepackage[UTF-8]{inputenc}
 ---
 
 ```{r setup, include = FALSE, eval = TRUE}
 library(recountmethylation)
-knitr::opts_chunk$set(eval = TRUE, echo = FALSE)
+knitr::opts_chunk$set(eval = TRUE, echo = TRUE, warning = FALSE, message = FALSE)
 ```
 
-This is the vignette for the package `recountmethylation`. This document uses the test database, `remethdbtest.h5` for expediency in illustrative examples. The full database file, `remethdb.h5`, is available for access or download online (see the package Bioconductor page for details).
+This is the vignette for the R package `recountmethylation`, which provides utilities to access DNAm array data from Recount Methylation. Please see the affiliated manuscript for a thorough characterization of this dataset.
 
-# Overview
+# Introduction
 
-This package provides accessor functions to query and work with objects in the `recountmethylation` database file, `remethdb.h5`. The database stores relatively large red- and green-channel raw signal tables in [hierarchical data format](https://www.hdfgroup.org/), or "HDF5". These signal tables are extracted directly from IDAT files for DNA methylation samples run using the Illumina HM450k array platform. DNA methylation arrays were accessed from the [Gene Expression Omnibus](https://www.ncbi.nlm.nih.gov/geo/) via the GEO Data Sets database. 
+This package provides accessor functions to query Recount Methylation database file, `remethdb2.h5`. The database stores relatively large red- and green-channel raw signal tables in [hierarchical data format](https://www.hdfgroup.org/), or "HDF5". These DNAm signal tables are extracted directly from IDAT files generated using the Illumina HM450k array DNAm array platform. DNAm arrays were accessed from the [Gene Expression Omnibus](https://www.ncbi.nlm.nih.gov/geo/) via the GEO Data Sets database.
 
-To construct sample queries, the database includes sample metadata learned from GEO GSE [SOFT](https://www.ncbi.nlm.nih.gov/geo/info/soft.html) files. Several convenience functions assist with querying and accessing the database files, and returned objects can be either of class `data.frame`s or `RGChannelSet`, which is a special data class for DNA methylation arrays inheriting from the `SummarizedExperiment` class.
+To help inform sample queries, the HDF5 database includes a sample metadata table learned from GEO GSE [SOFT](https://www.ncbi.nlm.nih.gov/geo/info/soft.html) files. When specifying samples whose DNAm data to return, several arguments assist with querying and accessing the database files. For instance, returned objects can be either of class `data.frame`s or `RGChannelSet`, which is a type of DNAm `SummarizedExperiment` object class.
 
-While this package can aid and expand research capabilities for published HM450k data, this resource is intended primarily for exploratory and discovery analyses. Users should cross-check their findings with study-level metadata, methods, and supplement for consistency and completion. Please see the affiliated manuscript for details and critical analysis of this dataset.
+The `recountmethylation` R package can aid and expand research capabilities in epigenetics, it is intended primarily for initial discovery and exploration of published data. Users should cross-check their findings with study-level metadata, methods, and supplement for consistency and completion.
+
+# Installation
+
+The `recountmethylation` package can be installed from GitHub using 
+
+```{r gh install, eval = F}
+require(devtools); install_github("metamaden/recountmethylation")
+```
+
 
 # Data access
-We first define a pointer for the database to access. Here, we assume the `remethdb_test.h5` file is in the current working directory. We then summarize the test database contents as follows:
 
-```{r h5_details, echo = T}
-dbn = "remethdbtest.h5" # path to h5 db
+We need to provide the name of the database file with extension `.h5`. The entire Recount Methylation HDF5 database file, called `remethdb2.h5`, is available for download [here](https://recount.bio/data/remethdb2.h5). 
+
+For this vignette, we used a small test dataset from the dedicated repo on [GitHub](https://github.com/metamaden/recountmethylation_packagedata/), called `remethdbtest.h5`. This test dataset contains DNAm red and green signal from 30 samples at just the chromosome 22 probes. We assume this file has been downloaded to the current directory.
+
+```{r h5_details}
+url = "https://github.com/metamaden/recountmethylation_packagedata/raw/master/remethdbtest.h5"
+dbn = "remethdbtest.h5" # db name
+download.file(url, dbn)
 rhdf5::h5ls(dbn)
 ```
 
-Note datasets are stored with separate row and column name entities, denoted as "[dataset].[row/column]names", and each object has homogenous data format (e.g. signal datasets of type `float`, row and column names and metadata as type `character`).
+Datasets include separate entities for row and column names of each matrix, denoted as "[dataset].[row/column]names". Data contained in each respective object has a single format (e.g. `FLOAT`, `STRING`, etc.), where row and column names as well as the metadata table are of type `STRING`).
 
 We can quickly access the entire metadata table for sample queries:
 
-```{r get_gsm_metadata, echo = T}
+```{r get_gsm_metadata}
 # get full gsm metadata
-mdp = data.mdpost(dbn)
+mdp = data_mdpost(dbn, dsn = "mdpost")
 dim(mdp)
 ```
 
 The test dataset contains a small subset of the data available in recount methylation. We can check available sample types and construct a sample query as follows:
 
-```{r make_gsm_query, echo = T}
+```{r make_gsm_query}
 # check which samples available in h5 db
 dsn = "redsignal"
 rs.gsm = rhdf5::h5read(dbn, paste(dsn, "rownames", sep = ".")) # redsignal rownames (gsm ids)
@@ -63,13 +79,13 @@ gsmvi = mdf$gsm[which.gsm]
 
 Next, we can query a subset of the available array probes based on location. Here, our query selects only probes located on chromosome 9:
 
-```{r make_cg_query, echo = F}
+```{r make_cg_query}
 anno.name = "IlluminaHumanMethylation450kanno.ilmn12.hg19"
 man = eval(parse(text = paste(anno.name, "Manifest", sep = "::")))
 loc = eval(parse(text = paste(anno.name, "Locations", sep = "::")))
 identical(rownames(loc), rownames(man))
 
-chrname = "chr9"
+chrname = "chr22"
 cgfilt = rownames(loc[grepl(paste0("^", chrname, "$"), loc$chr),])
 cgvi = unique(c(man[cgfilt,]$AddressA, man[cgfilt,]$AddressB))
 ```
@@ -83,7 +99,7 @@ DNA methylation signal data can be retrieved in one of two ways using the `recou
 # make df list from h5 db query
 se.rgi = getrg(gsmv = gsmvi, cgv = cgvi, dbn = dbn, data.type = "se", metadata = T, verbose = F)
 ```
-```{r check_se_set, echo = T}
+```{r check_se_set}
 dim(se.rgi)
 dim(minfi::pData(se.rgi))
 dim(minfi::getRed(se.rgi))
@@ -95,9 +111,9 @@ This class conveniently stores signal data, sample metadata, genome annotations,
 Alternatively, we can return a list of `data.frame` objects.
 
 ```{r get_dflist}
-ldat.rgi = getrg(gsmv = gsmvi, dbn = dbn, data.type = "df", metadata = F)
+ldat.rgi = getrg(gsmv = gsmvi, dbn = dbn, data.type = "df", metadata = T, verbose = F)
 ```
-```{r check_dflist, echo = T}
+```{r check_dflist}
 length(ldat.rgi)
 dim(ldat.rgi[["redsignal"]])
 dim(ldat.rgi[["metadata"]])
@@ -118,7 +134,10 @@ for(gsmi in gsmvi){
                  substr(gsmi, 1, nchar(gsmi)-3), 
                  paste(rep("n", 3), collapse = ""), 
                  "/", gsmi, "/suppl/")
-  fn = RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE) # get urls to idats
+  # get urls to idats
+  if(require(RCurl)){
+    fn = RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE) 
+  }
   fn <- unlist(strsplit(fn, "\n"))
   fn = unlist(fn)[grepl("\\.idat\\.gz", fn)] # retain valid idat paths
   bnv = c(bnv, unique(gsub("_Red.*|_Grn.*", "", fn))) # retain idat basenames
@@ -139,7 +158,7 @@ rgdl = minfi::read.metharray(basenames = bnv)
 colnames(rgdl) = gsub("_.*", "", colnames(rgdl)) # extract gsm ids
 rgdl = rgdl[rownames(rgdl) %in% cgvi,]
 ```
-```{r check_rgdl, echo = T}
+```{r check_rgdl}
 dim(rgdl)
 identical(rownames(rgdl), rownames(se.rgi)) # check that cg addresses match
 ```
@@ -155,7 +174,7 @@ for(c in colnames(rgdl)){
                              as.numeric(minfi::getGreen(se.rgi[,c]))))
 }
 ```
-```{r check_rg_eval, echo = T}
+```{r check_rg_eval}
 table(evalv == TRUE)
 ```
 

@@ -16,7 +16,7 @@ Imports:
   rhdf5,
   S4Vectors
 Suggests:
-  Rcpp,
+  RCurl,
   knitr
 VignetteBuilder: knitr
 biocViews: DNAMethylation, Epigenetics, Microarray, MethylationArray

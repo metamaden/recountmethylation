@@ -1,6 +1,10 @@
-Changes in version 0.01.0 (2020-01-29)
-+ Adds key query/accessor functions
-+ Adds vignette for
-  o Accessing HDF5 database objects
-  o Example queries on small test db
-  o Example validation with fresh GSM IDAT downloads
+\name{recountmethylationnews}
+\title{Recountmethylation News}
+\encoding{UTF-8}
+
+\section{Version 0.01}{
+  \itemize{
+    \item {v0.01.0} Added key query/accessor functions.
+    \item Added package vignette.
+  }
+}
