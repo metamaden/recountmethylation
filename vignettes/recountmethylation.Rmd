@@ -1,5 +1,5 @@
 ---
-title: 'Vignette for `recountmethylation`: basic data retrieval, queries,
+title: 'Vignette for the `recount-methylation` R package: data retrieval, queries,
   validation, and preprocessing'
 output:
   pdf_document: default
