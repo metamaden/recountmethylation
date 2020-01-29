@@ -1,5 +1,5 @@
 ---
-title: 'Vignette for the `recount-methylation` R package: data retrieval, queries,
+title: 'Vignette for the `recountmethylation` R package: data retrieval, queries,
   validation, and preprocessing'
 output:
   pdf_document: default
@@ -14,7 +14,7 @@ library(recountmethylation)
 knitr::opts_chunk$set(eval = TRUE, echo = FALSE)
 ```
 
-This is the vignette for the package `recountmethylation`. This document uses the test database, `remethdb_test.h5` for expediency in illustrative examples. The full database file, `remethdb.h5`, is available for access or download online (see the package Bioconductor page for details).
+This is the vignette for the package `recountmethylation`. This document uses the test database, `remethdbtest.h5` for expediency in illustrative examples. The full database file, `remethdb.h5`, is available for access or download online (see the package Bioconductor page for details).
 
 # Overview
 
