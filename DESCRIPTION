@@ -3,8 +3,8 @@ Version: 0.01.0
 Title: Access and analyze the recount methylation database
 Authors@R: c(person(c("Sean", "Kenneth"), "Maden", role = c("cre", "aut"),
                     email = "maden@ohsu.edu", comment = c(ORCID = "0000-0002-2212-4894")),
-             person("Abhi", "Nellore", role = c("cre", "aut"), email = "nellore@ohsu.edu"),
-             person("Kasper", "Hansen", role = c("aut"))
+             person("Abhi", "Nellore", role = "aut", email = "nellore@ohsu.edu"),
+             person("Kasper", "Hansen", role = "aut"))
 Description: Access and analyze data from the recount methylation database.
 License: Artistic-2.0
 Encoding: UTF-8
@@ -16,7 +16,7 @@ Imports:
   rhdf5,
   S4Vectors
 Suggests:
-  Rcpp
+  Rcpp,
   knitr
 VignetteBuilder: knitr
 biocViews: DNAMethylation, Epigenetics, Microarray, MethylationArray

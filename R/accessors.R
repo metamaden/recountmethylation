@@ -146,7 +146,7 @@ getrg = function(gsmv = "all", cgv = "all",
     stop("Invalid GSM or CpG IDs. Check arguments for 'gsmv' and 'cgv'.")
   }
   if(gsmv == "all" & cgv == "all"){
-    stop("Too many samples and probes selected, please set gsmv or cgv so that it is not 'all'."
+    stop("Too many samples and probes selected, please set gsmv or cgv so that it is not 'all'.")
   }
   if(!gsmv == "all" & length(gsmv) < 2){
     stop("Not enough GSM IDs in query, please designate at least 2 valid IDs or set gsmv to `all`.")
