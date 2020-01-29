@@ -16,15 +16,19 @@ getrg(
 )
 }
 \arguments{
-\item{gsmv}{Vector valid GSM IDs (rows) to query in the raw signal datasets. If 'all', selects all available GSM IDs.}
+\item{gsmv}{Vector valid GSM IDs (rows) to query in the raw signal datasets. 
+If 'all', selects all available GSM IDs.}
 
-\item{cgv}{Vector of valid CpG probe addresses (columns) to query in the raw signal datasets. If 'all', selects all probe IDs.}
+\item{cgv}{Vector of valid CpG probe addresses (columns) to query in the raw 
+signal datasets. If 'all', selects all probe IDs.}
 
 \item{dbn}{Name of the HDF5 database file.}
 
-\item{data.type}{Format for returned query matches, either as datasets 'df' or `RGChannelSet` 'se' object.}
+\item{data.type}{Format for returned query matches, either as datasets 
+'df' or `RGChannelSet` 'se' object.}
 
-\item{dsv}{Vector of raw signal datasets or group paths to query, including both the red channel 'redsignal' and green channel 'greensignal' datasets.}
+\item{dsv}{Vector of raw signal datasets or group paths to query, including 
+both the red channel 'redsignal' and green channel 'greensignal' datasets.}
 
 \item{metadata}{Whether to access available postprocessed metadata for queries samples.}
 
@@ -33,17 +37,23 @@ getrg(
 \item{verbose}{Whether to post status messages.}
 }
 \value{
-Returns either an `RGChannelSet` or list of `data.frame` objects from dataset query matches.
+Returns either an `RGChannelSet` or list of `data.frame` objects 
+from dataset query matches.
 }
 \description{
-Retrieves query matches from raw signal HDF5 datasets. Handles identity queries to rows (GSM IDs) or columns (CpG probe addresses). Returns query matches either as a list of 2 `data.frame`s or a signle `RGChannelSet` object.
+Retrieves query matches from raw signal HDF5 datasets. Handles identity 
+queries to rows (GSM IDs) or columns (CpG probe addresses). Returns 
+query matches either as a list of 2 `data.frame`s or a single 
+`RGChannelSet` object.
 }
 \examples{
 # get list of data tables for a query
-ldat = ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), data.type = "df", metadata = T)
+ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"),
+            data.type = "df", metadata = TRUE)
 
 # get the RGChannel set object for a query
-ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), data.type = "se", metadata = T)
+rgset = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), 
+             data.type = "se", metadata = TRUE)
 }
 \seealso{
 rgse()

@@ -7,7 +7,8 @@
 rgse(ldat, verbose = FALSE)
 }
 \arguments{
-\item{ldat}{List of raw signal data query results. Must include 2 `data.frame` objects named 'redsignal' and 'greensignal'.}
+\item{ldat}{List of raw signal data query results. Must include 2 
+`data.frame` objects named 'redsignal' and 'greensignal'.}
 
 \item{verbose}{Whether to post status messages.}
 }
@@ -15,11 +16,13 @@ rgse(ldat, verbose = FALSE)
 Returns a `RGChannelSet` object from raw signal dataset queries.
 }
 \description{
-Forms an object of `RGChannelSet` class from a query to the red and green signal tables.
+Forms an object of `RGChannelSet` class from a query to the red 
+and green signal tables.
 }
 \examples{
 # get the list of datasets for all probe addresses, 3 samples
-ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), data.type = "df", metadata = F)
+ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), 
+data.type = "df", metadata = FALSE)
 
 # get the rg set object
 rg = rgse(ldat)

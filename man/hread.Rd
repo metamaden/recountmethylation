@@ -19,7 +19,8 @@ hread(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5")
 HDF5 database connection object.
 }
 \description{
-Get a dataset connection object from an HDF5 database ('.h5') file and return the indexed table subset.
+Get a dataset connection object from an HDF5 database 
+('.h5') file and return the indexed table subset.
 }
 \examples{
 # get red signal for first 2 probe addresses, first 3 samples

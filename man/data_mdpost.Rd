@@ -9,7 +9,8 @@ data_mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
 \arguments{
 \item{dbn}{Path to HDF5 database file.}
 
-\item{dsn}{Name or group path to HDF5 dataset containing postprocessed metadata.}
+\item{dsn}{Name or group path to HDF5 dataset containing 
+postprocessed metadata.}
 }
 \value{
 Postprocessed metadata as a `data.frame`.
