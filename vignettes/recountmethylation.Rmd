@@ -1,22 +1,30 @@
 ---
-title: 'Vignette for the `recountmethylation` R package: data retrieval, queries,
-  validation, and preprocessing'
+title: "User's Guide for `recountmethylation`"
+author:
+  - Sean K. Maden
+  - Abhinav Nellore
+package: recountmethylation
+abstract: >
+  This is the user's guide for the `recountmethylation` R package, which provides utilities to   
+  access DNAm array data from Recount   Methylation. Topics discussed include accessing the HDF5 
+  dataset, querying the dataset, and storing retrieved data as     SummarizedExperiment-like 
+  objects. You may find additional information and characterization of samples in RecountMethylation
+  in the affiliated manuscript.
+vignette: >
+  % \VignetteDepends{RCurl}
+  %\VignetteEngine{knitr::knitr} 
+  %\VignetteIndexEntry{recountmethylation user's guide} 
+  %\usepackage[UTF-8]{inputenc}
 output:
   html_document:
     toc: true
-    df_print: paged
   pdf_document: default
-vignette: |
-  % \VignetteDepends{RCurl}
-  %\VignetteEngine{knitr::knitr} %\VignetteIndexEntry{Title of your vignette} %\usepackage[UTF-8]{inputenc}
 ---
 
 ```{r setup, include = FALSE, eval = TRUE}
 library(recountmethylation)
 knitr::opts_chunk$set(eval = TRUE, echo = TRUE, warning = FALSE, message = FALSE)
 ```
-
-This is the vignette for the R package `recountmethylation`, which provides utilities to access DNAm array data from Recount Methylation. Please see the affiliated manuscript for a thorough characterization of this dataset.
 
 # Introduction
 
