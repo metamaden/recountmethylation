@@ -17,7 +17,7 @@
 #' @examples 
 #' # get red signal for first 2 probe addresses, first 3 samples
 #' st <- hread(1:3, 1:2, d = "redsignal", dbn = "remethdb2.h5")
-#' @seealso data_mdpost
+#' @seealso data_mdpost()
 #' @export
 hread = function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
   return(rhdf5::h5read(dbn, dsn, index = list(ri, ci)))
@@ -157,7 +157,7 @@ rgse = function(ldat, verbose = FALSE){
 #' 
 #' # get the RGChannel set object for a query
 #' ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), data.type = "se", metadata = T)
-#' @seealso rgse
+#' @seealso rgse()
 #' @export
 getrg = function(gsmv = "all", cgv = "all",
                  dbn = "remethdb2.h5", data.type = c("se", "df"),

@@ -46,5 +46,5 @@ ldat = ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), data.typ
 ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), data.type = "se", metadata = T)
 }
 \seealso{
-rgse
+rgse()
 }

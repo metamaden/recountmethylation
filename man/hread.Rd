@@ -26,5 +26,5 @@ Get a dataset connection object from an HDF5 database ('.h5') file and return th
 st <- hread(1:3, 1:2, d = "redsignal", dbn = "remethdb2.h5")
 }
 \seealso{
-data_mdpost
+data_mdpost()
 }
