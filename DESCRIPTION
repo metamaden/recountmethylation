@@ -1,4 +1,4 @@
-Package: recount-methylation
+Package: recountmethylation
 Version: 0.01.0
 Title: Access and analyze the Recount Methylation database
 Authors@R: c(person(c("Sean", "Kenneth"), "Maden", role = c("cre", "aut"),
@@ -8,8 +8,8 @@ Authors@R: c(person(c("Sean", "Kenneth"), "Maden", role = c("cre", "aut"),
 Description: Access and analyze data from the recount methylation database.
 License: Artistic-2.0
 Encoding: UTF-8
-URL: https://github.com/metamaden/recount-methylation
-BugReports: https://github.com/metamaden/recount-methylation/issues
+URL: https://github.com/metamaden/recountmethylation
+BugReports: https://github.com/metamaden/recountmethylation/issues
 LazyData: FALSE
 Imports:
   minfi,
