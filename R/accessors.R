@@ -1,10 +1,10 @@
 #!/usr/bin/env R
 
-# Access recount-methylation HDF5 database.
+#    Access recount-methylation HDF5 database.
 
-#--------------------------
-# HDF5 connection utilities
-#--------------------------
+#-----------------------------
+#    HDF5 connection utilities
+#-----------------------------
 
 #' Query and store an HDF5 dataset on row and column indices.
 #'
@@ -20,13 +20,13 @@
 #' st <- hread(1:3, 1:2, d = "redsignal", dbn = "remethdb2.h5")
 #' @seealso data_mdpost()
 #' @export
-hread = function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
+hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
     return(rhdf5::h5read(dbn, dsn, index = list(ri, ci)))
 }
 
-#--------------------------
-# Query the sample metadata
-#--------------------------
+#-----------------------------
+#    Query the sample metadata
+#-----------------------------
 
 #' Query and store sample metadata.
 #'
@@ -41,7 +41,7 @@ hread = function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
 #' mdp <- data_mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
 #' @seealso hread()
 #' @export
-data_mdpost = function(dbn = "remethdb2.h5", dsn = "mdpost"){
+data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
     mdp <- as.data.frame(rhdf5::h5read(file = dbn, name = dsn),
         stringsAsFactors = FALSE)
     mcn <- paste(dsn, "colnames", sep = ".")
@@ -49,9 +49,9 @@ data_mdpost = function(dbn = "remethdb2.h5", dsn = "mdpost"){
     return(mdp)
 }
 
-#-------------------------------------------------------
-# Get SummarizedExperiment objects from dataset queries
-#-------------------------------------------------------
+#---------------------------------------------------------
+#    Get SummarizedExperiment objects from dataset queries
+#---------------------------------------------------------
 
 #' Form an `RGChannelSet` from a signal table query
 #'
@@ -64,33 +64,33 @@ data_mdpost = function(dbn = "remethdb2.h5", dsn = "mdpost"){
 #' @return Returns a `RGChannelSet` object from raw signal dataset queries.
 #' @examples 
 #' # get the list of datasets for all probe addresses, 3 samples
-#' ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), 
-#' data.type = "df", metadata = FALSE)
+#' gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
+#' ldat = getrg(gsmv = gsml, data.type = "df", metadata = FALSE)
 #' 
 #' # get the rg set object
 #' rg = rgse(ldat)
 #' @seealso getrg()
 #' @export
-rgse = function(ldat, verbose = FALSE){
+rgse <- function(ldat, verbose = FALSE){
     if(!("greensignal" %in% names(ldat) & "redsignal" %in% names(ldat))){
         stop(paste0("Invalid datasets list passed."))
     }
     if(verbose){message("Matching probe IDs in signal matrices...")}
     rga <- ldat[["redsignal"]]; gga <- ldat[["greensignal"]]
     addrv <- unique(c(rownames(rga), rownames(gga))) # get CpG addresses
-    rgs <- rga[rownames(rga) %in% addrv, ]; 
+    rgs <- rga[rownames(rga) %in% addrv, ]
     rgs <- rgs[order(match(rownames(rgs), addrv)), ]
-    ggs <- gga[rownames(gga) %in% addrv, ]; 
+    ggs <- gga[rownames(gga) %in% addrv, ]
     ggs <- ggs[order(match(rownames(ggs), addrv)), ]
-    cgidmatch = identical(rownames(rgs), rownames(ggs))
+    cgidmatch <- identical(rownames(rgs), rownames(ggs))
     if(!cgidmatch){stop("Couldn't probe IDs.")}
     if(verbose){message("Matching GSM IDs in signal matrices...")}
-    gsmidv = unique(c(colnames(rgs), colnames(ggs)))
+    gsmidv <- unique(c(colnames(rgs), colnames(ggs)))
     rgf <- rgs[, colnames(rgs) %in% gsmidv]
     ggf <- ggs[, colnames(ggs) %in% gsmidv]
     rgf <- rgf[, order(match(colnames(rgf), gsmidv))]
     ggf <- ggf[, order(match(colnames(ggf), gsmidv))]
-    gsmidmatch = identical(colnames(rgf), colnames(ggf))
+    gsmidmatch <- identical(colnames(rgf), colnames(ggf))
     if(!gsmidmatch){stop("Couldn't match GSM IDs for signal data.")}
     if("metadata" %in% names(ldat)){
         if(verbose){message("Checking metadata...")}
@@ -112,7 +112,7 @@ rgse = function(ldat, verbose = FALSE){
     }
     anno <- c("IlluminaHumanMethylation450k", "ilmn12.hg19")
     names(anno) <- c("array", "annotation")
-    rgi = minfi::RGChannelSet(Green = ggf, Red = rgf, annotation = anno)
+    rgi <- minfi::RGChannelSet(Green = ggf, Red = rgf, annotation = anno)
     if("metadata" %in% names(ldat)){
         minfi::pData(rgi) <- S4Vectors::DataFrame(mdf)
     }
@@ -157,7 +157,7 @@ rgse = function(ldat, verbose = FALSE){
 #' rgset = getrg(gsmv = gsml, data.type = "se")
 #' @seealso rgse()
 #' @export
-getrg = function(gsmv = NULL, cgv = NULL,
+getrg <- function(gsmv = NULL, cgv = NULL,
     dbn = "remethdb2.h5", data.type = c("se", "df"),
     dsv = c("redsignal", "greensignal"), all.gsm = FALSE, 
     all.cg = TRUE, metadata = TRUE, md.dsn = "mdpost", 
@@ -172,9 +172,9 @@ getrg = function(gsmv = NULL, cgv = NULL,
             rnd <- rhdf5::h5read(dbn, paste(d, "rownames", sep = ".")) 
             rnd <- gsub("\\..*", "", rnd) # clean GSM IDs
             cnd <- rhdf5::h5read(dbn, paste(d, "colnames", sep = ".")) 
-            cgvp = ifelse(all.cg, seq(1, length(cnd), 1),
+            cgvp <- ifelse(all.cg, seq(1, length(cnd), 1),
                 which(cnd %in% cgv))  
-            gsmvp = ifelse(all.gsm, seq(1, length(rnd), 1), 
+            gsmvp <- ifelse(all.gsm, seq(1, length(rnd), 1), 
                 which(rnd %in% gsmv))
             if(length(gsmvp) < 2){stop("Not enough valid GSM IDs found.")}
         }

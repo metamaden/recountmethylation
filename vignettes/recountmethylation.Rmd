@@ -51,16 +51,22 @@ which inherits properties from the `SummarizedExperiment` class.
 # Disclaimer
 
 The `recountmethylation` R package can aid and expand research capabilities 
-in epigenetics, especially for initial discovery and exploration phases of an experiment utilizing published data. The data contained in Recount Methylation, a cross-study compilation of DNAm signal matrices and learned metadata, 
-is extensively characterized and described in the accompanying manuscript, which also vitally includes transparent methods for how we obtained samples and learned sample metadata annotations. 
+in epigenetics, especially for initial discovery and exploration phases of an 
+experiment utilizing published data. The data contained in Recount Methylation, 
+a cross-study compilation of DNAm signal matrices and learned metadata, is 
+extensively characterized and described in the accompanying manuscript, which 
+also vitally includes transparent methods for how we obtained samples and 
+learned sample metadata annotations. 
 
-Recount Methylation contains data from GEO, a live public database where alterations
- (e.g. updates, revisions, additions, and removals) to online records can cause
-discrepancies with stored data over time. Thus, we cannot universally guarantee 
-the data contained in Recount Methylation will reflect the current state of latest
-available corresponding records in GEO. Below, we showed how to check retrieved data against a fresh download of sample IDATs from GEO Datat Sets (see below). Through this and other means, we advise `recountmethylation` users be
-vigilant in cross-checking their findings with latest available records and study
- data.
+Recount Methylation contains data from GEO, a live public database where 
+alterations (e.g. updates, revisions, additions, and removals) to online 
+records can cause discrepancies with stored data over time. Thus, we cannot 
+universally guarantee the data contained in Recount Methylation will reflect 
+the current state of latest available corresponding records in GEO. Below, 
+we showed how to check retrieved data against a fresh download of sample 
+IDATs from GEO Datat Sets (see below). Through this and other means, we 
+advise `recountmethylation` users be vigilant in cross-checking their findings 
+with latest available records and study data.
 
 # Installation
 
@@ -77,10 +83,11 @@ We need to provide the name of the database file with extension `.h5`.
 The entire Recount Methylation HDF5 database file, called `remethdb2.h5`, 
 is available for download [here](https://recount.bio/data/remethdb2.h5). 
 
-For this vignette, we used a small test dataset available [here](https://recount.bio/data/remethdbtest.h5), 
-called `remethdbtest.h5`. This test dataset contains DNAm red and green 
-signal from 30 samples at just the chromosome 22 probes. We assume this 
-file has been downloaded to the current directory.
+For this vignette, we used a small test dataset available 
+[here](https://recount.bio/data/remethdbtest.h5), called `remethdbtest.h5`. 
+This test dataset contains DNAm red and green signal from 30 samples at just 
+the chromosome 22 probes. We assume this file has been downloaded to the 
+current directory.
 
 ```{r h5_details}
 url = "https://recount.bio/data/"
