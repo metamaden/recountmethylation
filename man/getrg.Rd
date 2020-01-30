@@ -5,55 +5,66 @@
 \title{Query and store data from the signal tables}
 \usage{
 getrg(
-  gsmv = "all",
-  cgv = "all",
+  gsmv = NULL,
+  cgv = NULL,
   dbn = "remethdb2.h5",
   data.type = c("se", "df"),
   dsv = c("redsignal", "greensignal"),
+  all.gsm = FALSE,
+  all.cg = TRUE,
   metadata = TRUE,
   md.dsn = "mdpost",
   verbose = FALSE
 )
 }
 \arguments{
-\item{gsmv}{Vector valid GSM IDs (rows) to query in the raw signal datasets. 
-If 'all', selects all available GSM IDs.}
+\item{gsmv}{Vector valid GSM IDs (rows) to query, 
+either NULL or vector of length > 2 valid GSM IDs, 
+or `all.gsm` should be TRUE.}
 
-\item{cgv}{Vector of valid CpG probe addresses (columns) to query in the raw 
-signal datasets. If 'all', selects all probe IDs.}
+\item{cgv}{Vector of valid CpG probe addresses (columns) query,
+either NULL or a vector of valid probe addresses, or `all.cg` 
+should be TRUE.}
 
 \item{dbn}{Name of the HDF5 database file.}
 
-\item{data.type}{Format for returned query matches, either as datasets 
+\item{data.type}{Format for returned query matches, either as 
+datasets 
 'df' or `RGChannelSet` 'se' object.}
 
-\item{dsv}{Vector of raw signal datasets or group paths to query, including 
-both the red channel 'redsignal' and green channel 'greensignal' datasets.}
+\item{dsv}{Vector of raw signal datasets or group paths to query, 
+including both the red channel 'redsignal' and green channel 
+'greensignal' datasets.}
 
-\item{metadata}{Whether to access available postprocessed metadata for queries samples.}
+\item{all.gsm}{Whether to query all available GSM IDs.}
+
+\item{metadata}{Whether to access available postprocessed 
+metadata for queries samples.}
 
 \item{md.dsn}{Name of metadata dataset in h5 file.}
 
 \item{verbose}{Whether to post status messages.}
+
+\item{all.cgv}{Whether to query all available CpG probe addresses.}
 }
 \value{
-Returns either an `RGChannelSet` or list of `data.frame` objects 
-from dataset query matches.
+Returns either an `RGChannelSet` or list of 
+`data.frame` objects from dataset query matches.
 }
 \description{
-Retrieves query matches from raw signal HDF5 datasets. Handles identity 
-queries to rows (GSM IDs) or columns (CpG probe addresses). Returns 
-query matches either as a list of 2 `data.frame`s or a single 
-`RGChannelSet` object.
+Retrieves query matches from raw signal HDF5 datasets. 
+Handles identity queries to rows (GSM IDs) or columns 
+(CpG probe addresses). Returns query matches either 
+as a list of 2 `data.frame`s or a single `RGChannelSet` 
+object.
 }
 \examples{
+gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
 # get list of data tables for a query
-ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"),
-            data.type = "df", metadata = TRUE)
+ldat = getrg(gsmv = gsml, data.type = "df")
 
 # get the RGChannel set object for a query
-rgset = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), 
-             data.type = "se", metadata = TRUE)
+rgset = getrg(gsmv = gsml, data.type = "se")
 }
 \seealso{
 rgse()

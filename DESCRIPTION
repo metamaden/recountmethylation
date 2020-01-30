@@ -2,9 +2,9 @@ Package: recountmethylation
 Version: 0.01.0
 Title: Access and analyze the Recount Methylation database
 Authors@R: c(person(c("Sean", "Kenneth"), "Maden", role = c("cre", "aut"),
-                    email = "maden@ohsu.edu", comment = c(ORCID = "0000-0002-2212-4894")),
-             person("Abhi", "Nellore", role = "aut", email = "nellore@ohsu.edu"),
-             person("Kasper", "Hansen", role = "aut"))
+        email = "maden@ohsu.edu", comment = c(ORCID = "0000-0002-2212-4894")),
+    person("Abhi", "Nellore", role = "aut", email = "nellore@ohsu.edu"),
+    person("Kasper", "Hansen", role = "aut"))
 Description: Access and analyze data from the recount methylation database.
 License: Artistic-2.0
 Encoding: UTF-8
@@ -12,12 +12,12 @@ URL: https://github.com/metamaden/recountmethylation
 BugReports: https://github.com/metamaden/recountmethylation/issues
 LazyData: FALSE
 Imports:
-  minfi,
-  rhdf5,
-  S4Vectors
+    minfi,
+    rhdf5,
+    S4Vectors
 Suggests:
-  RCurl,
-  knitr
+    RCurl,
+    knitr
 VignetteBuilder: knitr
 biocViews: DNAMethylation, Epigenetics, Microarray, MethylationArray
 RoxygenNote: 7.0.2

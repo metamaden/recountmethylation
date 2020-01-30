@@ -1,62 +1,101 @@
 ---
 title: "User's Guide for `recountmethylation`"
 author:
-  - Sean K. Maden
-  - Abhinav Nellore
+    - Sean K. Maden
+    - Abhinav Nellore
 package: recountmethylation
 abstract: >
-  This is the user's guide for the `recountmethylation` R package, which provides utilities to   
-  access DNAm array data from Recount   Methylation. Topics discussed include accessing the HDF5 
-  dataset, querying the dataset, and storing retrieved data as     SummarizedExperiment-like 
-  objects. You may find additional information and characterization of samples in RecountMethylation
-  in the affiliated manuscript.
+    This is the user's guide for the `recountmethylation` R package, which 
+    provides utilities to access DNAm array data from Recount   Methylation. 
+    Topics discussed include accessing the HDF5 dataset, querying the dataset, 
+    and storing retrieved data as SummarizedExperiment-like objects. You may 
+    find additional information and characterization of contained samples in 
+    the affiliated manuscript.
 vignette: >
-  % \VignetteDepends{RCurl}
-  %\VignetteEngine{knitr::knitr} 
-  %\VignetteIndexEntry{recountmethylation user's guide} 
-  %\usepackage[UTF-8]{inputenc}
+    % \VignetteDepends{RCurl}
+    %\VignetteEngine{knitr::knitr} 
+    %\VignetteIndexEntry{recountmethylation user's guide} 
+    %\usepackage[UTF-8]{inputenc}
 output:
-  html_document:
-    toc: true
-  pdf_document: default
+    html_document:
+        toc: true
+    pdf_document: default
 ---
 
 ```{r setup, include = FALSE, eval = TRUE}
 library(recountmethylation)
-knitr::opts_chunk$set(eval = TRUE, echo = TRUE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(eval = TRUE,
+    echo = TRUE, warning = FALSE,
+    message = FALSE)
 ```
 
 # Introduction
 
-This package provides accessor functions to query Recount Methylation database file, `remethdb2.h5`. The database stores relatively large red- and green-channel raw signal tables in [hierarchical data format](https://www.hdfgroup.org/), or "HDF5". These DNAm signal tables are extracted directly from IDAT files generated using the Illumina HM450k array DNAm array platform. DNAm arrays were accessed from the [Gene Expression Omnibus](https://www.ncbi.nlm.nih.gov/geo/) via the GEO Data Sets database.
+This package provides accessor functions to query Recount Methylation 
+database file, `remethdb2.h5`. The database stores relatively large red- and 
+green-channel raw signal tables in 
+[hierarchical data format](https://www.hdfgroup.org/), or "HDF5". These DNAm 
+signal tables have been extracted directly from IDAT files generated using the 
+Illumina HM450k array DNAm array platform. DNAm arrays were accessed from 
+the [Gene Expression Omnibus](https://www.ncbi.nlm.nih.gov/geo/) via the 
+GEO Data Sets database.
 
-To help inform sample queries, the HDF5 database includes a sample metadata table learned from GEO GSE [SOFT](https://www.ncbi.nlm.nih.gov/geo/info/soft.html) files. When specifying samples whose DNAm data to return, several arguments assist with querying and accessing the database files. For instance, returned objects can be either of class `data.frame`s or `RGChannelSet`, which is a type of DNAm `SummarizedExperiment` object class.
+To help inform sample queries, the HDF5 database includes a sample metadata 
+table learned from GEO GSE 
+[SOFT](https://www.ncbi.nlm.nih.gov/geo/info/soft.html) files. 
+When specifying samples whose DNAm data to return, several arguments assist 
+with querying and accessing the database files. For instance, returned objects 
+can be either a list of datasets or a single object of class `RGChannelSet`, 
+which inherits properties from the `SummarizedExperiment` class.
 
-The `recountmethylation` R package can aid and expand research capabilities in epigenetics, it is intended primarily for initial discovery and exploration of published data. Users should cross-check their findings with study-level metadata, methods, and supplement for consistency and completion.
+# Disclaimer
+
+The `recountmethylation` R package can aid and expand research capabilities 
+in epigenetics, especially for initial discovery and exploration phases of an experiment utilizing published data. The data contained in Recount Methylation, a cross-study compilation of DNAm signal matrices and learned metadata, 
+is extensively characterized and described in the accompanying manuscript, which also vitally includes transparent methods for how we obtained samples and learned sample metadata annotations. 
+
+Recount Methylation contains data from GEO, a live public database where alterations
+ (e.g. updates, revisions, additions, and removals) to online records can cause
+discrepancies with stored data over time. Thus, we cannot universally guarantee 
+the data contained in Recount Methylation will reflect the current state of latest
+available corresponding records in GEO. Below, we showed how to check retrieved data against a fresh download of sample IDATs from GEO Datat Sets (see below). Through this and other means, we advise `recountmethylation` users be
+vigilant in cross-checking their findings with latest available records and study
+ data.
 
 # Installation
 
 The `recountmethylation` package can be installed from GitHub using 
 
-```{r gh install, eval = F}
-require(devtools); install_github("metamaden/recountmethylation")
+```{r gh_install, eval = FALSE}
+devtools::install_github("metamaden/recountmethylation")
 ```
 
 
 # Data access
 
-We need to provide the name of the database file with extension `.h5`. The entire Recount Methylation HDF5 database file, called `remethdb2.h5`, is available for download [here](https://recount.bio/data/remethdb2.h5). 
+We need to provide the name of the database file with extension `.h5`. 
+The entire Recount Methylation HDF5 database file, called `remethdb2.h5`, 
+is available for download [here](https://recount.bio/data/remethdb2.h5). 
 
-For this vignette, we used a small test dataset from the dedicated repo on [GitHub](https://github.com/metamaden/recountmethylation_packagedata/), called `remethdbtest.h5`. This test dataset contains DNAm red and green signal from 30 samples at just the chromosome 22 probes. We assume this file has been downloaded to the current directory.
+For this vignette, we used a small test dataset from the dedicated 
+repo on [GitHub](https://github.com/metamaden/recountmethylation_packagedata/), 
+called `remethdbtest.h5`. This test dataset contains DNAm red and green 
+signal from 30 samples at just the chromosome 22 probes. We assume this 
+file has been downloaded to the current directory.
 
 ```{r h5_details}
-url = "https://github.com/metamaden/recountmethylation_packagedata/raw/master/remethdbtest.h5"
+url = paste0("https://github.com/metamaden/",
+    "recountmethylation_packagedata/",
+    "raw/master/remethdbtest.h5")
 dbn = "remethdbtest.h5" # db name
 download.file(url, dbn)
 rhdf5::h5ls(dbn)
 ```
 
-Datasets include separate entities for row and column names of each matrix, denoted as "[dataset].[row/column]names". Data contained in each respective object has a single format (e.g. `FLOAT`, `STRING`, etc.), where row and column names as well as the metadata table are of type `STRING`).
+Datasets include separate entities for row and column names of each matrix, 
+denoted as "[dataset].[row/column]names". Data contained in each 
+respective object has a single format (e.g. `FLOAT`, `STRING`, etc.), 
+where row and column names as well as the metadata table are of type `STRING`).
 
 We can quickly access the entire metadata table for sample queries:
 
@@ -66,46 +105,55 @@ mdp = data_mdpost(dbn, dsn = "mdpost")
 dim(mdp)
 ```
 
-The test dataset contains a small subset of the data available in recount methylation. We can check available sample types and construct a sample query as follows:
+The test dataset contains a small subset of the data available in 
+recount methylation. We can check available sample types and construct 
+a sample query as follows:
 
 ```{r make_gsm_query}
 # check which samples available in h5 db
 dsn = "redsignal"
-rs.gsm = rhdf5::h5read(dbn, paste(dsn, "rownames", sep = ".")) # redsignal rownames (gsm ids)
+# redsignal rownames (gsm ids)
+rs.gsm = rhdf5::h5read(dbn, paste(dsn, "rownames", sep = ".")) 
 rs.gsm = gsub("\\..*", "", rs.gsm)
 mdf = mdp[mdp$gsm %in% rs.gsm,]
-unique(unlist(strsplit(mdf$tissue, ";"))) # available tissue terms
+# available tissue terms
+unique(unlist(strsplit(mdf$tissue, ";"))) 
 
 # get sample id query by tissue term
 termi = "blood"
 var.query = "tissue"
 which.index = 1:2
 which.gsm = which(grepl(paste0(".*", termi, ".*"), 
-                        mdf[,var.query]))[which.index]
+    mdf[,var.query]))[which.index]
 gsmvi = mdf$gsm[which.gsm]
 ```
 
-Next, we can query a subset of the available array probes based on location. Here, our query selects only probes located on chromosome 9:
+Next, we can query a subset of the available array probes based on 
+location. Here, our query selects only probes located on chromosome 9:
 
 ```{r make_cg_query}
 anno.name = "IlluminaHumanMethylation450kanno.ilmn12.hg19"
 man = eval(parse(text = paste(anno.name, "Manifest", sep = "::")))
 loc = eval(parse(text = paste(anno.name, "Locations", sep = "::")))
 identical(rownames(loc), rownames(man))
-
 chrname = "chr22"
 cgfilt = rownames(loc[grepl(paste0("^", chrname, "$"), loc$chr),])
 cgvi = unique(c(man[cgfilt,]$AddressA, man[cgfilt,]$AddressB))
 ```
 
-With the queries constructed, we can proceed to extracting the methylation datasets.
+With the queries constructed, we can proceed to extracting the 
+methylation datasets.
 
 # Data queries
-DNA methylation signal data can be retrieved in one of two ways using the `recountmethylation::getrg()` function. First, data can be returned as an object of class `RGChannelSet`, a type of `SummarizedExperiment` object, by setting the `data.type` argument to 'se'. 
+DNA methylation signal data can be retrieved in one of two ways using the 
+`recountmethylation::getrg()` function. First, data can be returned as 
+an object of class `RGChannelSet`, a type of `SummarizedExperiment` 
+object, by setting the `data.type` argument to 'se'. 
 
 ```{r get_se_set}
 # make df list from h5 db query
-se.rgi = getrg(gsmv = gsmvi, cgv = cgvi, dbn = dbn, data.type = "se", metadata = T, verbose = F)
+se.rgi = getrg(gsmv = gsmvi, cgv = cgvi, dbn = dbn, 
+    data.type = "se", metadata = TRUE, verbose = FALSE)
 ```
 ```{r check_se_set}
 dim(se.rgi)
@@ -114,12 +162,14 @@ dim(minfi::getRed(se.rgi))
 dim(minfi::getBeta(se.rgi))
 ```
 
-This class conveniently stores signal data, sample metadata, genome annotations, and other useful metadata in a single object. 
+This class conveniently stores signal data, sample metadata, 
+genome annotations, and other useful metadata in a single object. 
 
 Alternatively, we can return a list of `data.frame` objects.
 
 ```{r get_dflist}
-ldat.rgi = getrg(gsmv = gsmvi, dbn = dbn, data.type = "df", metadata = T, verbose = F)
+ldat.rgi = getrg(gsmv = gsmvi, dbn = dbn, 
+    data.type = "df", metadata = TRUE, verbose = FALSE)
 ```
 ```{r check_dflist}
 length(ldat.rgi)
@@ -127,39 +177,49 @@ dim(ldat.rgi[["redsignal"]])
 dim(ldat.rgi[["metadata"]])
 ```
 
-It's likely the best data type will vary with the particular query and research question. It may be preferable for queries of over 20 non-consecutive samples to be processed in a loop over smaller queries.
+It's likely the best data type will vary with the particular 
+query and research question. It may be preferable for queries of over 
+20 non-consecutive samples to be processed in a loop over smaller queries.
 
 # Validation of sample data
-Because data is constantly being added and revised in GEO, it can be useful to validate retrieved data with the latest available data. We can readily validate the retrieved sample DNA methylation data against a query to the current IDAT files in GEO GSM supplement from GEO Data Sets. 
+Because data is constantly being added and revised in GEO, it can be 
+useful to validate retrieved data with the latest available data. We can 
+readily validate the retrieved sample DNA methylation data against a 
+query to the current IDAT files in GEO GSM supplement from GEO Data Sets. 
 
-There are 2 IDATs roughly 4.5 Mb in size expected per GSM, one for each color channel. The following will perform fresh downloads of the IDATs for the queried GSMs to the current directory:
+There are 2 IDATs roughly 4.5 Mb in size expected per GSM, one for each 
+color channel. The following will perform fresh downloads of the IDATs 
+for the queried GSMs to the current directory:
 
 ```{r idat_dl}
 dn = "" # download idats to cwd
 bnv = c() # store the idat basenames
 for(gsmi in gsmvi){
-  url = paste0("ftp://ftp.ncbi.nlm.nih.gov/geo/samples/", 
-                 substr(gsmi, 1, nchar(gsmi)-3), 
-                 paste(rep("n", 3), collapse = ""), 
-                 "/", gsmi, "/suppl/")
-  # get urls to idats
-  if(require(RCurl)){
-    fn = RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE) 
-  }
-  fn <- unlist(strsplit(fn, "\n"))
-  fn = unlist(fn)[grepl("\\.idat\\.gz", fn)] # retain valid idat paths
-  bnv = c(bnv, unique(gsub("_Red.*|_Grn.*", "", fn))) # retain idat basenames
-  for(f in fn){
-    dfp = paste(getwd(), "/", dn, "/", f, sep = "")
-    download.file(paste(url, f, sep = ""), dfp)
-    system(paste0("gunzip ", dfp))
-    message(f)
-  }
-  message(gsmi)
+    url = paste0("ftp://ftp.ncbi.nlm.nih.gov/geo/samples/", 
+        substr(gsmi, 1, nchar(gsmi)-3), 
+        paste(rep("n", 3), collapse = ""), 
+        "/", gsmi, "/suppl/")
+    # get urls to idats
+    if(require(RCurl)){
+        fn = RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE) 
+    }
+    fn <- unlist(strsplit(fn, "\n"))
+    fn = unlist(fn)[grepl("\\.idat\\.gz", fn)] # retain valid idat paths
+    bnv = c(bnv, unique(gsub("_Red.*|_Grn.*", "", fn))) # retain idat basenames
+    for(f in fn){
+        dfp = paste(getwd(), "/", dn, "/", f, sep = "")
+        download.file(paste(url, f, sep = ""), dfp)
+        system(paste0("gunzip ", dfp))
+        message(f)
+    }
+    message(gsmi)
 }
 ```
 
-The IDAT basenames are the unique IDAT filenames excluding the strings "_Red.idat" and "_Grn.idat". We use the basename vector above to read downloaded IDATs into a new `RGChannelSet` object with minfi, then subset on chromosome 9 probes as above.
+The IDAT basenames are the unique IDAT filenames excluding the 
+strings "_Red.idat" and "_Grn.idat". We use the basename vector above to 
+read downloaded IDATs into a new `RGChannelSet` object with minfi, then 
+subset on chromosome 22 probes as above.
 
 ```{r read_idatdl}
 rgdl = minfi::read.metharray(basenames = bnv)
@@ -171,30 +231,37 @@ dim(rgdl)
 identical(rownames(rgdl), rownames(se.rgi)) # check that cg addresses match
 ```
 
-We can then check for consistency between the methylation data returned from the `recountmethylation` query and the fresh data downloads.
+We can then check for consistency between the methylation data returned 
+from the `recountmethylation` query and the fresh data downloads.
 
 ```{r rg_validate}
 evalv = c()
 for(c in colnames(rgdl)){
-  evalv = c(evalv, identical(as.numeric(minfi::getRed(rgdl[,c])), 
-                             as.numeric(minfi::getRed(se.rgi[,c]))))
-  evalv = c(evalv, identical(as.numeric(minfi::getGreen(rgdl[,c])), 
-                             as.numeric(minfi::getGreen(se.rgi[,c]))))
+    evalv = c(evalv, identical(as.numeric(minfi::getRed(rgdl[,c])), 
+        as.numeric(minfi::getRed(se.rgi[,c]))))
+    evalv = c(evalv, identical(as.numeric(minfi::getGreen(rgdl[,c])), 
+        as.numeric(minfi::getGreen(se.rgi[,c]))))
 }
 ```
 ```{r check_rg_eval}
 table(evalv == TRUE)
 ```
 
-The packages [`GEOquery`](https://bioconductor.org/packages/release/bioc/html/GEOquery.html) and [`GEOmetadb`](https://www.bioconductor.org/packages/release/bioc/html/GEOmetadb.html) provide additional utilities for data access that can aid with validation.
+The packages `GEOquery` and `GEOmetadb` provide additional utilities for 
+data access that can aid with validation.
 
 # Basic preprocessing
-Basic preprocessing of the `RGChannelSet` object can be performed with functions from the `minfi` package. In general, the `RGChannelSet` is larger than derived objects of class `MethylSet`, `GenomeRatioSet`, etc. though the latter excludes full signal information such as for control probes. We can obtain the raw Beta-values and noob-normalized Beta-values in more compact `MethylSet` objects as follows.
+Basic preprocessing of the `RGChannelSet` object can be performed with 
+functions from the `minfi` package. In general, the `RGChannelSet` is 
+larger than derived objects of class `MethylSet`, `GenomeRatioSet`, etc. 
+though the latter excludes full signal information such as for control 
+probes. We can obtain the raw Beta-values and noob-normalized 
+Beta-values in more compact `MethylSet` objects as follows.
 
 ```{r preprocess_list}
 lpre = list(se = list(),
-            mv = list(), umv = list(),
-            bv = list())
+    mv = list(), umv = list(),
+    bv = list())
 lpre[["se"]][["raw"]] = se.raw = preprocessRaw(se.rgi)
 lpre[["se"]][["nb"]] = se.noob = preprocessNoob(se.rgi)
 

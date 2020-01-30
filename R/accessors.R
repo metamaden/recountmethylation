@@ -21,7 +21,7 @@
 #' @seealso data_mdpost()
 #' @export
 hread = function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
-  return(rhdf5::h5read(dbn, dsn, index = list(ri, ci)))
+    return(rhdf5::h5read(dbn, dsn, index = list(ri, ci)))
 }
 
 #--------------------------
@@ -42,11 +42,11 @@ hread = function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
 #' @seealso hread()
 #' @export
 data_mdpost = function(dbn = "remethdb2.h5", dsn = "mdpost"){
-  mdp <- as.data.frame(rhdf5::h5read(file = dbn, name = dsn), 
-                       stringsAsFactors = FALSE)
-  colnames(mdp) <- rhdf5::h5read(file = dbn, 
-                                 name = paste(dsn, "colnames", sep = "."))
-  return(mdp)
+    mdp <- as.data.frame(rhdf5::h5read(file = dbn, name = dsn),
+        stringsAsFactors = FALSE)
+    mcn <- paste(dsn, "colnames", sep = ".")
+    colnames(mdp) <- rhdf5::h5read(file = dbn, name = mcn)
+    return(mdp)
 }
 
 #-------------------------------------------------------
@@ -72,188 +72,129 @@ data_mdpost = function(dbn = "remethdb2.h5", dsn = "mdpost"){
 #' @seealso getrg()
 #' @export
 rgse = function(ldat, verbose = FALSE){
-  if(!("greensignal" %in% names(ldat) & 
-       "redsignal" %in% names(ldat))){
-    stop(paste0("Invalid ldat object passed. ",
-                "Verify the necessary data types are available."))
-  }
-  # match and check CpG addresses for signal datasets
-  if(verbose){
-    message("Matching CpG addresses for signal matrices...")
-  }
-  rga <- ldat[["redsignal"]]; gga <- ldat[["greensignal"]]
-
-  # match probe IDs
-  addrv <- unique(c(rownames(rga), rownames(gga))) # get the unique CpG addresses
-  rgs <- rga[rownames(rga) %in% addrv, ]; 
-  rgs <- rgs[order(match(rownames(rgs), addrv)), ]
-  ggs <- gga[rownames(gga) %in% addrv, ]; 
-  ggs <- ggs[order(match(rownames(ggs), addrv)), ]
-  if(!identical(rownames(rgs), rownames(ggs))){
-    stop("Couldn't match CpG addresses for signal data.")
-  }
-
-  # match and check GMS IDs for signal datasets
-  message("Matching GSM IDs for signal matrices...")
-  gsmidv = unique(c(colnames(rgs), colnames(ggs)))
-  rgf <- rgs[, colnames(rgs) %in% gsmidv]
-  ggf <- ggs[, colnames(ggs) %in% gsmidv]
-  rgf <- rgf[, order(match(colnames(rgf), gsmidv))]
-  ggf <- ggf[, order(match(colnames(ggf), gsmidv))]
-  if(!identical(colnames(rgf), colnames(ggf))){
-    stop("Couldn't match GSM IDs for signal data.")
-  }
-
-  # match and check GSM IDs for metadata
-  if("metadata" %in% names(ldat)){
-    if(verbose){
-      message("Checking provided postprocessed metadata...")
+    if(!("greensignal" %in% names(ldat) & "redsignal" %in% names(ldat))){
+        stop(paste0("Invalid datasets list passed."))
     }
-    mdp <- ldat[["metadata"]]
-    mdp$gsm <- as.character(mdp$gsm)
-    # append blank rows for missing GSM IDs
-    gsmov <- gsmidv[!gsmidv %in% mdp$gsm]
-    if(length(gsmov) > 0){
-      if(verbose){
-        message("Appending data for ", length(gsmov), 
-                " GSM IDs lacking metadata...")
-      }
-      numo <- length(gsmov)
-      nmm <- matrix(c(gsmov, rep(rep("NA", numo), 
-                                 ncol(mdp) - 1)), nrow = numo)
-      colnames(nmm) <- colnames(mdp)
-      mdp <- rbind(mdp, nmm)
+    if(verbose){message("Matching probe IDs in signal matrices...")}
+    rga <- ldat[["redsignal"]]; gga <- ldat[["greensignal"]]
+    addrv <- unique(c(rownames(rga), rownames(gga))) # get CpG addresses
+    rgs <- rga[rownames(rga) %in% addrv, ]; 
+    rgs <- rgs[order(match(rownames(rgs), addrv)), ]
+    ggs <- gga[rownames(gga) %in% addrv, ]; 
+    ggs <- ggs[order(match(rownames(ggs), addrv)), ]
+    cgidmatch = identical(rownames(rgs), rownames(ggs))
+    if(!cgidmatch){stop("Couldn't probe IDs.")}
+    if(verbose){message("Matching GSM IDs in signal matrices...")}
+    gsmidv = unique(c(colnames(rgs), colnames(ggs)))
+    rgf <- rgs[, colnames(rgs) %in% gsmidv]
+    ggf <- ggs[, colnames(ggs) %in% gsmidv]
+    rgf <- rgf[, order(match(colnames(rgf), gsmidv))]
+    ggf <- ggf[, order(match(colnames(ggf), gsmidv))]
+    gsmidmatch = identical(colnames(rgf), colnames(ggf))
+    if(!gsmidmatch){stop("Couldn't match GSM IDs for signal data.")}
+    if("metadata" %in% names(ldat)){
+        if(verbose){message("Checking metadata...")}
+        mdp <- ldat[["metadata"]]; mdp$gsm <- as.character(mdp$gsm)
+        gsmov <- gsmidv[!gsmidv %in% mdp$gsm]; numo <- length(gsmov)
+        if(numo > 0){
+            if(verbose){message("Adding md NAs for ", length(gsmov), " GSMs.")}
+            nmdat <- c(gsmov, rep(rep("NA", numo), ncol(mdp) - 1))
+            nmm <- matrix(nmdat, nrow = numo); colnames(nmm) <- colnames(mdp)
+            mdp <- rbind(mdp, nmm)
+        }
+        mdf <- mdp[mdp$gsm %in% gsmidv,]
+        mdf <- mdf[order(match(mdf$gsm, gsmidv)),]
+        mdf$gsm <- as.character(mdf$gsm)
+        mdmatchid <- identical(mdf$gsm, colnames(rgf)) & 
+            identical(mdf$gsm, colnames(ggf))
+        if(!mdmatchid){stop("Couldn't match GSM IDs for md and signal data.")}
+        rownames(mdf) <- mdf$gsm
     }
-    if(verbose){
-      message("Checking metadata match...")
+    anno <- c("IlluminaHumanMethylation450k", "ilmn12.hg19")
+    names(anno) <- c("array", "annotation")
+    rgi = minfi::RGChannelSet(Green = ggf, Red = rgf, annotation = anno)
+    if("metadata" %in% names(ldat)){
+        minfi::pData(rgi) <- S4Vectors::DataFrame(mdf)
     }
-    mdf <- mdp[mdp$gsm %in% gsmidv,]
-    mdf <- mdf[order(match(mdf$gsm, gsmidv)),]
-    mdf$gsm <- as.character(mdf$gsm)
-    checkid <- identical(mdf$gsm, colnames(rgf)) & 
-      identical(mdf$gsm, colnames(ggf))
-    if(!checkid){
-      stop("Couldn't match metadata GSM IDs with signal ID matrices.")
-    }
-    rownames(mdf) <- mdf$gsm
-  }
-  if(verbose){
-    message("forming the RGset...")
-  }
-  anno <- c("IlluminaHumanMethylation450k", "ilmn12.hg19")
-  names(anno) <- c("array", "annotation")
-  rgi = minfi::RGChannelSet(Green = ggf, Red = rgf, annotation = anno)
-  if("metadata" %in% names(ldat)){
-    if(verbose){
-      message("Adding postprocessed metadata as pheno data to SE set...")
-    }
-    minfi::pData(rgi) <- S4Vectors::DataFrame(mdf)
-  }
-  return(rgi)
+    return(rgi)
 }
 
 #' Query and store data from the signal tables
 #'
-#' Retrieves query matches from raw signal HDF5 datasets. Handles identity 
-#' queries to rows (GSM IDs) or columns (CpG probe addresses). Returns 
-#' query matches either as a list of 2 `data.frame`s or a single 
-#' `RGChannelSet` object.
+#' Retrieves query matches from raw signal HDF5 datasets. 
+#' Handles identity queries to rows (GSM IDs) or columns 
+#' (CpG probe addresses). Returns query matches either 
+#' as a list of 2 `data.frame`s or a single `RGChannelSet` 
+#' object.
 #'
 #' @param dbn Name of the HDF5 database file.
-#' @param gsmv Vector valid GSM IDs (rows) to query in the raw signal datasets. 
-#' If 'all', selects all available GSM IDs.
-#' @param cgv Vector of valid CpG probe addresses (columns) to query in the raw 
-#' signal datasets. If 'all', selects all probe IDs.
-#' @param data.type Format for returned query matches, either as datasets 
+#' @param gsmv Vector valid GSM IDs (rows) to query, 
+#' either NULL or vector of length > 2 valid GSM IDs, 
+#' or `all.gsm` should be TRUE.
+#' @param cgv Vector of valid CpG probe addresses (columns) query,
+#' either NULL or a vector of valid probe addresses, or `all.cg` 
+#' should be TRUE.
+#' @param data.type Format for returned query matches, either as 
+#' datasets 
 #' 'df' or `RGChannelSet` 'se' object.
-#' @param dsv Vector of raw signal datasets or group paths to query, including 
-#' both the red channel 'redsignal' and green channel 'greensignal' datasets.
-#' @param metadata Whether to access available postprocessed metadata for queries samples.
+#' @param dsv Vector of raw signal datasets or group paths to query, 
+#' including both the red channel 'redsignal' and green channel 
+#' 'greensignal' datasets.
+#' @param all.gsm Whether to query all available GSM IDs.
+#' @param all.cgv Whether to query all available CpG probe addresses.
+#' @param metadata Whether to access available postprocessed 
+#' metadata for queries samples.
 #' @param md.dsn Name of metadata dataset in h5 file.
 #' @param verbose Whether to post status messages.
-#' @return Returns either an `RGChannelSet` or list of `data.frame` objects 
-#' from dataset query matches.
+#' @return Returns either an `RGChannelSet` or list of 
+#' `data.frame` objects from dataset query matches.
 #' @examples
+#' gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
 #' # get list of data tables for a query
-#' ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"),
-#'             data.type = "df", metadata = TRUE)
+#' ldat = getrg(gsmv = gsml, data.type = "df")
 #' 
 #' # get the RGChannel set object for a query
-#' rgset = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), 
-#'              data.type = "se", metadata = TRUE)
+#' rgset = getrg(gsmv = gsml, data.type = "se")
 #' @seealso rgse()
 #' @export
-getrg = function(gsmv = "all", cgv = "all",
-                 dbn = "remethdb2.h5", data.type = c("se", "df"),
-                 dsv = c("redsignal", "greensignal"), metadata = TRUE,
-                 md.dsn = "mdpost", verbose = FALSE){
-  # form the datasets list
-  if(length(gsmv) == 0 | length(cgv) == 0){
-    stop("Invalid GSM or CpG IDs. Check arguments for 'gsmv' and 'cgv'.")
-  }
-  if(gsmv == "all" & cgv == "all"){
-    stop(paste0("Too many samples and probes selected, ",
-                "please set gsmv or cgv so that it is not 'all'."))
-  }
-  if(!gsmv == "all" & length(gsmv) < 2){
-    stop(paste0("Not enough GSM IDs in query, please designate at, ",
-                "least 2 valid IDs or set gsmv to `all`."))
-  }
-  ldat <- list()
-  for(d in dsv){
-    if(verbose){
-      message("Working on ", d, "...")
+getrg = function(gsmv = NULL, cgv = NULL,
+    dbn = "remethdb2.h5", data.type = c("se", "df"),
+    dsv = c("redsignal", "greensignal"), all.gsm = FALSE, 
+    all.cg = TRUE, metadata = TRUE, md.dsn = "mdpost", 
+    verbose = FALSE){
+    if(length(gsmv) < 2 | length(cgv) == 0 & !all.cg | all.gsm & all.cg){
+        stop("Invalid query indices. Review GSM and probe ID args.")
     }
-    if(d %in% c("redsignal", "greensignal")){
-      rnd <- rhdf5::h5read(dbn, paste(d, "rownames", sep = ".")) # rownames, GSM IDs
-      rnd <- gsub("\\..*", "", rnd) # clean GSM IDs
-      cnd <- rhdf5::h5read(dbn, paste(d, "colnames", sep = ".")) # colnames, CpG addr
-      # parse the index values
-      if(cgv == "all"){
-        cgvp <- seq(1, length(cnd), 1)
-      } else{
-        cgvp <- which(cnd %in% cgv)
-      }
-      if(gsmv == "all"){
-        gsmvp = seq(1, length(rnd), 1)
-      } else{
-        gsmvp <- which(rnd %in% gsmv)
-        if(length(gsmvp) < 2){
-          stop(paste0("Not enough queries GSM IDs detected in signal matrix, ",
-                      "please query at least 2 valid IDs or set gsmv to `all`."))
+    ldat <- list() # datasets list
+    for(d in dsv){
+        if(verbose){message("Working on ", d, "...")}
+        if(d %in% c("redsignal", "greensignal")){
+            rnd <- rhdf5::h5read(dbn, paste(d, "rownames", sep = ".")) 
+            rnd <- gsub("\\..*", "", rnd) # clean GSM IDs
+            cnd <- rhdf5::h5read(dbn, paste(d, "colnames", sep = ".")) 
+            cgvp = ifelse(all.cg, seq(1, length(cnd), 1),
+                which(cnd %in% cgv))  
+            gsmvp = ifelse(all.gsm, seq(1, length(rnd), 1), 
+                which(rnd %in% gsmv))
+            if(length(gsmvp) < 2){stop("Not enough valid GSM IDs found.")}
         }
-      }
-      # get data matrix
-      ddat <- hread(ri = gsmvp, ci = cgvp, d, dbn)
-      rownames(ddat) <- rnd[gsmvp]
-      colnames(ddat) <- cnd[cgvp]
-      ldat[[d]] <- t(ddat) # append transpose of data
-    } else{
-      if(verbose){
-        message("Invalid data type detected: ", d, ", continuing...")
-      }
+        ddat <- hread(ri = gsmvp, ci = cgvp, d, dbn)
+        rownames(ddat) <- rnd[gsmvp]; colnames(ddat) <- cnd[cgvp]
+        ldat[[d]] <- t(ddat) # append transpose of data
     }
-  }
-  # append metadata
-  if(metadata){
-    mdpost <- data_mdpost(dbn = dbn, dsn = md.dsn)
-    mdpost$gsm <- as.character(mdpost$gsm)
-    mdf <- mdpost[mdpost$gsm %in% gsmv,]
-    ldat[["metadata"]] <- mdf
-  }
-  # return desired data type
-  if(data.type == "df"){
-    if(verbose){
-      message("Returning the datasets list...")
+    if(metadata){
+        mdpost <- data_mdpost(dbn = dbn, dsn = md.dsn)
+        mdpost$gsm <- as.character(mdpost$gsm)
+        ldat[["metadata"]] <- mdpost[mdpost$gsm %in% gsmv,]
     }
-    robj <- ldat
-  }
-  if(data.type == "se"){
-    if(verbose){
-      message("Forming the RGChannelSet...")
+    if(data.type == "df"){
+        if(verbose){message("Returning the datasets list...")}
+        robj <- ldat
     }
-    robj <- rgse(ldat = ldat, verbose = verbose)
-  }
-  rhdf5::h5closeAll() # close all open connections
-  return(robj)
+    if(data.type == "se"){
+        if(verbose){message("Forming the RGChannelSet...")}
+        robj <- rgse(ldat = ldat, verbose = verbose)
+    }
+    rhdf5::h5closeAll() # close all open connections
+    return(robj)
 }
