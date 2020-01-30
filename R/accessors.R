@@ -30,7 +30,7 @@ hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
 
 #' Query and store sample metadata.
 #'
-#' Retrieves sample postprocessed metadata from an HDF5 database.
+#' Retrieves learned sample annotations metadata from an HDF5 database.
 #'
 #' @param dbn Path to HDF5 database file.
 #' @param dsn Name or group path to HDF5 dataset containing 
@@ -53,10 +53,10 @@ data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
 #    Get SummarizedExperiment objects from dataset queries
 #---------------------------------------------------------
 
-#' Form an `RGChannelSet` from a signal table query
+#' Form an `RGChannelSet` from signal data
 #'
-#' Forms an object of `RGChannelSet` class from a query to the red 
-#' and green signal tables.
+#' Forms an object of `RGChannelSet` class from a signal data object 
+#' returned from a query to the red and green signal tables.
 #'
 #' @param ldat List of raw signal data query results. Must include 2 
 #' `data.frame` objects named 'redsignal' and 'greensignal'.
@@ -124,8 +124,8 @@ rgse <- function(ldat, verbose = FALSE){
 #' Retrieves query matches from raw signal HDF5 datasets. 
 #' Handles identity queries to rows (GSM IDs) or columns 
 #' (CpG probe addresses). Returns query matches either 
-#' as a list of 2 `data.frame`s or a single `RGChannelSet` 
-#' object.
+#' as a list of datasets or a single `RGChannelSet` 
+#' object, with the option of including sample metadata.
 #'
 #' @param dbn Name of the HDF5 database file.
 #' @param gsmv Vector valid GSM IDs (rows) to query, 
@@ -149,7 +149,9 @@ rgse <- function(ldat, verbose = FALSE){
 #' @return Returns either an `RGChannelSet` or list of 
 #' `data.frame` objects from dataset query matches.
 #' @examples
+#' # make samples list
 #' gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
+#' 
 #' # get list of data tables for a query
 #' ldat = getrg(gsmv = gsml, data.type = "df")
 #' 

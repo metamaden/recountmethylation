@@ -55,11 +55,13 @@ Returns either an `RGChannelSet` or list of
 Retrieves query matches from raw signal HDF5 datasets. 
 Handles identity queries to rows (GSM IDs) or columns 
 (CpG probe addresses). Returns query matches either 
-as a list of 2 `data.frame`s or a single `RGChannelSet` 
-object.
+as a list of datasets or a single `RGChannelSet` 
+object, with the option of including sample metadata.
 }
 \examples{
+# make samples list
 gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
+
 # get list of data tables for a query
 ldat = getrg(gsmv = gsml, data.type = "df")
 

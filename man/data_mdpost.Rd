@@ -16,7 +16,7 @@ postprocessed metadata.}
 Postprocessed metadata as a `data.frame`.
 }
 \description{
-Retrieves sample postprocessed metadata from an HDF5 database.
+Retrieves learned sample annotations metadata from an HDF5 database.
 }
 \examples{
 # get all available sample metadata

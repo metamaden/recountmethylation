@@ -2,7 +2,7 @@
 % Please edit documentation in R/accessors.R
 \name{rgse}
 \alias{rgse}
-\title{Form an `RGChannelSet` from a signal table query}
+\title{Form an `RGChannelSet` from signal data}
 \usage{
 rgse(ldat, verbose = FALSE)
 }
@@ -16,13 +16,13 @@ rgse(ldat, verbose = FALSE)
 Returns a `RGChannelSet` object from raw signal dataset queries.
 }
 \description{
-Forms an object of `RGChannelSet` class from a query to the red 
-and green signal tables.
+Forms an object of `RGChannelSet` class from a signal data object 
+returned from a query to the red and green signal tables.
 }
 \examples{
 # get the list of datasets for all probe addresses, 3 samples
-ldat = getrg(gsmv = c("GSM1235984", "GSM1236090", "GSM1506278"), 
-data.type = "df", metadata = FALSE)
+gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
+ldat = getrg(gsmv = gsml, data.type = "df", metadata = FALSE)
 
 # get the rg set object
 rg = rgse(ldat)
