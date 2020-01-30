@@ -77,16 +77,13 @@ We need to provide the name of the database file with extension `.h5`.
 The entire Recount Methylation HDF5 database file, called `remethdb2.h5`, 
 is available for download [here](https://recount.bio/data/remethdb2.h5). 
 
-For this vignette, we used a small test dataset from the dedicated 
-repo on [GitHub](https://github.com/metamaden/recountmethylation_packagedata/), 
+For this vignette, we used a small test dataset available [here](https://recount.bio/data/remethdbtest.h5), 
 called `remethdbtest.h5`. This test dataset contains DNAm red and green 
 signal from 30 samples at just the chromosome 22 probes. We assume this 
 file has been downloaded to the current directory.
 
 ```{r h5_details}
-url = paste0("https://github.com/metamaden/",
-    "recountmethylation_packagedata/",
-    "raw/master/remethdbtest.h5")
+url = "https://recount.bio/data/"
 dbn = "remethdbtest.h5" # db name
 download.file(url, dbn)
 rhdf5::h5ls(dbn)
