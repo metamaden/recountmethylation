@@ -152,7 +152,8 @@ rgse <- function(ldat, verbose = FALSE){
         stop("Couldn't match GSM IDs for signal data.")
     }
     if("metadata" %in% names(ldat)){
-        gsmidv <- unique(c(colnames(rgs), colnames(ggs)))
+        gsmidv <- unique(c(colnames(lm.rg[[1]]), 
+                           colnames(lm.rg[[2]])))
         if(verbose){
             message("Checking metadata...")
         }
