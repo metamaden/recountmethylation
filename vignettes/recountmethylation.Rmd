@@ -162,7 +162,7 @@ location. We will select only the probes from chromosome 22 (the only chromosome
 anno.name = "IlluminaHumanMethylation450kanno.ilmn12.hg19"
 man = eval(parse(text = paste(anno.name, "Manifest", sep = "::")))
 loc = eval(parse(text = paste(anno.name, "Locations", sep = "::")))
-identical(rownames(loc), rownames(man))
+# identical(rownames(loc), rownames(man))
 chrname = "chr22"
 cgfilt = rownames(loc[grepl(paste0("^", chrname, "$"), loc$chr),])
 cgvi = unique(c(man[cgfilt,]$AddressA, man[cgfilt,]$AddressB))
@@ -179,8 +179,8 @@ object, by setting the `data.type` argument to 'se'.
 
 ```{r get_se_set}
 # make df list from h5 db query
-se.rgi = getrg(gsmv = gsmvi, cgv = cgvi, dbn = dbn, 
-    data.type = "se", metadata = TRUE, verbose = FALSE)
+se.rgi = getrg(gsmv = gsmvi, cgv = cgvi, all.cg = FALSE, 
+    dbn = dbn, data.type = "se", metadata = TRUE, verbose = FALSE)
 ```
 ```{r check_se_set}
 dim(se.rgi)
@@ -195,8 +195,8 @@ genome annotations, and other useful metadata in a single object.
 Alternatively, we can return a list of datasets.
 
 ```{r get_dflist}
-ldat.rgi = getrg(gsmv = gsmvi, dbn = dbn, 
-    data.type = "df", metadata = TRUE, verbose = FALSE)
+ldat.rgi = getrg(gsmv = gsmvi, cgv = cgvi, all.cg = FALSE, 
+    dbn = dbn, data.type = "df", metadata = TRUE, verbose = FALSE)
 ```
 ```{r check_dflist}
 length(ldat.rgi)
