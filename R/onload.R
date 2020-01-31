@@ -3,8 +3,8 @@
   msg = paste0("",
 "\n***************************************
 \n", pkgname, 
-"\n* VERSION:\n", version,
-"\n* DISCLAIMER:\n
+"\n\n* VERSION:\n", version,
+"\n\n* DISCLAIMER:\n
 Recount Methylation contains data from GEO 
 (ncbi.nlm.nih.gov/geo/), a live public 
 database where alterations to online records 
@@ -13,9 +13,9 @@ over time. We cannot gaurantee the accuracy
 of data in Recount Methylation and advise 
 users cross-check their findings with 
 latest available records.
-\n* CITATION:\n
+\n\n* CITATION:\n
 If you use this package in published research, 
 please cite the accompanying manuscript.
-***************************************")	
+\n***************************************")	
   packageStartupMessage(msg)
 }
