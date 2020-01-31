@@ -4,6 +4,17 @@ annotations from the Recount Methylation HDF5 database.
 
 [<img src="inst/figures/remeth_hexsticker.png" height="120"/>](https://recount.bio/data)
 
+# Authors
+
+Sean K. Maden
+Ph.D. candidate, Computational Biology Program, Dept. of Biomedical Engineering, OHSU
+
+Kasper D. Hansen, Ph.D. 
+Professor, Dept. of Biostatistics, Johns Hopkins Bloomberg School of Public Health
+
+Abhi Nellore, Ph.D.
+Professor, Computational Biology Program, Dept. of Biomedical Engineering & Dept. of Surgery, OHSU
+
 # Installation and data access
 
 Install this library from GitHub with 
