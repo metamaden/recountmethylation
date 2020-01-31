@@ -6,14 +6,16 @@ annotations from the Recount Methylation HDF5 database.
 
 # Authors
 
-Sean K. Maden, Ph.D. candidate
- Computational Biology Program, Dept. of Biomedical Engineering, OHSU
+Sean K. Maden, Ph.D. candidate, Computational Biology Program, 
+Dept. of Biomedical Engineering, OHSU
 
-Kasper D. Hansen, Ph.D. 
- Professor, Dept. of Biostatistics, Johns Hopkins Bloomberg School of Public Health
+Kasper D. Hansen, Ph.D., 
+Professor, Dept. of Biostatistics, Johns Hopkins Bloomberg 
+School of Public Health
 
-Abhi Nellore, Ph.D.
- Professor, Computational Biology Program, Dept. of Biomedical Engineering & Dept. of Surgery, OHSU
+Abhi Nellore, Ph.D.,
+Professor, Computational Biology Program, Dept. of Biomedical 
+Engineering & Dept. of Surgery, OHSU
 
 # Installation and data access
 
