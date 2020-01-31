@@ -10,20 +10,23 @@ Install this library from GitHub with
 The latest version of the Recount Methylation HDF5 database is contained
 in the `remethdb2.h5` file, which can be downloaded from 
 [https://recount.bio/data/](https://recount.bio/data/). We presently 
-recommend users download this database (about 130Gb) and
+recommend users download the database file (about 120Gb in size) and
 use `recountmethylation` for local access (e.g. by setting 
 `dbn = remethdb2.h5`).
 
 # Introduction
 
-This package provides accessor functions to query Recount Methylation 
+This package provides accessor functions to query the Recount Methylation HDF5 
 database file, `remethdb2.h5`. The database stores relatively large red- and 
 green-channel raw signal tables in 
-[hierarchical data format](https://portal.hdfgroup.org/display/HDF5/HDF5), or "HDF5". These DNAm 
-signal tables have been extracted directly from IDAT files generated using the 
-Illumina HM450k array DNAm array platform. DNAm arrays were accessed from 
-the [Gene Expression Omnibus](https://www.ncbi.nlm.nih.gov/geo/) via the 
-GEO Data Sets database.
+[hierarchical data format](https://portal.hdfgroup.org/display/HDF5/HDF5), 
+or "HDF5". These DNAm signal tables have been extracted directly from IDAT 
+files generated using the Illumina HM450k array DNAm array platform. 
+DNAm arrays were accessed from the 
+[Gene Expression Omnibus](https://www.ncbi.nlm.nih.gov/geo/) via the 
+GEO Data Sets database and 
+[Entrez programming utilities](https://www.ncbi.nlm.nih.gov/books/NBK25501/) 
+software.
 
 To help inform sample queries, the HDF5 database includes a sample metadata 
 table learned from GEO GSE 
