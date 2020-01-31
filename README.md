@@ -12,7 +12,7 @@ Access this library from GitHub with
 This package provides accessor functions to query Recount Methylation 
 database file, `remethdb2.h5`. The database stores relatively large red- and 
 green-channel raw signal tables in 
-[hierarchical data format](https://www.hdfgroup.org/), or "HDF5". These DNAm 
+[hierarchical data format](https://portal.hdfgroup.org/display/HDF5/HDF5), or "HDF5". These DNAm 
 signal tables have been extracted directly from IDAT files generated using the 
 Illumina HM450k array DNAm array platform. DNAm arrays were accessed from 
 the [Gene Expression Omnibus](https://www.ncbi.nlm.nih.gov/geo/) via the 
