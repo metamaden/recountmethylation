@@ -78,35 +78,35 @@ data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
 #'     mi1 = "columns", mi2 = "columns)
 #' @export
 matchds.1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"), 
-                    mi2 = c("rows", "columns"), subset.match = FALSE){
+    mi2 = c("rows", "columns"), subset.match = FALSE){
   if(mi1 == "rows"){ii1 = as.character(rownames(ds1))}
   if(mi1 == "columns"){ii1 = as.character(colnames(ds1))}
   if(mi2 == "rows"){ii2 = as.character(rownames(ds2))}
   if(mi2 == "columns"){ii2 = as.character(colnames(ds2))}
   if(subset.match){
-    ii1 = ii1[ii1 %in% intersect(ii1, ii2)]
-    ii2 = ii2[ii2 %in% intersect(ii1, ii2)]
+      ii1 = ii1[ii1 %in% intersect(ii1, ii2)]
+      ii2 = ii2[ii2 %in% intersect(ii1, ii2)]
   }
   ii1 = ii1[order(match(ii1, ii2))] # match 1 to 2
   if(!identical(ii1, ii2)){
-    stop(paste0("Couldn't match provided indices. ",
-                "Are they of the same length?"))
+      stop(paste0("Couldn't match provided indices. ",
+          "Are they of the same length?"))
   }
   if(mi1 == "rows"){
-    ds1m = ds1[rownames(ds1) %in% ii1,]
-    ds1m = ds1m[order(match(as.character(rownames(ds1m)), ii1)),]
+      ds1m = ds1[rownames(ds1) %in% ii1,]
+      ds1m = ds1m[order(match(as.character(rownames(ds1m)), ii1)),]
   }
   if(mi1 == "columns"){
-    ds1m = ds1[, colnames(ds1) %in% ii1]
-    ds1m = ds1m[, order(match(as.character(colnames(ds1m)), ii1))]
+      ds1m = ds1[, colnames(ds1) %in% ii1]
+      ds1m = ds1m[, order(match(as.character(colnames(ds1m)), ii1))]
   }
   if(mi2 == "rows"){
-    ds2m = ds2[rownames(ds2) %in% ii2,]
-    ds2m = ds2m[order(match(as.character(rownames(ds2m)), ii2)),]
+      ds2m = ds2[rownames(ds2) %in% ii2,]
+      ds2m = ds2m[order(match(as.character(rownames(ds2m)), ii2)),]
   }
   if(mi2 == "columns"){
-    ds2m = ds2[, colnames(ds2) %in% ii2]
-    ds2m = ds2m[, order(match(as.character(colnames(ds2m)), ii2))]
+      ds2m = ds2[, colnames(ds2) %in% ii2]
+      ds2m = ds2m[, order(match(as.character(colnames(ds2m)), ii2))]
   }
   return(list(ds1 = ds1m, ds2 = ds2m))
 }
