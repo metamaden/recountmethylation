@@ -2,10 +2,17 @@
 Library to query, access, and store DNAm signal and learned sample metadata 
 annotations from the Recount Methylation HDF5 database.
 
-# Installation
+# Installation and data access
 
-Access this library from GitHub with 
-`require(devtools); install_github("metamaden/recountmethylation")`
+Install this library from GitHub with 
+`require(devtools); install_github("metamaden/recountmethylation")`.
+
+The latest version of the Recount Methylation HDF5 database is contained
+in the `remethdb2.h5` file, which can be downloaded from 
+[https://recount.bio/data/](https://recount.bio/data/). We presently 
+recommend users download this database (about 130Gb) and
+use `recountmethylation` for local access (e.g. by setting 
+`dbn = remethdb2.h5`).
 
 # Introduction
 
@@ -45,8 +52,3 @@ showed how to check retrieved data against a fresh download of sample IDATs
 from GEO Datat Sets (see vigentte). Through this and other means, 
 we advise `recountmethylation` users be vigilant in cross-checking their 
 findings with latest available records and study data.
-
-# Data access
-
-The Recount Methylation [HDF5](https://www.hdfgroup.org/) database can be 
-downloaded from (https://recount.bio/data/)[https://recount.bio/data/].
