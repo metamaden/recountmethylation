@@ -1,4 +1,4 @@
-[<img style="float: right;" src = "inst/figures/remeth_hexsticker.png" height="180"/>](https://recount.bio/data){
+![<img style="float: right;" src = "inst/figures/remeth_hexsticker.png" height="180"/>](https://recount.bio/data){
   float: right;
 }
 # The `recountmethylation` package
