@@ -12,7 +12,7 @@ in the `remethdb2.h5` file, which can be downloaded from
 [https://recount.bio/data/](https://recount.bio/data/). We presently 
 recommend users download the database file (about 120Gb in size) and
 use `recountmethylation` for local access (e.g. by setting 
-`dbn = remethdb2.h5`).
+`dbn = "remethdb2.h5"`).
 
 # Introduction
 
