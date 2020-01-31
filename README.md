@@ -66,6 +66,6 @@ records can cause discrepancies with stored data over time. Thus, we cannot
 universally guarantee the data contained in Recount Methylation will reflect 
 the current state of latest available corresponding records in GEO. We 
 showed how to check retrieved data against a fresh download of sample IDATs 
-from GEO Datat Sets (see vigentte). Through this and other means, 
+from GEO Data Sets (see vignette). Through this and other means, 
 we advise `recountmethylation` users be vigilant in cross-checking their 
 findings with latest available records and study data.
