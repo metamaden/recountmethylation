@@ -1,8 +1,13 @@
 ---
 title: "User's Guide for `recountmethylation`"
-author:
-    - Sean K. Maden
-    - Abhinav Nellore
+- name: Sean K. Maden
+    affiliation:
+    - &libd Computational Biology Program, Dept. of Biomedical Engineering, OHSU
+    email: maden@ohsu.edu
+- name: Abhi Nellore
+    affiliation:
+    - &libd Computational Biology Program, Dept. of Biomedical Engineering, OHSU
+    - &ccb Dept. of Surgery, OHSU
 package: recountmethylation
 abstract: >
     This is the user's guide for the `recountmethylation` R package, which 
