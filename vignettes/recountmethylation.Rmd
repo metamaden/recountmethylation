@@ -274,8 +274,8 @@ for(c in colnames(rgdl)){
 table(evalv == TRUE)
 ```
 
-The packages `GEOquery` and `GEOmetadb` provide additional utilities for 
-data access that can aid with validation.
+The packages `GEOquery` and `GEOmetadb` provide additional data and 
+utilities for that can aid with validation.
 
 # Basic preprocessing
 Basic preprocessing of the `RGChannelSet` object can be performed with 
