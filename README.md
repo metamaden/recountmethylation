@@ -5,7 +5,7 @@ annotations from the Recount Methylation HDF5 database.
 
 # Authors
 
-![Sean K. Maden](https://metamaden.github.io/about/), Ph.D. candidate, Computational Biology Program, 
+[Sean K. Maden](https://metamaden.github.io/about/), Ph.D. candidate, Computational Biology Program, 
 Dept. of Biomedical Engineering, OHSU
 
 Kasper D. Hansen, Ph.D., 
