@@ -98,7 +98,7 @@ matchds.1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
   }
   if(mi1 == "columns"){
     ds1m = ds1[, colnames(ds1) %in% ii1]
-    ds1m = ds1m[, order(match(as.character(colnames(ds1m)), ii1)),]
+    ds1m = ds1m[, order(match(as.character(colnames(ds1m)), ii1))]
   }
   if(mi2 == "rows"){
     ds2m = ds2[rownames(ds2) %in% ii2,]
@@ -106,7 +106,7 @@ matchds.1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
   }
   if(mi2 == "columns"){
     ds2m = ds2[, colnames(ds2) %in% ii2]
-    ds2m = ds2m[, order(match(as.character(colnames(ds2m)), ii2)),]
+    ds2m = ds2m[, order(match(as.character(colnames(ds2m)), ii2))]
   }
   return(list(ds1 = ds1m, ds2 = ds2m))
 }

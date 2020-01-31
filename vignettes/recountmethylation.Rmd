@@ -90,8 +90,8 @@ the chromosome 22 probes. We assume this file has been downloaded to the
 current directory.
 
 ```{r h5_details}
-url = "https://recount.bio/data/"
 dbn = "remethdbtest.h5" # db name
+url = "https://recount.bio/data/"
 download.file(paste0(url, dbn), dbn)
 rhdf5::h5ls(dbn)
 ```
