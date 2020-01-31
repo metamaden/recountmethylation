@@ -15,10 +15,9 @@
 #' @param dsn Name of dataset or group of dataset to connect with.
 #' @param dbn Path to h5 database file.
 #' @return HDF5 database connection object.
-#' @examples 
+#' @examples
 #' # get red signal for first 2 probe addresses, first 3 samples
 #' st <- hread(1:3, 1:2, d = "redsignal", dbn = "remethdb2.h5")
-#' @seealso data_mdpost()
 #' @export
 hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
     return(rhdf5::h5read(dbn, dsn, index = list(ri, ci)))
@@ -49,6 +48,69 @@ data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
     return(mdp)
 }
 
+#------------------------
+#    Additional Utilities
+#------------------------
+
+#' Match two datasets
+#'
+#' Match the character vectors of row or column names 
+#' for 2 datasets.
+#' 
+#' @param ds1 First dataset to match
+#' @param ds2 Second dataset to match
+#' @param mi1 Match index of ds1 (either "rows" or "columns")
+#' @param mi2 Match index of ds2 (either "rows" or "columns")
+#' @param subset.match If index lengths don't match, match on the 
+#' common subset instead
+#' @return A list of the matched datasets.
+#' @examples
+#' # make 2 mismatched datasets
+#' ds1 <- matrix(seq(1, 10, 1), nrow = 5)
+#' ds2 <- matrix(seq(11, 20, 1), nrow = 5)
+#' rownames(ds1) <- rownames(ds2) <- paste0("row", seq(1, 5, 1))
+#' colnames(ds1) <- colnames(ds2) <- paste0("col", c(1, 2))
+#' ds2 <- ds2[rev(seq(1, 5, 1)), c(2, 1)]
+#' 
+#' # match row and column names
+#' lmatched = matchds(d1, d2, mi1 = "rows", mi2 = "rows")
+#' lmatched = matchds(lmatched[[1]], lmatched[[2]], 
+#'     mi1 = "columns", mi2 = "columns)
+#' @export
+matchds.1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"), 
+                    mi2 = c("rows", "columns"), subset.match = FALSE){
+  if(mi1 == "rows"){ii1 = as.character(rownames(ds1))}
+  if(mi1 == "columns"){ii1 = as.character(colnames(ds1))}
+  if(mi2 == "rows"){ii2 = as.character(rownames(ds2))}
+  if(mi2 == "columns"){ii2 = as.character(colnames(ds2))}
+  if(subset.match){
+    ii1 = ii1[ii1 %in% intersect(ii1, ii2)]
+    ii2 = ii2[ii2 %in% intersect(ii1, ii2)]
+  }
+  ii1 = ii1[order(match(ii1, ii2))] # match 1 to 2
+  if(!identical(ii1, ii2)){
+    stop(paste0("Couldn't match provided indices. ",
+                "Are they of the same length?"))
+  }
+  if(mi1 == "rows"){
+    ds1m = ds1[rownames(ds1) %in% ii1,]
+    ds1m = ds1m[order(match(as.character(rownames(ds1m)), ii1)),]
+  }
+  if(mi1 == "columns"){
+    ds1m = ds1[, colnames(ds1) %in% ii1]
+    ds1m = ds1m[, order(match(as.character(colnames(ds1m)), ii1)),]
+  }
+  if(mi2 == "rows"){
+    ds2m = ds2[rownames(ds2) %in% ii2,]
+    ds2m = ds2m[order(match(as.character(rownames(ds2m)), ii2)),]
+  }
+  if(mi2 == "columns"){
+    ds2m = ds2[, colnames(ds2) %in% ii2]
+    ds2m = ds2m[, order(match(as.character(colnames(ds2m)), ii2)),]
+  }
+  return(list(ds1 = ds1m, ds2 = ds2m))
+}
+
 #---------------------------------------------------------
 #    Get SummarizedExperiment objects from dataset queries
 #---------------------------------------------------------
@@ -75,25 +137,25 @@ rgse <- function(ldat, verbose = FALSE){
     if(!("greensignal" %in% names(ldat) & "redsignal" %in% names(ldat))){
         stop(paste0("Invalid datasets list passed."))
     }
-    if(verbose){message("Matching probe IDs in signal matrices...")}
+    if(verbose){
+        message("Matching probe IDs in signal matrices...")
+    }
     rga <- ldat[["redsignal"]]; gga <- ldat[["greensignal"]]
-    addrv <- unique(c(rownames(rga), rownames(gga))) # get CpG addresses
-    rgs <- rga[rownames(rga) %in% addrv, ]
-    rgs <- rgs[order(match(rownames(rgs), addrv)), ]
-    ggs <- gga[rownames(gga) %in% addrv, ]
-    ggs <- ggs[order(match(rownames(ggs), addrv)), ]
-    cgidmatch <- identical(rownames(rgs), rownames(ggs))
-    if(!cgidmatch){stop("Couldn't probe IDs.")}
-    if(verbose){message("Matching GSM IDs in signal matrices...")}
-    gsmidv <- unique(c(colnames(rgs), colnames(ggs)))
-    rgf <- rgs[, colnames(rgs) %in% gsmidv]
-    ggf <- ggs[, colnames(ggs) %in% gsmidv]
-    rgf <- rgf[, order(match(colnames(rgf), gsmidv))]
-    ggf <- ggf[, order(match(colnames(ggf), gsmidv))]
-    gsmidmatch <- identical(colnames(rgf), colnames(ggf))
-    if(!gsmidmatch){stop("Couldn't match GSM IDs for signal data.")}
+    lm.rg <- matchds.1to2(rga, gga, "rows", "rows")
+    lm.rg <- matchds.1to2(lm.rg[[1]], lm.rg[[2]], "columns", "columns")
+    cgidmatch <- identical(rownames(lm.rg[[1]]), rownames(lm.rg[[2]]))
+    gsmidmatch <- identical(colnames(lm.rg[[1]]), colnames(lm.rg[[2]]))
+    if(!cgidmatch){
+        stop("Couldn't probe IDs.")
+    }
+    if(!gsmidmatch){
+        stop("Couldn't match GSM IDs for signal data.")
+    }
     if("metadata" %in% names(ldat)){
-        if(verbose){message("Checking metadata...")}
+        gsmidv <- unique(c(colnames(rgs), colnames(ggs)))
+        if(verbose){
+            message("Checking metadata...")
+        }
         mdp <- ldat[["metadata"]]; mdp$gsm <- as.character(mdp$gsm)
         gsmov <- gsmidv[!gsmidv %in% mdp$gsm]; numo <- length(gsmov)
         if(numo > 0){
@@ -102,19 +164,19 @@ rgse <- function(ldat, verbose = FALSE){
             nmm <- matrix(nmdat, nrow = numo); colnames(nmm) <- colnames(mdp)
             mdp <- rbind(mdp, nmm)
         }
-        mdf <- mdp[mdp$gsm %in% gsmidv,]
-        mdf <- mdf[order(match(mdf$gsm, gsmidv)),]
-        mdf$gsm <- as.character(mdf$gsm)
-        mdmatchid <- identical(mdf$gsm, colnames(rgf)) & 
-            identical(mdf$gsm, colnames(ggf))
-        if(!mdmatchid){stop("Couldn't match GSM IDs for md and signal data.")}
-        rownames(mdf) <- mdf$gsm
+        rownames(mdp) <- mdp$gsm
+        lm.pr <- matchds.1to2(mdp, lm.rg[[1]], "rows", "columns")
+        mdmatchid <- identical(rownames(lm.pr[[1]]), colnames(lm.pr[[2]]))
+        if(!mdmatchid){
+            stop("Couldn't match GSM IDs for md and signal data.")
+        }
     }
     anno <- c("IlluminaHumanMethylation450k", "ilmn12.hg19")
     names(anno) <- c("array", "annotation")
-    rgi <- minfi::RGChannelSet(Green = ggf, Red = rgf, annotation = anno)
+    rgi <- minfi::RGChannelSet(Red = lm.rg[[1]], 
+                               Green = lm.rg[[2]], annotation = anno)
     if("metadata" %in% names(ldat)){
-        minfi::pData(rgi) <- S4Vectors::DataFrame(mdf)
+        minfi::pData(rgi) <- S4Vectors::DataFrame(lm.pr[[1]])
     }
     return(rgi)
 }
