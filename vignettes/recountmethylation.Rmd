@@ -1,10 +1,11 @@
 ---
 title: "User's Guide for `recountmethylation`"
-- name: Sean K. Maden
+author:
+  - name: Sean K. Maden
     affiliation:
     - &libd Computational Biology Program, Dept. of Biomedical Engineering, OHSU
     email: maden@ohsu.edu
-- name: Abhi Nellore
+  - name: Abhi Nellore
     affiliation:
     - &libd Computational Biology Program, Dept. of Biomedical Engineering, OHSU
     - &ccb Dept. of Surgery, OHSU
@@ -22,8 +23,10 @@ vignette: >
     %\VignetteIndexEntry{recountmethylation user's guide} 
     %\usepackage[UTF-8]{inputenc}
 output:
-    html_document:
+    BiocStyle::html_document:
         toc: true
+        tocfloat: true
+        code_folding: show
     pdf_document: default
 ---
 
@@ -91,8 +94,7 @@ is available for download [here](https://recount.bio/data/remethdb2.h5).
 For this vignette, we used a small test dataset available 
 [here](https://recount.bio/data/remethdbtest.h5), called `remethdbtest.h5`. 
 This test dataset contains DNAm red and green signal from 30 samples at just 
-the chromosome 22 probes. We assume this file has been downloaded to the 
-current directory.
+the chromosome 22 probes. We can download this file to the current working directory as follows.
 
 ```{r h5_details}
 dbn = "remethdbtest.h5" # db name
@@ -106,7 +108,7 @@ denoted as "[dataset].[row/column]names". Data contained in each
 respective object has a single format (e.g. `FLOAT`, `STRING`, etc.), 
 where row and column names as well as the metadata table are of type `STRING`).
 
-We can quickly access the entire metadata table for sample queries:
+We can quickly access the entire metadata table for sample queries as follows.
 
 ```{r get_gsm_metadata}
 # get full gsm metadata
@@ -115,16 +117,25 @@ dim(mdp)
 ```
 
 The test dataset contains a small subset of the data available in 
-recount methylation. We can check available sample types and construct 
-a sample query as follows:
+recount methylation. Here, we will query the samples under the GSM records [GSM2465267](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM2465267) 
+and 
+[GSM2814572](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSM2814572), 
+which are in turn under the GSE records
+[GSE93933](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE93933) and
+[GSE105018](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE105018). 
+
+Next, we can check available sample types and construct 
+a sample query from the sample metadata file.
 
 ```{r make_gsm_query}
 # check which samples available in h5 db
 dsn = "redsignal"
+
 # redsignal rownames (gsm ids)
 rs.gsm = rhdf5::h5read(dbn, paste(dsn, "rownames", sep = ".")) 
 rs.gsm = gsub("\\..*", "", rs.gsm)
 mdf = mdp[mdp$gsm %in% rs.gsm,]
+
 # available tissue terms
 unique(unlist(strsplit(mdf$tissue, ";"))) 
 
@@ -135,10 +146,17 @@ which.index = 1:2
 which.gsm = which(grepl(paste0(".*", termi, ".*"), 
     mdf[,var.query]))[which.index]
 gsmvi = mdf$gsm[which.gsm]
+
+# sample ids
+gsmvi
 ```
 
+Importantly, we described full methods for deriving sample metadata and learning annotations in the affiliated manuscript. In summary, we coerced various types of data mined directly from the GSE SOFT records into a uniform and predictable format. For the variables `disease` and `tissue`, we learned annotations as a series of labels separated by `;`, where samples can have one of seveal labels under a variable. This means exact term matches are best identified using `grepl(paste0("(^|;)", myterm, "($|;)", mdvariable)` and approximate term matches containing a queried string can use `grepl(paste0(".*", myterm, ".*", mdvariable)`. 
+
+Additional metadata variables are included for sample preparation type under `storage` (e.g. ffpe or frozen), mined age under `age`, most likely sample type prediction from MetaSRA-pipeline under `sampletype`, and DNAm model-based predictions for age (`predage`), sex (`predsex`), and cell type fractions (`predcell.*` variables).
+
 Next, we can query a subset of the available array probes based on 
-location. Here, our query selects only probes located on chromosome 9:
+location. We will select only the probes from chromosome 22 (the only chromosome included in the test dataset).
 
 ```{r make_cg_query}
 anno.name = "IlluminaHumanMethylation450kanno.ilmn12.hg19"
@@ -150,8 +168,8 @@ cgfilt = rownames(loc[grepl(paste0("^", chrname, "$"), loc$chr),])
 cgvi = unique(c(man[cgfilt,]$AddressA, man[cgfilt,]$AddressB))
 ```
 
-With the queries constructed, we can proceed to extracting the 
-methylation datasets.
+With the queries constructed, we can proceed to extracting and storing the 
+methylation datasets for analysis.
 
 # Data queries
 DNA methylation signal data can be retrieved in one of two ways using the 
@@ -174,7 +192,7 @@ dim(minfi::getBeta(se.rgi))
 This class conveniently stores signal data, sample metadata, 
 genome annotations, and other useful metadata in a single object. 
 
-Alternatively, we can return a list of `data.frame` objects.
+Alternatively, we can return a list of datasets.
 
 ```{r get_dflist}
 ldat.rgi = getrg(gsmv = gsmvi, dbn = dbn, 
