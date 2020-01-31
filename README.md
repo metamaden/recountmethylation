@@ -1,8 +1,7 @@
+[<img style="float: right;" src = "inst/figures/remeth_hexsticker.png" height="180"/>](https://recount.bio/data)
 # The `recountmethylation` package
 Library to query, access, and store DNAm signal and learned sample metadata 
 annotations from the Recount Methylation HDF5 database.
-
-[<img src="inst/figures/remeth_hexsticker.png" height="180"/>](https://recount.bio/data)
 
 # Authors
 
