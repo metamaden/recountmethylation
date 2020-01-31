@@ -226,8 +226,9 @@ getrg <- function(gsmv = NULL, cgv = NULL,
     dsv = c("redsignal", "greensignal"), all.gsm = FALSE, 
     all.cg = TRUE, metadata = TRUE, md.dsn = "mdpost", 
     verbose = FALSE){
-    if(length(gsmv) < 2 | length(cgv) == 0 & !all.cg | all.gsm & all.cg){
-        stop("Invalid query indices. Review GSM and probe ID args.")
+    if((length(gsmv) < 2 & !all.gsm) | (length(cgv) == 0 & !all.cg) | 
+       (all.gsm & all.cg)){
+        stop("Invalid query Review GSM and probe ID args.")
     }
     ldat <- list() # datasets list
     for(d in dsv){
@@ -236,10 +237,16 @@ getrg <- function(gsmv = NULL, cgv = NULL,
             rnd <- rhdf5::h5read(dbn, paste(d, "rownames", sep = ".")) 
             rnd <- gsub("\\..*", "", rnd) # clean GSM IDs
             cnd <- rhdf5::h5read(dbn, paste(d, "colnames", sep = ".")) 
-            cgvp <- ifelse(all.cg, seq(1, length(cnd), 1),
-                which(cnd %in% cgv))  
-            gsmvp <- ifelse(all.gsm, seq(1, length(rnd), 1), 
-                which(rnd %in% gsmv))
+            if(all.cg){
+              cgvp <- seq(1, length(cnd), 1)
+            } else{
+              cgvp <- which(cnd %in% cgv)
+            }
+            if(all.gsm){
+              gsmvp <- seq(1, length(rnd), 1)
+            } else{
+              gsmvp <- which(rnd %in% gsmv)
+            }
             if(length(gsmvp) < 2){stop("Not enough valid GSM IDs found.")}
         }
         ddat <- hread(ri = gsmvp, ci = cgvp, d, dbn)
