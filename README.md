@@ -12,7 +12,7 @@ Dept. of Biomedical Engineering, OHSU](https://github.com/ohsu-comp-bio)
 Professor, Dept. of Biostatistics, Johns Hopkins Bloomberg 
 School of Public Health
 
-[Abhi Nellore, Ph.D.,](https://github.com/nellore)
+[Abhi Nellore](https://github.com/nellore), Ph.D.,
 Professor, [Computational Biology Program, Dept. of Biomedical 
 Engineering](https://github.com/ohsu-comp-bio) & Dept. of Surgery, OHSU
 
