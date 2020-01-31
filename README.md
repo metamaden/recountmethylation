@@ -1,5 +1,6 @@
 # The `recountmethylation` package
-Library to query, access, and store DNAm signal and learned sample metadata annotations from the Recount Methylation HDF5 database.
+Library to query, access, and store DNAm signal and learned sample metadata 
+annotations from the Recount Methylation HDF5 database.
 
 # Installation
 
