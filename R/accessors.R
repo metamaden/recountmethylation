@@ -27,14 +27,14 @@ hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
 #    Query the sample metadata
 #-----------------------------
 
-#' Query and store sample metadata.
+#' Retrieve available sample metadata
 #'
-#' Retrieves learned sample annotations metadata from an HDF5 database.
+#' Retrieves all sample metadata from an HDF5 database.
 #'
 #' @param dbn Path to HDF5 database file.
 #' @param dsn Name or group path to HDF5 dataset containing 
-#' postprocessed metadata.
-#' @return Postprocessed metadata as a `data.frame`.
+#' the sample metadata and learned annotations.
+#' @return A `data.frame` of all the sample metadata
 #' @examples 
 #' # get all available sample metadata
 #' mdp <- data_mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
