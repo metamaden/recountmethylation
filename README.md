@@ -1,20 +1,20 @@
 
 # The `recountmethylation` R package [<img style="float: right;" src = "inst/figures/remeth_hexsticker.png" height="180"/>](https://recount.bio/data)
 This package provides methods to access, query, and store DNAm signal and learned sample metadata 
-annotations from the Recount Methylation HDF5 database.
+annotations from the Recount Methylation database files.
 
 # Authors
 
-[Sean K. Maden](https://metamaden.github.io/about/), Ph.D. candidate, [Computational Biology Program, 
-Dept. of Biomedical Engineering, OHSU](https://github.com/ohsu-comp-bio)
+Sean K. Maden, Ph.D. candidate, Computational Biology Program, 
+Dept. of Biomedical Engineering, OHSU
 
-[Kasper D. Hansen](https://github.com/hansenlab), Ph.D., 
-Professor, Dept. of Biostatistics, Johns Hopkins Bloomberg 
+Kasper D. Hansen, Ph.D., 
+Prof. Dept. of Biostatistics, Johns Hopkins Bloomberg 
 School of Public Health
 
-[Abhi Nellore](https://github.com/nellore), Ph.D.,
-Professor, [Computational Biology Program, Dept. of Biomedical 
-Engineering](https://github.com/ohsu-comp-bio) & Dept. of Surgery, OHSU
+Abhi Nellore, Ph.D.,
+Prof. Computational Biology Program, Dept. of Biomedical 
+Engineering & Dept. of Surgery, OHSU
 
 # Installation and data access
 
