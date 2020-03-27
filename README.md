@@ -1,5 +1,5 @@
 
-# `recountmethylation` [<img style="float: right;" src = "inst/figures/remeth_hexsticker.png" height="180"/>](https://recount.bio/data)
+# `recountmethylation`
 
 # Authors
 
@@ -39,3 +39,5 @@ please cite the accompanying manuscript.
 
 ***************************************
 ```
+
+ [<img style="float: right;" src = "inst/figures/remeth_hexsticker.png" height="180"/>](https://recount.bio/data)
