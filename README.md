@@ -23,22 +23,32 @@ Install this library from an R session using
 
 # Introduction
 
-# Disclaimer
+# Package disclaimer
 
-The `recountmethylation` R package can aid and expand research capabilities 
-in epigenetics, especially for initial discovery and exploration phases of an 
-experiment utilizing published data. The data contained in Recount Methylation, 
-a cross-study compilation of DNAm signal matrices and learned metadata, is 
-extensively characterized and described in the accompanying manuscript, which 
-also vitally includes transparent methods for how we obtained samples and 
-learned sample metadata annotations. 
+```
+***************************************
 
-Recount Methylation contains data from GEO, a live public database where 
-alterations (e.g. updates, revisions, additions, and removals) to online 
-records can cause discrepancies with stored data over time. Thus, we cannot 
-universally guarantee the data contained in Recount Methylation will reflect 
-the current state of latest available corresponding records in GEO. We 
-showed how to check retrieved data against a fresh download of sample IDATs 
-from GEO Data Sets (see vignette). Through this and other means, 
-we advise `recountmethylation` users be vigilant in cross-checking their 
-findings with latest available records and study data.
+recountmethylation
+
+* VERSION:
+0.01.0
+
+* DISCLAIMER:
+
+Recount Methylation contains data from GEO 
+(ncbi.nlm.nih.gov/geo/), a live public 
+database where alterations to online records 
+can cause discrepancies with stored data 
+over time. We cannot gaurantee the accuracy 
+of data in Recount Methylation and advise 
+users cross-check their findings with 
+latest available records.
+
+
+* CITATION:
+
+If you use this package in published research, 
+please cite the accompanying manuscript.
+
+***************************************
+```
