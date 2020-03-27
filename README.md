@@ -5,23 +5,12 @@ annotations from the Recount Methylation database files.
 
 # Authors
 
-Sean K. Maden, Ph.D. candidate, Computational Biology Program, 
-Dept. of Biomedical Engineering, OHSU
-
-Kasper D. Hansen, Ph.D., 
-Prof. Dept. of Biostatistics, Johns Hopkins Bloomberg 
-School of Public Health
-
-Abhi Nellore, Ph.D.,
-Prof. Computational Biology Program, Dept. of Biomedical 
-Engineering & Dept. of Surgery, OHSU
+Sean K. Maden, Kasper D. Hansen, Abhi Nellore
 
 # Installation and data access
 
 Install this library from an R session using 
 `require(devtools); install_github("metamaden/recountmethylation")`.
-
-# Introduction
 
 # Package disclaimer
 
