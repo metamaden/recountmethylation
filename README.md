@@ -18,12 +18,10 @@ Engineering & Dept. of Surgery, OHSU
 
 # Installation and data access
 
-Install this library from GitHub with 
+Install this library from an R session using 
 `require(devtools); install_github("metamaden/recountmethylation")`.
 
-The latest version of the Recount Methylation HDF5 database is contained
-in the `remethdb2.h5` file, which can be downloaded from 
-[https://recount.bio/data/](https://recount.bio/data/). We presently 
+The latest version of the Recount Methylation database files are contained [here](). We presently 
 recommend users download the database file (about 120Gb in size) and
 use `recountmethylation` for local access (e.g. by setting 
 `dbn = "remethdb2.h5"`).
