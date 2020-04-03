@@ -45,21 +45,13 @@ can be either a list of datasets or a single object of class `RGChannelSet`,
 which inherits properties from the `SummarizedExperiment` class.
 
 # Disclaimer
-The following disclaimer is included on loading `recountmethylation`:
-
-```{r, message=TRUE, echo=TRUE, warning=TRUE}
-library(recountmethylation)
-```
-
-Support fo r sample validation is detailed in the "Validation of sample data" section and the function().
-
-The `recountmethylation` R package can aid and expand research capabilities 
-in epigenetics, especially for initial discovery and exploration phases of an 
-experiment utilizing published data. The data contained in Recount Methylation, 
-a cross-study compilation of DNAm signal matrices and learned metadata, is 
-extensively characterized and described in the accompanying manuscript, which 
-also vitally includes transparent methods for how we obtained samples and 
-learned sample metadata annotations. 
+On loading `recountmethylation`, a disclaimer is provided. 
+In summary, the `recountmethylation` R package can aid and expand research capabilities 
+in epigenetics cross-study analysis.
+Contained data does not presently build live, and presently data reflects 
+assays and metadata available as of March 2019.
+Data validation can be performed using `recountmethylation::rg_from_geo()`, and users
+may find the packages `GEOquery` and `GEOmetadb` useful.
 
 # Installation
 
@@ -258,9 +250,6 @@ for(c in colnames(rgdl)){
 ```{r check_rg_eval}
 table(evalv == TRUE)
 ```
-
-The packages `GEOquery` and `GEOmetadb` provide additional data and 
-utilities for that can aid with validation.
 
 # Basic preprocessing
 Basic preprocessing of the `RGChannelSet` object can be performed with 
