@@ -15,8 +15,40 @@ output:
     pdf_document: default
 ---
 
+# Overview
+
+We piped GEO assay and metadata into large data objects for analysis in R sessions. Data files are versioned and timestamped (see filenames). Currently, these reflect 
+
+The `minfi` and `HDF5Array` libraries were used. 
+
+
+
 # obtain data
 
 DNAm assay data and metadata are bundled in H5SE objects. 
 
-These can be downloaded fro m
+These can be downloaded fro (url)
+
+(info about h5se objects)
+
+# access data
+
+Use `HDF5Array` to 
+
+H5SE objects were stored using `saveHDF5SummarizedExperiment`
+
+::loadHDF5SummarizedExperiment
+
+
+
+# work with data
+
+
+Use `minfi`
+
+
+
+
+
+
+
