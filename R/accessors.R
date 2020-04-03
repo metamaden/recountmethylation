@@ -1,10 +1,39 @@
 #!/usr/bin/env R
 
-#    Access recount-methylation HDF5 database.
-
-#-----------------------------
-#    HDF5 connection utilities
-#-----------------------------
+#' Get GDS DNAm data as object of type `RGChannelSet`
+#'
+#' Uses Rcurl
+#' ('.h5') file and return the indexed table subset.
+#' @param gsmvi A vector of GSM IDs (alphanumeric character strings).
+#' @return object of class `RGChannelSet`
+#' @examples
+#' gsmvi <- c("GSM2465267", "GSM2814572")
+#' rg <- rg_from_geo(gsmvi)
+#' 
+rg_from_geo <- function(gsmvi, burl = "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/"){
+  dn = "" # download idats to cwd
+  bnv = c() # store the idat basenames
+  for(gsmi in gsmvi){
+    # format URL for query to GDS
+    url = paste0(burl, substr(gsmi, 1, nchar(gsmi)-3), 
+                 paste(rep("n", 3), collapse = ""), 
+                 "/", gsmi, "/suppl/")
+    # get urls to idats
+    fn = RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE)
+    fn <- unlist(strsplit(fn, "\n"))
+    fn = unlist(fn)[grepl("\\.idat\\.gz", fn)] # retain valid idat paths
+    bnv = c(bnv, unique(gsub("_Red.*|_Grn.*", "", fn))) # retain idat basenames
+    for(f in fn){
+      dfp = paste(getwd(), "/", dn, "/", f, sep = "")
+      download.file(paste(url, f, sep = ""), dfp)
+      system(paste0("gunzip ", dfp))
+      message(f)
+    }
+    message(gsmi)
+  }
+  rgdl = minfi::read.metharray(basenames = bnv)
+  return()
+}
 
 #' Query and store an HDF5 dataset on row and column indices.
 #'
@@ -22,10 +51,6 @@
 hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
     return(rhdf5::h5read(dbn, dsn, index = list(ri, ci)))
 }
-
-#-----------------------------
-#    Query the sample metadata
-#-----------------------------
 
 #' Retrieve available sample metadata
 #'
@@ -47,10 +72,6 @@ data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
     colnames(mdp) <- rhdf5::h5read(file = dbn, name = mcn)
     return(mdp)
 }
-
-#------------------------
-#    Additional Utilities
-#------------------------
 
 #' Match two datasets
 #'
@@ -110,10 +131,6 @@ matchds.1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
   }
   return(list(ds1 = ds1m, ds2 = ds2m))
 }
-
-#---------------------------------------------------------
-#    Get SummarizedExperiment objects from dataset queries
-#---------------------------------------------------------
 
 #' Form an `RGChannelSet` from signal data
 #'
