@@ -17,8 +17,11 @@ output:
 
 DNAm assay data and sample metadata available as of March 2019 were 
 piped into HDF5-based SummarizedExperiment objects roughly 130Gb in size.
+These files presently include `#filenames`, located at `#link`
 
+# Data queries
 
+The 
 
 These power
 rapid data querying 
