@@ -14,9 +14,9 @@ LazyData: FALSE
 Imports:
     minfi,
     rhdf5,
-    S4Vectors
+    S4Vectors,
+    Rcurl
 Suggests:
-    RCurl,
     knitr,
     testthat
 VignetteBuilder: knitr
