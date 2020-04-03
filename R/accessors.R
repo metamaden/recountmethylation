@@ -1,7 +1,7 @@
 #!/usr/bin/env R
 
 
-#' title
+#' IDATs query
 #'
 #' description
 #' @param param1 param description
@@ -12,7 +12,7 @@
 #' 
 gds_idatquery <- function(burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
                                         "geo/samples/"),
-                          ext = "gz"){
+                          ext = "gz", verbose = FALSE){
   for(gsmi in gsmvi){
     # format URL for query to GDS
     url = paste0(burl, substr(gsmi, 1, nchar(gsmi)-3), 
@@ -21,13 +21,16 @@ gds_idatquery <- function(burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
     # get urls to idats
     fn = RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE)
     fn <- unlist(strsplit(fn, "\n"))
-    #if(!length(fn) == 2)
-    fn = unlist(fn)[grepl(paste0("\\.idat\\.", ext), fn)] # retain valid idat paths
+    # retain valid idat paths
+    fn = unlist(fn)[grepl(paste0("\\.idat\\.", ext), fn)] 
     check.cond <- length(fn) == 2
-    check.cond <- c(check.cond, 
-                    grepl(".*Grn.idat.*") & grepl(".*Red.*"))
+    grn.patt <- paste0(".*Grn.idat\\.", ext, "$"))
+    red.patt <- paste0(".*Red.idat\\.", ext, "$"))
+    check.cond <- c(check.cond, grepl(grn.patt) & 
+                      grepl(red.patt))
     if(check.cond[1] & check.cond[2]){
-      bnv = c(bnv, unique(gsub("_Red.*|_Grn.*", "", fn))) # retain idat basenames
+      # retain idat basenames
+      bnv = c(bnv, unique(gsub("_Red.*|_Grn.*", "", fn)))
       if(!)
         for(f in fn){
           dfp = paste(getwd(), "/", dn, "/", f, sep = "")
@@ -36,13 +39,12 @@ gds_idatquery <- function(burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
           message(f)
         }
     } else{
-      message("Query didn't identify 2 IDATs for ", gsmi)
+      if(verbose){message("Query didn't identify",
+                          " 2 IDATs for ", gsmi)}
     }
-    
-    
-    
-    message(gsmi)
+    if(verbose){message("Finished query for: ", gsmi)}
   }
+  return(NULL)
 }
 
 #' Gets DNAm assay data and stores as `RGChannelSet` object.
@@ -61,8 +63,10 @@ gds_idat2rg <- function(gsmvi,
                                       "geo/samples/")){
   dn = "" # download idats to cwd
   bnv = c() # store the idat basenames
-  try()
-  
+  rt = try(gds_idatquery())
+  if(!class(rt) == "RGChannelSet"){
+    stop("T")
+  }
   rgdl = minfi::read.metharray(basenames = bnv)
   return(rgdl)
 }
