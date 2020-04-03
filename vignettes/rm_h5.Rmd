@@ -2,13 +2,6 @@
 title: "HDF5 support"
 author:
   - name: Sean K. Maden
-    affiliation:
-    - &libd Computational Biology Program, Dept. of Biomedical Engineering, OHSU
-    email: maden@ohsu.edu
-  - name: Abhi Nellore
-    affiliation:
-    - &libd Computational Biology Program, Dept. of Biomedical Engineering, OHSU
-    - &ccb Dept. of Surgery, OHSU
 package: recountmethylation
 abstract: >
    Vignette for working with `recountmethylation` HDF5 database contents

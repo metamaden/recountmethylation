@@ -2,8 +2,6 @@
 title: "recountmethylation Bioconductor vignette"
 author: 
   - name: Sean K. Maden
-  - name: Abhi Nellore
-  - name: Kasper D. Hansen
 date: "4/3/2020"
 abstract: > 
   This is the main vignette for the `recountmethylation` package. This shows how to obtain and work with HDF5-SummarizedExperiment data, comprising of DNAm assay data and sample metadata from 35,000 samples.
@@ -18,35 +16,40 @@ output:
 # Overview
 
 We piped GEO assay and metadata, available as of March 2019, into large data objects for analysis in R sessions. Data files are versioned and timestamped (see filenames).
-
-
-
 The `minfi` and `HDF5Array` libraries were used. 
-
-
 
 # obtain data
 
 DNAm assay data and metadata are bundled in H5SE objects. 
-
 These can be downloaded fro (url)
-
 (info about h5se objects)
-
 # access data
-
 Use `HDF5Array` to 
-
 H5SE objects were stored using `saveHDF5SummarizedExperiment`
 
-::loadHDF5SummarizedExperiment
-
-
-
 # work with data
-
-
 Use `minfi`
+
+
+# example
+
+First obtain the compact example file from (url). 
+
+```{bash}
+url='recount.bio/remethdb_hdf5test_rg'
+curl -r $url
+```
+
+Next, point to the downloaded file with `loadHDF5SummarizedExperiment`
+
+```{r}
+```
+
+Finally, perform data anlaysis tasks as you normally would. For instance:
+
+```{r}
+```
+
 
 
 
