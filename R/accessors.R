@@ -3,71 +3,91 @@
 
 #' IDATs query
 #'
-#' description
-#' @param param1 param description
+#' Queries GDS IDATs and downloads, with exception handling.
+#' @param gsmvi param description
+#' @param ext filename extension
+#' @param verbose whether to show verbose messages (TRUE/FALSE)
+#' @param burl Base URL string for RCurl query
 #' @return describes returned object
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
-#' rg <- rg_from_geo(gsmvi)
+#' gds_idatquery(gsmvi)
 #' 
-gds_idatquery <- function(burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
-                                        "geo/samples/"),
-                          ext = "gz", verbose = FALSE){
+gds_idatquery <- function(gsmvi, ext = "gz", verbose = FALSE,
+                          burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
+                                        "geo/samples/")){
+  bnv <- fnv <- c()
   for(gsmi in gsmvi){
     # format URL for query to GDS
     url = paste0(burl, substr(gsmi, 1, nchar(gsmi)-3), 
                  paste(rep("n", 3), collapse = ""), 
                  "/", gsmi, "/suppl/")
     # get urls to idats
-    fn = RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE)
+    fn = RCurl::getURL(url, ftp.use.epsv = FALSE, 
+                       dirlistonly = TRUE)
     fn <- unlist(strsplit(fn, "\n"))
-    # retain valid idat paths
-    fn = unlist(fn)[grepl(paste0("\\.idat\\.", ext), fn)] 
+    idat.str <- paste0("\\.idat\\.", ext)
+    idat.catch <- grepl(idat.str, fn)
+    fn <- unlist(fn)[idat.catch]
+    # eval conditions
     check.cond <- length(fn) == 2
-    grn.patt <- paste0(".*Grn.idat\\.", ext, "$"))
-    red.patt <- paste0(".*Red.idat\\.", ext, "$"))
-    check.cond <- c(check.cond, grepl(grn.patt) & 
-                      grepl(red.patt))
+    grn.patt <- paste0(".*Grn.idat\\.", ext, "$")
+    red.patt <- paste0(".*Red.idat\\.", ext, "$")
+    check.cond <- c(check.cond, grepl(grn.patt, fn) & 
+                      grepl(red.patt, fn))
     if(check.cond[1] & check.cond[2]){
       # retain idat basenames
-      bnv = c(bnv, unique(gsub("_Red.*|_Grn.*", "", fn)))
-      if(!)
-        for(f in fn){
-          dfp = paste(getwd(), "/", dn, "/", f, sep = "")
-          download.file(paste(url, f, sep = ""), dfp)
-          system(paste0("gunzip ", dfp))
-          message(f)
-        }
+      rg.patt <- "_Red.*|_Grn.*"
+      match.rg <- gsub(rg.patt, "", fn)
+      idatl <- unique(match.rg)
+      bnv = c(bnv, idatl)
+      for(f in fn){
+        fnv <- c(fnv, f)
+        dfp = paste(getwd(), "/", dn, "/", f, sep = "")
+        download.file(paste(url, f, sep = ""), dfp)
+        system(paste0("gunzip ", dfp))
+        message(f)
+      }
     } else{
       if(verbose){message("Query didn't identify",
-                          " 2 IDATs for ", gsmi)}
+                          " red and grn IDATs for ", 
+                          gsmi)}
     }
     if(verbose){message("Finished query for: ", gsmi)}
   }
-  return(NULL)
+  return(list("basenames" = bnv, "filenames" = fnv))
 }
 
-#' Gets DNAm assay data and stores as `RGChannelSet` object.
+#' Handles IDAT queries to GDS and returns assay data as `RGChannelSet`.
 #'
 #' Queries and downloads GSM IDAT files in GDS, and returns
 #' assay data as an `RGChannelSet`.
 #' ('.h5') file and return the indexed table subset.
 #' @param gsmvi A vector of GSM IDs (alphanumeric character strings).
+#' @param burl Base URL string for IDATs query.
+#' @param rmdl Whether to remove downloaded .*idat files (default TRUE).
 #' @return object of class `RGChannelSet`
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' rg <- rg_from_geo(gsmvi)
 #' 
-gds_idat2rg <- function(gsmvi, 
-                        burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
-                                      "geo/samples/")){
+gds_idat2rg <- function(gsmvi, burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
+                                             "geo/samples/"), rmdl = TRUE){
   dn = "" # download idats to cwd
   bnv = c() # store the idat basenames
-  rt = try(gds_idatquery())
+  rt = try(gds_idatquery(gsmvi, burl)) # idat query and download
   if(!class(rt) == "RGChannelSet"){
-    stop("T")
+    stop("Process ended with the following message: ",
+         rt[1])
   }
-  rgdl = minfi::read.metharray(basenames = bnv)
+  rgdl = minfi::read.metharray(basenames = rt[["basenames"]])
+  # file cleanup
+  if(rmdl){
+    if(verbose){message("Removing downloaded files...")}
+    for(f in rt[["filenames"]]){
+      file.remove(f)
+    }
+  }
   return(rgdl)
 }
 
