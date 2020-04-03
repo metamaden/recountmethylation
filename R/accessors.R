@@ -10,8 +10,9 @@
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' rg <- rg_from_geo(gsmvi)
 #' 
-
-gds_idatquery <- function(){
+gds_idatquery <- function(burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
+                                        "geo/samples/"),
+                          ext = "gz"){
   for(gsmi in gsmvi){
     # format URL for query to GDS
     url = paste0(burl, substr(gsmi, 1, nchar(gsmi)-3), 
@@ -20,14 +21,26 @@ gds_idatquery <- function(){
     # get urls to idats
     fn = RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE)
     fn <- unlist(strsplit(fn, "\n"))
-    fn = unlist(fn)[grepl("\\.idat\\.gz", fn)] # retain valid idat paths
-    bnv = c(bnv, unique(gsub("_Red.*|_Grn.*", "", fn))) # retain idat basenames
-    for(f in fn){
-      dfp = paste(getwd(), "/", dn, "/", f, sep = "")
-      download.file(paste(url, f, sep = ""), dfp)
-      system(paste0("gunzip ", dfp))
-      message(f)
+    #if(!length(fn) == 2)
+    fn = unlist(fn)[grepl(paste0("\\.idat\\.", ext), fn)] # retain valid idat paths
+    check.cond <- length(fn) == 2
+    check.cond <- c(check.cond, 
+                    grepl(".*Grn.idat.*") & grepl(".*Red.*"))
+    if(check.cond[1] & check.cond[2]){
+      bnv = c(bnv, unique(gsub("_Red.*|_Grn.*", "", fn))) # retain idat basenames
+      if(!)
+        for(f in fn){
+          dfp = paste(getwd(), "/", dn, "/", f, sep = "")
+          download.file(paste(url, f, sep = ""), dfp)
+          system(paste0("gunzip ", dfp))
+          message(f)
+        }
+    } else{
+      message("Query didn't identify 2 IDATs for ", gsmi)
     }
+    
+    
+    
     message(gsmi)
   }
 }
