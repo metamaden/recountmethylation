@@ -1,0 +1,17 @@
+---
+title: "recountmethylation"
+author: 
+  - name: Sean K. Maden
+  - name: Abhi Nellore
+  - name: Kasper D. Hansen
+date: "4/3/2020"
+abstract: > 
+  This is the main vignette for the `recountmethylation` package. This shows how to obtain and work with HDF5-SummarizedExperiment data.
+output:
+    BiocStyle::html_document:
+        toc: true
+        tocfloat: true
+        code_folding: show
+    pdf_document: default
+---
+

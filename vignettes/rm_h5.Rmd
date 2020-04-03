@@ -1,5 +1,5 @@
 ---
-title: "User's Guide for `recountmethylation`"
+title: "HDF5 support"
 author:
   - name: Sean K. Maden
     affiliation:
@@ -11,12 +11,7 @@ author:
     - &ccb Dept. of Surgery, OHSU
 package: recountmethylation
 abstract: >
-    This is the user's guide for the `recountmethylation` R package, which 
-    provides utilities to access DNAm array data from Recount   Methylation. 
-    Topics discussed include accessing the HDF5 dataset, querying the dataset, 
-    and storing retrieved data as SummarizedExperiment-like objects. You may 
-    find additional information and characterization of contained samples in 
-    the affiliated manuscript.
+   Vignette for working with `recountmethylation` HDF5 database contents
 vignette: >
     % \VignetteDepends{RCurl}
     %\VignetteEngine{knitr::knitr} 
