@@ -1,20 +1,17 @@
 #!/usr/bin/env R
 
-#' Get GDS DNAm data as object of type `RGChannelSet`
+
+#' title
 #'
-#' Uses Rcurl
-#' ('.h5') file and return the indexed table subset.
-#' @param gsmvi A vector of GSM IDs (alphanumeric character strings).
-#' @return object of class `RGChannelSet`
+#' description
+#' @param param1 param description
+#' @return describes returned object
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' rg <- rg_from_geo(gsmvi)
 #' 
-rg_from_gds <- function(gsmvi, 
-                        burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
-                                      "geo/samples/")){
-  dn = "" # download idats to cwd
-  bnv = c() # store the idat basenames
+
+gds_idatquery <- function(){
   for(gsmi in gsmvi){
     # format URL for query to GDS
     url = paste0(burl, substr(gsmi, 1, nchar(gsmi)-3), 
@@ -33,8 +30,28 @@ rg_from_gds <- function(gsmvi,
     }
     message(gsmi)
   }
+}
+
+#' Gets DNAm assay data and stores as `RGChannelSet` object.
+#'
+#' Queries and downloads GSM IDAT files in GDS, and returns
+#' assay data as an `RGChannelSet`.
+#' ('.h5') file and return the indexed table subset.
+#' @param gsmvi A vector of GSM IDs (alphanumeric character strings).
+#' @return object of class `RGChannelSet`
+#' @examples
+#' gsmvi <- c("GSM2465267", "GSM2814572")
+#' rg <- rg_from_geo(gsmvi)
+#' 
+gds_idat2rg <- function(gsmvi, 
+                        burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
+                                      "geo/samples/")){
+  dn = "" # download idats to cwd
+  bnv = c() # store the idat basenames
+  try()
+  
   rgdl = minfi::read.metharray(basenames = bnv)
-  return()
+  return(rgdl)
 }
 
 #' Query and store an HDF5 dataset on row and column indices.
