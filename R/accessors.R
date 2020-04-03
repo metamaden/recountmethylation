@@ -10,7 +10,9 @@
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' rg <- rg_from_geo(gsmvi)
 #' 
-rg_from_gds <- function(gsmvi, burl = "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/"){
+rg_from_gds <- function(gsmvi, 
+                        burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
+                                      "geo/samples/")){
   dn = "" # download idats to cwd
   bnv = c() # store the idat basenames
   for(gsmi in gsmvi){
