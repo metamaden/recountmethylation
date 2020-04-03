@@ -6,7 +6,7 @@ package: recountmethylation
 abstract: >
    Vignette for working with `recountmethylation` HDF5 database contents
 vignette: >
-    % \VignetteDepends{RCurl}
+    %\VignetteDepends{RCurl}
     %\VignetteEngine{knitr::knitr} 
     %\VignetteIndexEntry{recountmethylation user's guide} 
     %\usepackage[UTF-8]{inputenc}
