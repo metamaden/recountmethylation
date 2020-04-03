@@ -15,8 +15,19 @@ output:
 
 # Overview
 
-We piped GEO assay and metadata, available as of March 2019, into large data objects for analysis in R sessions. Data files are versioned and timestamped (see filenames).
-The `minfi` and `HDF5Array` libraries were used. 
+DNAm assay data and sample metadata available as of March 2019 were 
+piped into HDF5-based SummarizedExperiment objects roughly 130Gb in size.
+
+
+
+These power
+rapid data querying 
+
+out-of-memory access within an R session with 
+`DelayedArray` technology.
+
+in R sessions. Data files are 
+versioned and timestamped (see filenames).
 
 # obtain data
 
