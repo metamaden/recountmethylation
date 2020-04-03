@@ -1,12 +1,12 @@
 ---
-title: "recountmethylation"
+title: "recountmethylation Bioconductor vignette"
 author: 
   - name: Sean K. Maden
   - name: Abhi Nellore
   - name: Kasper D. Hansen
 date: "4/3/2020"
 abstract: > 
-  This is the main vignette for the `recountmethylation` package. This shows how to obtain and work with HDF5-SummarizedExperiment data.
+  This is the main vignette for the `recountmethylation` package. This shows how to obtain and work with HDF5-SummarizedExperiment data, comprising of DNAm assay data and sample metadata from 35,000 samples.
 output:
     BiocStyle::html_document:
         toc: true
@@ -17,7 +17,9 @@ output:
 
 # Overview
 
-We piped GEO assay and metadata into large data objects for analysis in R sessions. Data files are versioned and timestamped (see filenames). Currently, these reflect 
+We piped GEO assay and metadata, available as of March 2019, into large data objects for analysis in R sessions. Data files are versioned and timestamped (see filenames).
+
+
 
 The `minfi` and `HDF5Array` libraries were used. 
 
