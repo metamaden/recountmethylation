@@ -4,16 +4,19 @@
 #' IDATs query
 #'
 #' Queries GDS IDATs and downloads, with exception handling.
-#' @param gsmvi param description
-#' @param ext filename extension
-#' @param verbose whether to show verbose messages (TRUE/FALSE)
+#' Files are downloaded 
+#' @param gsmvi Param description
+#' @param ext Filename extension
+#' @param verbose Whether to show verbose messages (TRUE/FALSE)
+#' @param dfp Download directory
 #' @param burl Base URL string for RCurl query
-#' @return describes returned object
+#' @return Describes returned object
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' gds_idatquery(gsmvi)
 #' 
 gds_idatquery <- function(gsmvi, ext = "gz", verbose = FALSE,
+                          dfp = "./idats/",
                           burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
                                         "geo/samples/")){
   bnv <- fnv <- c()
@@ -31,11 +34,11 @@ gds_idatquery <- function(gsmvi, ext = "gz", verbose = FALSE,
     fn <- unlist(fn)[idat.catch]
     # eval conditions
     check.cond <- length(fn) == 2
-    grn.patt <- paste0(".*Grn.idat\\.", ext, "$")
-    red.patt <- paste0(".*Red.idat\\.", ext, "$")
-    check.cond <- c(check.cond, grepl(grn.patt, fn) & 
-                      grepl(red.patt, fn))
-    if(check.cond[1] & check.cond[2]){
+    fn.grn <- fn[grepl(paste0(".*Grn.idat\\.", ext, "$"), fn)]
+    fn.red <- fn[grepl(paste0(".*Red.idat\\.", ext, "$"), fn)]
+    check.cond <- c(check.cond, fn.grn, fn.red)
+    if(check.cond[1] & check.cond[2] & 
+       check.cond[3]){
       # retain idat basenames
       rg.patt <- "_Red.*|_Grn.*"
       match.rg <- gsub(rg.patt, "", fn)
@@ -43,7 +46,6 @@ gds_idatquery <- function(gsmvi, ext = "gz", verbose = FALSE,
       bnv = c(bnv, idatl)
       for(f in fn){
         fnv <- c(fnv, f)
-        dfp = paste(getwd(), "/", dn, "/", f, sep = "")
         download.file(paste(url, f, sep = ""), dfp)
         system(paste0("gunzip ", dfp))
         message(f)

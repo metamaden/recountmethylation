@@ -15,7 +15,7 @@ Imports:
     minfi,
     rhdf5,
     S4Vectors,
-    Rcurl
+    RCurl
 Suggests:
     knitr,
     testthat
