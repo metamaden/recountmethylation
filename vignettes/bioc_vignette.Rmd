@@ -15,3 +15,8 @@ output:
     pdf_document: default
 ---
 
+# obtain data
+
+DNAm assay data and metadata are bundled in H5SE objects. 
+
+These can be downloaded fro m
