@@ -45,6 +45,8 @@ can be either a list of datasets or a single object of class `RGChannelSet`,
 which inherits properties from the `SummarizedExperiment` class.
 
 # Disclaimer
+A disclaimer is included on loading `recountmethylation`.
+
 
 The `recountmethylation` R package can aid and expand research capabilities 
 in epigenetics, especially for initial discovery and exploration phases of an 
