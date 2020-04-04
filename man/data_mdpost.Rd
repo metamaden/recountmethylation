@@ -2,7 +2,7 @@
 % Please edit documentation in R/accessors.R
 \name{data_mdpost}
 \alias{data_mdpost}
-\title{Query and store sample metadata.}
+\title{Retrieve available sample metadata}
 \usage{
 data_mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
 }
@@ -10,13 +10,13 @@ data_mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
 \item{dbn}{Path to HDF5 database file.}
 
 \item{dsn}{Name or group path to HDF5 dataset containing 
-postprocessed metadata.}
+the sample metadata and learned annotations.}
 }
 \value{
-Postprocessed metadata as a `data.frame`.
+A `data.frame` of all the sample metadata
 }
 \description{
-Retrieves learned sample annotations metadata from an HDF5 database.
+Retrieves all sample metadata from an HDF5 database.
 }
 \examples{
 # get all available sample metadata

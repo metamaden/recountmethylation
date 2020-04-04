@@ -26,6 +26,3 @@ Get a dataset connection object from an HDF5 database
 # get red signal for first 2 probe addresses, first 3 samples
 st <- hread(1:3, 1:2, d = "redsignal", dbn = "remethdb2.h5")
 }
-\seealso{
-data_mdpost()
-}

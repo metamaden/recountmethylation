@@ -3,13 +3,13 @@ title: "recountmethylation Bioconductor vignette"
 author: 
   - name: Sean K. Maden
 package: recountmethylation
-date: "4/3/2020"
+date: "4/4/2020"
 abstract: > 
-  This is the main vignette for the `recountmethylation` package. This shows how to obtain and work with HDF5-SummarizedExperiment data, comprising of DNAm assay data and sample metadata from 35,000 samples.
+  This is the main vignette for the `recountmethylation` package.
 vignette: >
     %\VignetteDepends{RCurl}
     %\VignetteEngine{knitr::knitr} 
-    %\VignetteIndexEntry{recountmethylation user's guide} 
+    %\VignetteIndexEntry{bioc_vignette} 
     %\usepackage[UTF-8]{inputenc}
 output:
     BiocStyle::html_document:
