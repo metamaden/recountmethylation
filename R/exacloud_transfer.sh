@@ -7,7 +7,7 @@ cd /home/exacloud/lustre1/CompBio/recount_meth
 
 
 # transfer calls
-scp -r -P 21747 metamaden@96.79.111.125:/home/metamaden/recount-methylation/recount-methylation-analysis/files/mdata/compilations/ ./
+scp -r -P 21747 metamaden@96.79.111.125:/home/metamaden/recount-methylation/recount-methylation-analysis/files/mdata/compilations/remethdb_h5se-test_gr_00-00-01_1583780004 ./
 
 
 scp -r -P 21747 metamaden@96.79.111.125:/home/metamaden/recount-methylation/recountmethylation_manuscript_supplement ./
