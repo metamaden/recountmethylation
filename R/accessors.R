@@ -133,18 +133,23 @@ gds_idatquery <- function(gsmvi, ext = "gz", verbose = FALSE,
 #' assay data as an `RGChannelSet`.
 #' ('.h5') file and return the indexed table subset.
 #' @param gsmvi A vector of GSM IDs (alphanumeric character strings).
-#' @param burl Base URL string for IDATs query.
 #' @param rmdl Whether to remove downloaded .*idat files (default TRUE).
+#' @param ext Filename extension (default "gz").
+#' @param verbose Whether to show verbose messages (default FALSE).
+#' @param dfp Destination file dir for idats.
+#' @param burl Base URL string for idat query (default "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/").
 #' @return object of class `RGChannelSet`
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
-#' rg <- rg_from_geo(gsmvi)
+#' rg <- gds_idat2rg(gsmvi)
 #' 
-gds_idat2rg <- function(gsmvi, burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
-                                             "geo/samples/"), rmdl = TRUE){
+gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", 
+                        verbose = FALSE, dfp = "./idats/", 
+                        burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
+                                      "geo/samples/")){
   dn = "" # download idats to cwd
   bnv = c() # store the idat basenames
-  rt = try(gds_idatquery(gsmvi, burl)) # idat query and download
+  rt = try(gds_idatquery(gsmvi, burl, ext, verbose, dfp)) # idat query and download
   if(!class(rt) == "RGChannelSet"){
     stop("Process ended with the following message: ",
          rt[1])
