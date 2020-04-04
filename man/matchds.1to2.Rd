@@ -25,12 +25,9 @@ matchds.1to2(
 common subset instead}
 }
 \value{
-list of the matched datasets
+A list of the matched datasets.
 }
 \description{
 Match the character vectors of row or column names 
 for 2 datasets.
-}
-\seealso{
-data_mdpost()
 }
