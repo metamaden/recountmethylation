@@ -11,7 +11,7 @@
 #' @return New filepath to dir with downloaded data.
 #' @examples 
 #' get_rmdl("h5se-test_gr", verbose = TRUE)
-get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr", 
+get.rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr", 
                                   "h5se_gm", "h5se_rg", "\\.h5"),
                      url = "https://recount.bio/data/", 
                      dfp = "data", verbose = TRUE){
@@ -82,7 +82,7 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' gds_idatquery(gsmvi)
 #' 
-gds_idatquery <- function(gsmvi, ext = "gz", verbose = FALSE,
+gds.idatquery <- function(gsmvi, ext = "gz", verbose = FALSE,
                           dfp = "./idats/",
                           burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
                                         "geo/samples/")){
@@ -143,7 +143,7 @@ gds_idatquery <- function(gsmvi, ext = "gz", verbose = FALSE,
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' rg <- gds_idat2rg(gsmvi)
 #' 
-gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", 
+gds.idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", 
                         verbose = FALSE, dfp = "./idats/", 
                         burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
                                       "geo/samples/")){
@@ -195,7 +195,7 @@ hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
 #' mdp <- data_mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
 #' @seealso hread()
 #' @export
-data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
+data.mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
     mdp <- as.data.frame(rhdf5::h5read(file = dbn, name = dsn),
         stringsAsFactors = FALSE)
     mcn <- paste(dsn, "colnames", sep = ".")
