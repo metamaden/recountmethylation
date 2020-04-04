@@ -28,13 +28,15 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
     stop("There was a problem parsing the file string.")
   }
   # check dest dir
-  dfp.dn <- paste(c(".", dfp, dn.clean), collapse = "/")
-  if(!dir.exists(dfp)){
-    if(verbose){message("Making new dir ", dfp.dn,
-                        " for download...")}
-    dct <- try(dir.create(dfp))
-    if(!dft){stop("Attempt to make new dir ", dfp,
-                  "failed with error: ", dct[2])}
+  dfp.dn <- paste(c(dfp, dn.clean), collapse = "/")
+  if(!dir.exists(dfp.dn)){
+    if(verbose){message("Making new dl dir ", dfp.dn)}
+    dct1 <- try(dir.create(dfp))
+    dct2 <- try(dir.create(dfp.dn))
+    if(!(dct1 & dct2)){
+      stop("Unable to make new dir path for download.",
+           "Check your permissions.")
+      }
   }
   # recursively get filenames in target dir
   if(verbose){message("Retrieving filenames from server...")}
