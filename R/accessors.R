@@ -192,7 +192,7 @@ hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
 #' @return A `data.frame` of all the sample metadata
 #' @examples 
 #' # get all available sample metadata
-#' mdp <- data_mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
+#' mdp <- data.mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
 #' @seealso hread()
 #' @export
 data.mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
@@ -402,7 +402,7 @@ getrg <- function(gsmv = NULL, cgv = NULL,
         ldat[[d]] <- t(ddat) # append transpose of data
     }
     if(metadata){
-        mdpost <- data_mdpost(dbn = dbn, dsn = md.dsn)
+        mdpost <- data.mdpost(dbn = dbn, dsn = md.dsn)
         mdpost$gsm <- as.character(mdpost$gsm)
         ldat[["metadata"]] <- mdpost[mdpost$gsm %in% gsmv,]
     }
