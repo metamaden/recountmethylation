@@ -30,12 +30,12 @@ which enables rapid querying and delayed execution of memory-intensive processes
 Use `h5se <- HDF5Array::loadHDF5SummarizedExperiment(path)` where `path` is the path to the
 downloaded `HDF5-SummarizedExperiment` object. Then access metadata using `minfi::pData(h5se)`.
 
-# example
+# Example with test dataset
 
-First obtain the compact example file from (url). 
+First obtain the compact example file from `recount.bio/data` with `wget`.
 
 ```{bash}
-url='https://recount.bio/remethdb_hdf5test_gr'
+url='https://recount.bio/remethdb_h5se-test_gr_00-00-01_1583780004'
 wget -r $url
 ```
 
