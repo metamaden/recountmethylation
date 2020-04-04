@@ -1,5 +1,72 @@
 #!/usr/bin/env R
 
+#' Get DNAm assay data.
+#'
+#'
+#' Uses RCurl to recursively download latest H5SE and HDF5 data objects the from server.
+#' @param which.file  Type of data object to be downloaded
+#' @param dfp Target local directory for downloaded files
+#' @param url Server url address
+#' @param dfp Data file path
+#' @param verbose Whether to return verbose messages
+#' @return TRUE if downloads completed successfully, FALSE/NULL otherwise
+#' @examples 
+#' get_rmdl("h5se-test_gr", verbose = TRUE)
+get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr", 
+                                  "h5se_gm", "h5se_rg", "\\.h5"),
+                     url = "https://recount.bio/data/", 
+                     dfp = "data", verbose = TRUE){
+  if(verbose){message("Retrieving data dirnames from server...")}
+  dn <- RCurl::getURL(url, ftp.use.epsv = FALSE, 
+                      dirlistonly = TRUE)
+  dn <- unlist(strsplit(dn, "\n"))
+  catch.str <- paste0(".*", which.dn,".*")
+  dn.catch <- grepl(catch.str, dn)
+  dn <- unlist(dn)[dn.catch]
+  dn.clean <- gsub('<.*', "", gsub('.*">', "", dn))
+  if(!length(dn.clean) == 1){
+    stop("There was a problem parsing the file string.")
+  }
+  # recursively get filenames in target dir
+  if(verbose){message("Retrieving filenames from server...")}
+  dn.url <- paste0(url, dn.clean)
+  fl = RCurl::getURL(dn.url, ftp.use.epsv = FALSE,
+                     dirlistonly = TRUE)
+  fl <- unlist(strsplit(fl, "\n"))
+  fl.str <- paste0(c("assays.h5", "se.rds"), collapse = "|")
+  fl.catch.str <- paste0(".*", fl.str,".*")
+  fl.catch <- grepl(fl.catch.str, fl)
+  fl <- unlist(fl)[fl.catch]
+  fl.clean <- gsub('<.*', "", gsub('.*">', "", fl))
+  # check dest dir
+  if(!dir.exists(dfp)){
+    dct <- try(dir.create(dfp))
+    if(!dft){stop("Attempt to make new dir ", dfp,
+                  "failed with error: ", dct[2])}s
+  }
+  # make data object dir
+  new.data.dn <- gsub("/", "", dn.clean)
+  path.data.dn <- c(dfp, new.data.dn)
+  path.data.dn <- paste(path.data.dn, collapse = "/")
+  # dl files to data dir
+  if(verbose){message("Downloading files...")}
+  dll <- list()
+  for(i in 1:length(fl.clean)){
+    f <- fl.clean[i]
+    fpath <- paste0(c(dn.url, f), collapse = "")
+    dll[[i]] <- try(download.file(fpath, path.data.dn))
+  }
+  if(dll[[1]] & dll[[2]]){
+    if(verbose){message("Download completed successfully.")}
+    return(TRUE)
+  } else{
+    if(verbose){message("Download incomplete. ",
+                        "Returning with following outcomes: ",
+                        dll[[1]], " ", dll[2])}
+    return(FALSE)
+  }
+  return(NULL)
+}
 
 #' IDATs query
 #'
