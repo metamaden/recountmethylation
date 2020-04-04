@@ -13,6 +13,13 @@ output:
     pdf_document: default
 ---
 
+```{r setup, include = FALSE, eval = TRUE}
+library(recountmethylation)
+knitr::opts_chunk$set(eval = TRUE,
+    echo = TRUE, warning = FALSE,
+    message = FALSE)
+```
+
 # Overview
 
 DNAm assay data and sample metadata available as of March 2019 were 
@@ -32,26 +39,17 @@ downloaded `HDF5-SummarizedExperiment` object. Then access metadata using `minfi
 
 # Example with test dataset
 
-First obtain the compact example file from `recount.bio/data` with `get_rmdl`.
+First obtain the test data from `recount.bio/data` with `get_rmdl()`, which returns the path we'll use to load the data.
 
-```{bash}
-get_rmdl("h5se-test_gr")
+```{r, testdat.dl}
+datapath <- get_rmdl("h5se-test_gr", verbose = FALSE)
 ```
 
-Next, point to the downloaded file with `loadHDF5SummarizedExperiment`
+Once data is successfully downloaded, use the returned path to load data into an R session witih `HDF5Array::loadHDF5SummarizedExperiment()` thusly:
 
-```{r}
+```{r, testdat.load}
+grtest <- HDF5Array::loadHDF5SummarizedExperiment(nfpath)
+dim(grtest)
 ```
 
-Finally, perform data anlaysis tasks as you normally would. For instance:
-
-```{r}
-```
-
-
-
-
-
-
-
-
+Data summaries, analysis, and preprocessing can be performed, such as with `minfi`.
