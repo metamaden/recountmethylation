@@ -19,39 +19,24 @@ DNAm assay data and sample metadata available as of March 2019 were
 piped into HDF5-based SummarizedExperiment objects roughly 130Gb in size.
 These files presently include `#filenames`, located at `#link`
 
-# Data queries
-
-The 
-
-These power
-rapid data querying 
-
-out-of-memory access within an R session with 
-`DelayedArray` technology.
-
-in R sessions. Data files are 
-versioned and timestamped (see filenames).
-
-# obtain data
-
-DNAm assay data and metadata are bundled in H5SE objects. 
-These can be downloaded fro (url)
-(info about h5se objects)
-# access data
+# Download data
 Use `HDF5Array` to 
 H5SE objects were stored using `saveHDF5SummarizedExperiment`
 
-# work with data
-Use `minfi`
+# Query data
 
+The `HDF5-SummarizedExperiment` objects use `DelayedArray` backend,
+which enables rapid querying and delayed execution of memory-intensive processes.
+Use `h5se <- HDF5Array::loadHDF5SummarizedExperiment(path)` where `path` is the path to the
+downloaded `HDF5-SummarizedExperiment` object. Then access metadata using `minfi::pData(h5se)`.
 
 # example
 
 First obtain the compact example file from (url). 
 
 ```{bash}
-url='recount.bio/remethdb_hdf5test_rg'
-curl -r $url
+url='https://recount.bio/remethdb_hdf5test_gr'
+wget -r $url
 ```
 
 Next, point to the downloaded file with `loadHDF5SummarizedExperiment`
