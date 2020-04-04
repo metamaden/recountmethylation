@@ -2,14 +2,13 @@
 
 #' Get DNAm assay data.
 #'
-#'
 #' Uses RCurl to recursively download latest H5SE and HDF5 data objects the from server.
-#' @param which.file  Type of data object to be downloaded
-#' @param dfp Target local directory for downloaded files
-#' @param url Server url address
+#' @param which.file  Type of data object to be downloaded.
+#' @param dfp Target local directory for downloaded files.
+#' @param url Server URL containing assay data.
 #' @param dfp Data file path. Use "" for working dir.
-#' @param verbose Whether to return verbose messages
-#' @return TRUE if downloads completed successfully, FALSE/NULL otherwise
+#' @param verbose Whether to return verbose messages.
+#' @return New filepath to dir with downloaded data.
 #' @examples 
 #' get_rmdl("h5se-test_gr", verbose = TRUE)
 get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr", 
@@ -49,26 +48,22 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
   fl.catch <- grepl(fl.catch.str, fl)
   fl <- unlist(fl)[fl.catch]
   fl.clean <- gsub('<.*', "", gsub('.*">', "", fl))
-  # make data object dir
-  new.data.dn <- gsub("/", "", dn.clean)
-  path.data.dn <- c(dfp, new.data.dn)
-  path.data.dn <- paste(path.data.dn, collapse = "/")
   # dl files to data dir
   if(verbose){message("Downloading files...")}
   dll <- list()
   for(i in 1:length(fl.clean)){
     f <- fl.clean[i]
     fpath <- paste0(c(dn.url, f), collapse = "")
-    dll[[i]] <- try(download.file(fpath, path.data.dn))
+    dll[[i]] <- try(download.file(fpath, paste0(dfp.dn, f)))
   }
-  if(dll[[1]] & dll[[2]]){
-    if(verbose){message("Download completed successfully.")}
-    return(TRUE)
+  if(dll[[1]] == 0 & dll[[2]] == 0){
+    if(verbose){message("Download completed successfully. ",
+                        "Returning new path...")}
+    return(dfp.dn)
   } else{
-    if(verbose){message("Download incomplete. ",
-                        "Returning with following outcomes: ",
-                        dll[[1]], " ", dll[2])}
-    return(FALSE)
+    if(verbose){message("Download incomplete for file ",
+                        fl.clean[which(dll!=0)])}
+    return(NULL)
   }
   return(NULL)
 }
