@@ -7,7 +7,7 @@
 #' @param which.file  Type of data object to be downloaded
 #' @param dfp Target local directory for downloaded files
 #' @param url Server url address
-#' @param dfp Data file path
+#' @param dfp Data file path. Use "" for working dir.
 #' @param verbose Whether to return verbose messages
 #' @return TRUE if downloads completed successfully, FALSE/NULL otherwise
 #' @examples 
@@ -27,6 +27,15 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
   if(!length(dn.clean) == 1){
     stop("There was a problem parsing the file string.")
   }
+  # check dest dir
+  dfp.dn <- paste(c(".", dfp, dn.clean), collapse = "/")
+  if(!dir.exists(dfp)){
+    if(verbose){message("Making new dir ", dfp.dn,
+                        " for download...")}
+    dct <- try(dir.create(dfp))
+    if(!dft){stop("Attempt to make new dir ", dfp,
+                  "failed with error: ", dct[2])}
+  }
   # recursively get filenames in target dir
   if(verbose){message("Retrieving filenames from server...")}
   dn.url <- paste0(url, dn.clean)
@@ -38,12 +47,6 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
   fl.catch <- grepl(fl.catch.str, fl)
   fl <- unlist(fl)[fl.catch]
   fl.clean <- gsub('<.*', "", gsub('.*">', "", fl))
-  # check dest dir
-  if(!dir.exists(dfp)){
-    dct <- try(dir.create(dfp))
-    if(!dft){stop("Attempt to make new dir ", dfp,
-                  "failed with error: ", dct[2])}
-  }
   # make data object dir
   new.data.dn <- gsub("/", "", dn.clean)
   path.data.dn <- c(dfp, new.data.dn)
