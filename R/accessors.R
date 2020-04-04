@@ -42,7 +42,7 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
   if(!dir.exists(dfp)){
     dct <- try(dir.create(dfp))
     if(!dft){stop("Attempt to make new dir ", dfp,
-                  "failed with error: ", dct[2])}s
+                  "failed with error: ", dct[2])}
   }
   # make data object dir
   new.data.dn <- gsub("/", "", dn.clean)
