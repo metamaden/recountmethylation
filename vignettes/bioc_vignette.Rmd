@@ -35,7 +35,7 @@ downloaded `HDF5-SummarizedExperiment` object. Then access metadata using `minfi
 First obtain the compact example file from `recount.bio/data` with `wget`.
 
 ```{bash}
-url='https://recount.bio/remethdb_h5se-test_gr_00-00-01_1583780004'
+url='https://recount.bio/remethdb_h5se-test_gr_00-00-01_1583780004/'
 wget -r $url
 ```
 
