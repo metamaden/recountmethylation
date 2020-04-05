@@ -3,10 +3,9 @@
 #' Get DNAm assay data.
 #'
 #' Uses RCurl to recursively download latest H5SE and HDF5 data objects the from server.
-#' @param which.file  Type of data object to be downloaded.
-#' @param dfp Target local directory for downloaded files.
+#' @param which.dn  Type of data dir to be downloaded.
 #' @param url Server URL containing assay data.
-#' @param dfp Data file path. Use "" for working dir.
+#' @param dfp Target local directory for downloaded files.
 #' @param verbose Whether to return verbose messages.
 #' @return New filepath to dir with downloaded data.
 #' @examples 
