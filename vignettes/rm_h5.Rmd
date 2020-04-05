@@ -57,7 +57,7 @@ may find the packages `GEOquery` and `GEOmetadb` useful.
 
 The `recountmethylation` package can be installed from GitHub using 
 
-```{r gh_install, eval = FALSE}
+```{r gh_install, eval = FALSE, echo = TRUE}
 devtools::install_github("metamaden/recountmethylation")
 ```
 
@@ -89,7 +89,7 @@ We can quickly access the entire metadata table for sample queries as follows.
 
 ```{r get_gsm_metadata}
 # get full gsm metadata
-mdp = data_mdpost(dbn, dsn = "mdpost")
+mdp = data.mdpost(dbn, dsn = "mdpost")
 dim(mdp)
 ```
 
