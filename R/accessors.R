@@ -10,7 +10,8 @@
 #' @return New filepath to dir with downloaded data.
 #' @examples 
 #' get_rmdl("h5se-test_gr", verbose = TRUE)
-get.rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr", 
+#' @export
+get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr", 
                                   "h5se_gm", "h5se_rg", "\\.h5"),
                      url = "https://recount.bio/data/", 
                      dfp = "data", verbose = TRUE){
@@ -80,8 +81,8 @@ get.rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' gds_idatquery(gsmvi)
-#' 
-gds.idatquery <- function(gsmvi, ext = "gz", verbose = FALSE,
+#' @export
+gds_idatquery <- function(gsmvi, ext = "gz", verbose = FALSE,
                           dfp = "./idats/",
                           burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
                                         "geo/samples/")){
@@ -141,8 +142,8 @@ gds.idatquery <- function(gsmvi, ext = "gz", verbose = FALSE,
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' rg <- gds_idat2rg(gsmvi)
-#' 
-gds.idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", 
+#' @export
+gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", 
                         verbose = FALSE, dfp = "./idats/", 
                         burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
                                       "geo/samples/")){
@@ -191,10 +192,10 @@ hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
 #' @return A `data.frame` of all the sample metadata
 #' @examples 
 #' # get all available sample metadata
-#' mdp <- data.mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
+#' mdp <- data_mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
 #' @seealso hread()
 #' @export
-data.mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
+data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
     mdp <- as.data.frame(rhdf5::h5read(file = dbn, name = dsn),
         stringsAsFactors = FALSE)
     mcn <- paste(dsn, "colnames", sep = ".")
@@ -227,7 +228,7 @@ data.mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
 #' lmatched = matchds(lmatched[[1]], lmatched[[2]], 
 #'     mi1 = "columns", mi2 = "columns)
 #' @export
-matchds.1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"), 
+matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"), 
     mi2 = c("rows", "columns"), subset.match = FALSE){
   if(mi1 == "rows"){ii1 = as.character(rownames(ds1))}
   if(mi1 == "columns"){ii1 = as.character(colnames(ds1))}
@@ -287,8 +288,8 @@ rgse <- function(ldat, verbose = FALSE){
         message("Matching probe IDs in signal matrices...")
     }
     rga <- ldat[["redsignal"]]; gga <- ldat[["greensignal"]]
-    lm.rg <- matchds.1to2(rga, gga, "rows", "rows")
-    lm.rg <- matchds.1to2(lm.rg[[1]], lm.rg[[2]], "columns", "columns")
+    lm.rg <- matchds_1to2(rga, gga, "rows", "rows")
+    lm.rg <- matchds_1to2(lm.rg[[1]], lm.rg[[2]], "columns", "columns")
     cgidmatch <- identical(rownames(lm.rg[[1]]), rownames(lm.rg[[2]]))
     gsmidmatch <- identical(colnames(lm.rg[[1]]), colnames(lm.rg[[2]]))
     if(!cgidmatch){
@@ -312,7 +313,7 @@ rgse <- function(ldat, verbose = FALSE){
             mdp <- rbind(mdp, nmm)
         }
         rownames(mdp) <- mdp$gsm
-        lm.pr <- matchds.1to2(mdp, lm.rg[[1]], "rows", "columns")
+        lm.pr <- matchds_1to2(mdp, lm.rg[[1]], "rows", "columns")
         mdmatchid <- identical(rownames(lm.pr[[1]]), colnames(lm.pr[[2]]))
         if(!mdmatchid){
             stop("Couldn't match GSM IDs for md and signal data.")
@@ -401,7 +402,7 @@ getrg <- function(gsmv = NULL, cgv = NULL,
         ldat[[d]] <- t(ddat) # append transpose of data
     }
     if(metadata){
-        mdpost <- data.mdpost(dbn = dbn, dsn = md.dsn)
+        mdpost <- data_mdpost(dbn = dbn, dsn = md.dsn)
         mdpost$gsm <- as.character(mdpost$gsm)
         ldat[["metadata"]] <- mdpost[mdpost$gsm %in% gsmv,]
     }

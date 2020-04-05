@@ -21,4 +21,4 @@ Suggests:
     testthat
 VignetteBuilder: knitr
 biocViews: DNAMethylation, Epigenetics, Microarray, MethylationArray
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.0
