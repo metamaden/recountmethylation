@@ -12,13 +12,13 @@ get.rmdl(
 )
 }
 \arguments{
+\item{which.dn}{Type of data dir to be downloaded.}
+
 \item{url}{Server URL containing assay data.}
 
-\item{dfp}{Data file path. Use "" for working dir.}
+\item{dfp}{Target local directory for downloaded files.}
 
 \item{verbose}{Whether to return verbose messages.}
-
-\item{which.file}{Type of data object to be downloaded.}
 }
 \value{
 New filepath to dir with downloaded data.
