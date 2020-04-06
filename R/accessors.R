@@ -150,7 +150,7 @@ gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz",
   dn = "" # download idats to cwd
   bnv = c() # store the idat basenames
   rt = try(gds_idatquery(gsmvi, burl, ext, verbose, dfp)) # idat query and download
-  if(!class(rt) == "RGChannelSet"){
+  if(!is(rt) == "RGChannelSet"){
     stop("Process ended with the following message: ",
          rt[1])
   }
