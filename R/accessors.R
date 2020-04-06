@@ -16,17 +16,13 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
                      url = "https://recount.bio/data/", 
                      dfp = "data", verbose = TRUE){
   if(verbose){message("Retrieving data dirnames from server...")}
-  dn <- RCurl::getURL(url, ftp.use.epsv = FALSE, 
-                      dirlistonly = TRUE)
+  dn <- RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE)
   dn <- unlist(strsplit(dn, "\n"))
   catch.str <- paste0(".*", which.dn,".*")
   dn.catch <- grepl(catch.str, dn)
   dn <- unlist(dn)[dn.catch]
   dn.clean <- gsub('<.*', "", gsub('.*">', "", dn))
-  if(!length(dn.clean) == 1){
-    stop("There was a problem parsing the file string.")
-  }
-  # check dest dir
+  if(!length(dn.clean) == 1){stop("There was a problem parsing the file string.")}
   dfp.dn <- paste(c(dfp, dn.clean), collapse = "/")
   if(!dir.exists(dfp.dn)){
     if(verbose){message("Making new dl dir ", dfp.dn)}
@@ -37,18 +33,15 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
            "Check your permissions.")
       }
   }
-  # recursively get filenames in target dir
   if(verbose){message("Retrieving filenames from server...")}
   dn.url <- paste0(url, dn.clean)
-  fl = RCurl::getURL(dn.url, ftp.use.epsv = FALSE,
-                     dirlistonly = TRUE)
+  fl = RCurl::getURL(dn.url, ftp.use.epsv = FALSE, dirlistonly = TRUE)
   fl <- unlist(strsplit(fl, "\n"))
   fl.str <- paste0(c("assays.h5", "se.rds"), collapse = "|")
   fl.catch.str <- paste0(".*", fl.str,".*")
   fl.catch <- grepl(fl.catch.str, fl)
   fl <- unlist(fl)[fl.catch]
   fl.clean <- gsub('<.*', "", gsub('.*">', "", fl))
-  # dl files to data dir
   if(verbose){message("Downloading files...")}
   dll <- list()
   for(i in 1:length(fl.clean)){
@@ -61,8 +54,7 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
                         "Returning new path...")}
     return(dfp.dn)
   } else{
-    if(verbose){message("Download incomplete for file ",
-                        fl.clean[which(dll!=0)])}
+    if(verbose){message("Download incomplete for file ", fl.clean[which(dll!=0)])}
     return(NULL)
   }
   return(NULL)
