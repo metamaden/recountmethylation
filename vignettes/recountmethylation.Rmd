@@ -2,6 +2,9 @@
 title: "recountmethylation Bioconductor vignette"
 author: 
   - name: Sean K. Maden
+  - name: Reid F. Thompson
+  - name: Kasper D. Hansen
+  - name: Abhi Nellore
 package: recountmethylation
 date: "4/4/2020"
 abstract: > 
