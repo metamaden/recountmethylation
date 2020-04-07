@@ -1,0 +1,23 @@
+---
+title: "Advice for workflows with `recountmethylation` data objects and `DelayedArray`"
+author:
+  - name: Sean K. Maden
+  - name: Reid F. Thompson
+  - name: Kasper D. Hansen
+  - name: Abhi Nellore
+package: recountmethylation
+abstract: >
+   Recommendations for data management and preprocessing tasks that effectively 
+   utilize `DelayedArray` technology.
+vignette: >
+    %\VignetteDepends{RCurl}
+    %\VignetteEngine{knitr::knitr} 
+    %\VignetteIndexEntry{recountmethylation DelayedArray} 
+    %\usepackage[UTF-8]{inputenc}
+output:
+    BiocStyle::html_document:
+        toc: true
+        tocfloat: true
+        code_folding: show
+    pdf_document: default
+---
