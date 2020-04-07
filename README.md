@@ -3,7 +3,7 @@
 
 # Authors
 
-Sean K. Maden, Kasper D. Hansen, Abhi Nellore
+Sean K. Maden, Reid F. Thompson, Kasper D. Hansen, Abhi Nellore
 
 # Manuscript
 Sean K. Maden, Reid F. Thompson, Kasper D. Hansen, Abhi Nellore. "Human methylome variation across
