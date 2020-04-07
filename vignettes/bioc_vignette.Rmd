@@ -33,8 +33,16 @@ piped into HDF5-based SummarizedExperiment objects roughly 130Gb in size.
 These files presently include `#filenames`, located at `#link`
 
 # Download data
-Use `HDF5Array` to 
-H5SE objects were stored using `saveHDF5SummarizedExperiment`
+
+DNAm assay and sample metadata is stored at `recount.bio/data`. 
+We recommend working with data formatted as `HDF5SummarizedExperiment`, including
+`remethdb_h5se_gm_00-00-01_1583780004` (`GenomicMethylSet` format),
+`remethdb_h5se_gr_00-00-01_1583780004` (`GenomicRanges` format), 
+`remethdb_h5se_rg_00-00-01_1583780004` (`RGChannelSet` format). 
+Note these files are relatively large (about 80 - 120 Gb). 
+However, these make use of `DelayedArray` and `HDF5Array` to 
+allow rapid data queries, summaries, and management of preprocessing workflows.
+Download these from your browser or using the `get_rmdl()` function in `recountmethylation`.
 
 # Query data
 
