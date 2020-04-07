@@ -1,6 +1,5 @@
 
-# `recountmethylation`
-
+[<img style="float: right;" src = "inst/figures/remeth_hexsticker.png" height="180"/>](https://recount.bio/data)
 # Authors
 
 Sean K. Maden, Reid F. Thompson, Kasper D. Hansen, Abhi Nellore
@@ -47,5 +46,3 @@ Infinium 450K raw data on the Gene Expression Omnibus. 2019 (preprint in prepara
 
 ***************************************
 ```
-
- [<img style="float: right;" src = "inst/figures/remeth_hexsticker.png" height="180"/>](https://recount.bio/data)
