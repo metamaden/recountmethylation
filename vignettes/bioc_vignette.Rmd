@@ -48,13 +48,13 @@ downloaded `HDF5-SummarizedExperiment` object. Then access metadata using `minfi
 First obtain the test data from `recount.bio/data` with `get_rmdl()`, which returns the path we'll use to load the data.
 
 ```{r, testdat.dl}
-datapath <- get.rmdl("h5se-test_gr", verbose = FALSE)
+datapath <- get_rmdl("h5se-test_gr", verbose = FALSE)
 ```
 
 Once data is successfully downloaded, use the returned path to load data into an R session witih `HDF5Array::loadHDF5SummarizedExperiment()` thusly:
 
 ```{r, testdat.load}
-grtest <- HDF5Array::loadHDF5SummarizedExperiment(nfpath)
+grtest <- HDF5Array::loadHDF5SummarizedExperiment(datapath)
 dim(grtest)
 ```
 
