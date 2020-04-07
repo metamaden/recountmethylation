@@ -5,6 +5,10 @@
 
 Sean K. Maden, Kasper D. Hansen, Abhi Nellore
 
+# Manuscript
+Sean K. Maden, Reid F. Thompson, Kasper D. Hansen, Abhi Nellore. "Human methylome variation across
+ Infinium 450K raw data on the Gene Expression Omnibus." 2019 (preprint in preparation for submission).
+
 # Installation and data access
 
 Install this library from an R session using 
