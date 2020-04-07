@@ -2,6 +2,9 @@
 title: "HDF5 support"
 author:
   - name: Sean K. Maden
+  - name: Reid F. Thompson
+  - name: Kasper D. Hansen
+  - name: Abhi Nellore
 package: recountmethylation
 abstract: >
    Vignette for working with `recountmethylation` HDF5 database contents
