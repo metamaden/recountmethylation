@@ -57,7 +57,7 @@ may find the packages `GEOquery` and `GEOmetadb` useful.
 
 The `recountmethylation` package can be installed from GitHub using 
 
-```{r gh_install, eval = FALSE, echo = TRUE}
+```{r gh_install}
 devtools::install_github("metamaden/recountmethylation")
 ```
 
