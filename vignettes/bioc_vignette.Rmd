@@ -59,7 +59,7 @@ First obtain the test data from `recount.bio/data` with `get_rmdl()`, which retu
 datapath <- get_rmdl("h5se-test_gr", verbose = FALSE)
 ```
 
-Once data is successfully downloaded, use the returned path to load data into an R session witih `HDF5Array::loadHDF5SummarizedExperiment()` thusly:
+Once data is successfully downloaded, use the returned path to load data into an R session with `HDF5Array::loadHDF5SummarizedExperiment()` thusly:
 
 ```{r, testdat.load}
 grtest <- HDF5Array::loadHDF5SummarizedExperiment(datapath)
