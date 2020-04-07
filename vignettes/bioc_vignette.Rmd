@@ -46,10 +46,8 @@ Download these from your browser or using the `get_rmdl()` function in `recountm
 
 # Query data
 
-The `HDF5-SummarizedExperiment` objects use `DelayedArray` backend,
-which enables rapid querying and delayed execution of memory-intensive processes.
 Use `h5se <- HDF5Array::loadHDF5SummarizedExperiment(path)` where `path` is the path to the
-downloaded `HDF5-SummarizedExperiment` object. Then access metadata using `minfi::pData(h5se)`.
+downloaded `HDF5-SummarizedExperiment` object. Then access metadata using `minfi::pData(h5se)`. See the minfi [page](https://bioconductor.org/packages/release/bioc/html/minfi.html) for more details.
 
 # Example with test dataset
 
