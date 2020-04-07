@@ -21,3 +21,8 @@ output:
         code_folding: show
     pdf_document: default
 ---
+
+# Session info
+```{r}
+sessionInfo()
+```
