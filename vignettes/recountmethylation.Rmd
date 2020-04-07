@@ -68,3 +68,8 @@ dim(grtest)
 ```
 
 Data summaries, analysis, and preprocessing can be performed, such as with `minfi`.
+
+# Session info
+```{r}
+sessionInfo()
+```
