@@ -7,6 +7,8 @@
 gds_idatquery(
   gsmvi,
   ext = "gz",
+  expand = TRUE,
+  sys.cmd = "gunzip ",
   verbose = FALSE,
   dfp = "./idats/",
   burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/", "geo/samples/")
@@ -16,6 +18,10 @@ gds_idatquery(
 \item{gsmvi}{Param description}
 
 \item{ext}{Filename extension}
+
+\item{expand}{Whether to expand compressed files.}
+
+\item{sys.cmd}{System command to expand compressed files (if expand TRUE).}
 
 \item{verbose}{Whether to show verbose messages (TRUE/FALSE)}
 
