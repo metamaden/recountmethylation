@@ -87,15 +87,17 @@ gds_idatquery <- function(gsmvi, ext = "gz", verbose = FALSE,
     # get urls to idats
     fn = RCurl::getURL(url, ftp.use.epsv = FALSE, 
                        dirlistonly = TRUE)
-    fn <- unlist(strsplit(fn, "\n"))
+    fn <- gsub("\\\r", "", unlist(strsplit(fn, "\n")))
     idat.str <- paste0("\\.idat\\.", ext)
     idat.catch <- grepl(idat.str, fn)
     fn <- unlist(fn)[idat.catch]
     # eval conditions
     check.cond <- length(fn) == 2
-    fn.grn <- fn[grepl(paste0(".*Grn.idat\\.", ext, "$"), fn)]
-    fn.red <- fn[grepl(paste0(".*Red.idat\\.", ext, "$"), fn)]
-    check.cond <- c(check.cond, fn.grn, fn.red)
+    fn.grn <- fn[grepl(paste0(".*Grn.idat\\.", ext, "($)"), fn)]
+    fn.red <- fn[grepl(paste0(".*Red.idat\\.", ext, "($)"), fn)]
+    check.cond <- c(check.cond, 
+                    length(fn.grn) > 0, 
+                    length(fn.red) > 0)
     if(check.cond[1] & check.cond[2] & 
        check.cond[3]){
       # retain idat basenames
