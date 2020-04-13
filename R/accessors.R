@@ -107,8 +107,10 @@ gds_idatquery <- function(gsmvi, ext = "gz", verbose = FALSE,
       bnv = c(bnv, idatl)
       for(f in fn){
         fnv <- c(fnv, f)
-        download.file(paste(url, f, sep = ""), dfp)
-        system(paste0("gunzip ", dfp))
+        url.dlpath <- paste(url, f, sep = "")
+        dest.fpath <- paste(dfp,f, sep = "")
+        download.file(url.dlpath, dest.fpath)
+        system(paste0("gunzip ", dest.fpath))
         message(f)
       }
     } else{
