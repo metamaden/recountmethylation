@@ -66,6 +66,8 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
 #' Files are downloaded 
 #' @param gsmvi Param description
 #' @param ext Filename extension
+#' @param expand Whether to expand compressed files.
+#' @param sys.cmd System command to expand compressed files (if expand TRUE).
 #' @param verbose Whether to show verbose messages (TRUE/FALSE)
 #' @param dfp Download directory
 #' @param burl Base URL string for RCurl query
@@ -74,8 +76,8 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' gds_idatquery(gsmvi)
 #' @export
-gds_idatquery <- function(gsmvi, ext = "gz", verbose = FALSE,
-                          dfp = "./idats/",
+gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE, 
+                          sys.cmd = "gunzip ", verbose = FALSE, dfp = "./idats/",
                           burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
                                         "geo/samples/")){
   bnv <- fnv <- c()
@@ -110,7 +112,10 @@ gds_idatquery <- function(gsmvi, ext = "gz", verbose = FALSE,
         url.dlpath <- paste(url, f, sep = "")
         dest.fpath <- paste(dfp,f, sep = "")
         download.file(url.dlpath, dest.fpath)
-        system(paste0("gunzip ", dest.fpath))
+        if(expand){
+          if(verbose){message("Expanding compressed file...")}
+          system(paste0(sys.cmd, dest.fpath))
+        }
         message(f)
       }
     } else{
