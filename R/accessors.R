@@ -81,6 +81,13 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
                           burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
                                         "geo/samples/")){
   bnv <- fnv <- c()
+  # check dest dir
+  if(verbose){message("Checking dest dir dfp.")}
+  if(!dir.exists(dfp)){
+    message("Making new dest dir dfp.")
+    try(dir.create(dfp))
+    if(!tdir){stop("There was an issue making the new dest dir dfp.")}
+  }
   for(gsmi in gsmvi){
     # format URL for query to GDS
     url = paste0(burl, substr(gsmi, 1, nchar(gsmi)-3), 
@@ -110,7 +117,7 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
       for(f in fn){
         fnv <- c(fnv, f)
         url.dlpath <- paste(url, f, sep = "")
-        dest.fpath <- paste(dfp,f, sep = "")
+        dest.fpath <- paste(dfp, f, sep = "")
         download.file(url.dlpath, dest.fpath)
         if(expand){
           if(verbose){message("Expanding compressed file...")}

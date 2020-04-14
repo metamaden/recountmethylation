@@ -1,0 +1,17 @@
+---
+title: "idatinfo_recountmethylation"
+author: "Sean Maden"
+date: "4/13/2020"
+output: html_document
+---
+
+# Compare runtimes by GSE
+
+```{r}
+load("./Documents/GitHub/recount-methylation-analysis/files/data/mdpost_all-gsm-md.rda")
+gseid <- "GSE93933"
+gsmv <- mdpost[mdpost$gseid == gseid,]$gsm
+dlinfo <- recountmethylation::gds_idatquery(gsmv, dfp = gseid, 
+                                            expand = TRUE)
+```
+
