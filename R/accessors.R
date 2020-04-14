@@ -85,7 +85,7 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
   if(verbose){message("Checking dest dir dfp.")}
   if(!dir.exists(dfp)){
     message("Making new dest dir dfp.")
-    try(dir.create(dfp))
+    tdir <- try(dir.create(dfp))
     if(!tdir){stop("There was an issue making the new dest dir dfp.")}
   }
   for(gsmi in gsmvi){
