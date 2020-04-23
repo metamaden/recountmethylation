@@ -24,6 +24,7 @@ output:
 
 ```{r setup, include = FALSE, eval = TRUE}
 library(recountmethylation)
+library(HDF5Array)
 knitr::opts_chunk$set(eval = TRUE,
     echo = TRUE, warning = FALSE,
     message = FALSE)
@@ -32,42 +33,50 @@ knitr::opts_chunk$set(eval = TRUE,
 # Overview
 
 DNAm assay data and sample metadata available as of March 2019 were 
-piped into HDF5-based SummarizedExperiment objects roughly 130Gb in size.
-These files presently include `#filenames`, located at `#link`
+piped into HDF5-based SummarizedExperiment objects about 80 to 130Gb in size.
 
-# Download data
+# Server queries
 
-DNAm assay and sample metadata is stored at `recount.bio/data`. 
-We recommend working with data formatted as `HDF5SummarizedExperiment`, including
-`remethdb_h5se_gm_00-00-01_1583780004` (`GenomicMethylSet` format),
-`remethdb_h5se_gr_00-00-01_1583780004` (`GenomicRanges` format), 
-`remethdb_h5se_rg_00-00-01_1583780004` (`RGChannelSet` format). 
-Note these files are relatively large (about 80 - 120 Gb). 
-However, these make use of `DelayedArray` and `HDF5Array` to 
-allow rapid data queries, summaries, and management of preprocessing workflows.
-Download these from your browser or using the `get_rmdl()` function in `recountmethylation`.
+Queries to `recount.bio/data` can be handled using `get_rmdl()`. Targeted data are specified by setting `which.dn`. For instance, the test dataset may be downloaded using `get_rmdl("h5se_gr", verbose = FALSE)`, which generates a new directory containing `assays.h5` and `se.rds`. For convenience, `get_rmdl` returns the filepath, and this may be used in `loadHDF5SummarizedExperiment` at the start of an analysis workflow.
 
-# Query data
+Assay data are contained in the following directories:
 
-Use `h5se <- HDF5Array::loadHDF5SummarizedExperiment(path)` where `path` is the path to the
-downloaded `HDF5-SummarizedExperiment` object. Then access metadata using `minfi::pData(h5se)`. See the minfi [page](https://bioconductor.org/packages/release/bioc/html/minfi.html) for more details.
+* `remethdb_h5se_gm_00-00-01_1583780004` (class: `GenomicMethylSet`, size: 86 Gb)
+* `remethdb_h5se_gr_00-00-01_1583780004` (class: `GenomicRanges`, size: 132 Gb)
+* `remethdb_h5se_rg_00-00-01_1583780004` (class: `RGChannelSet`, size: 119 Gb)
 
-# Example with test dataset
+# DelayedArray workflows 
 
-First obtain the test data from `recount.bio/data` with `get_rmdl()`, which returns the path we'll use to load the data.
+Ideal workflows utilizing large DelayedArray objects will delay evaluations until absolutely necessary. In the following example, `getBeta` would not be assessed until the `summarize`.
+
+```{r, eval = FALSE}
+h5large <- loadHDF5SummarizedExperiment(h5fullsizepath)
+betamatrix <- getBeta(h5large) # this is delayed 
+summarize(betamatrix[,1]) # causes getBeta evaluation
+```
+
+You may consult `rm_delayedarray.Rmd` for example workflows using large DelayedArray objects. Note that not all functions are currently optimized for use with large DelayedArray objects.
+
+# Example
+
+For demonstration, we load the included test dataset.
 
 ```{r, testdat.dl}
-datapath <- get_rmdl("h5se-test_gr", verbose = FALSE)
+testdatdn <- "remethdb_h5se-test_gr_00-00-01_1583780004"
+datpath <- system.file("extdata", testdatdn, package = "recountmethylation")
+h5test <- loadHDF5SummarizedExperiment(datpath)
+dim(h5test)
 ```
 
-Once data is successfully downloaded, use the returned path to load data into an R session with `HDF5Array::loadHDF5SummarizedExperiment()` thusly:
+Standard inspection and summaries may be used.
 
-```{r, testdat.load}
-grtest <- HDF5Array::loadHDF5SummarizedExperiment(datapath)
-dim(grtest)
+```{r}
+# data info
+class(h5test)
+dim(h5test)
+head(colnames(h5test))
+head(rownames(h5test))
 ```
-
-Data summaries, analysis, and preprocessing can be performed, such as with `minfi`.
 
 # Session info
 ```{r}

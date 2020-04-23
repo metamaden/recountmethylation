@@ -18,6 +18,7 @@ Imports:
     S4Vectors,
     RCurl
 Suggests:
+    HDF5Array,
     knitr,
     testthat
 VignetteBuilder: knitr
