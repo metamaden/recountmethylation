@@ -7,6 +7,7 @@
 #' @param url Server URL containing assay data.
 #' @param dfp Target local directory for downloaded files.
 #' @param verbose Whether to return verbose messages.
+#' @param download Whether to download or just return latest filename.
 #' @return New filepath to dir with downloaded data.
 #' @examples 
 #' get_rmdl("h5se-test_gr", verbose = TRUE)
@@ -14,7 +15,7 @@
 get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr", 
                                   "h5se_gm", "h5se_rg", "\\.h5"),
                      url = "https://recount.bio/data/", 
-                     dfp = "", returntype = c("download", "filename"),
+                     dfp = "", download = c("download", "filename"),
                      verbose = TRUE){
   if(verbose){message("Retrieving data dirnames from server...")}
   dn <- RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE)
@@ -23,7 +24,7 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
   dn.catch <- grepl(catch.str, dn)
   dn <- unlist(dn)[dn.catch]
   dn.clean <- gsub('<.*', "", gsub('.*">', "", dn))
-  if(returntype == "filename"){return(dn.clean)}
+  if(download == "filename"){return(dn.clean)}
   if(!length(dn.clean) == 1){stop("There was a problem parsing the file string.")}
   dfp.dn <- paste(c(dfp, dn.clean), collapse = "/")
   if(!dir.exists(dfp) & !dfp == ""){
