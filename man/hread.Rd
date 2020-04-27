@@ -23,6 +23,10 @@ Get a dataset connection object from an HDF5 database
 ('.h5') file and return the indexed table subset.
 }
 \examples{
-# get red signal for first 2 probe addresses, first 3 samples
-st <- hread(1:3, 1:2, d = "redsignal", dbn = "remethdb2.h5")
+# Get tests data pointer
+path = system.file("extdata", "testh5", package = "recountmethylation")
+fn = list.files(path)
+dbpath = paste0(path, "/", fn)
+# red signal, first 2 assay addr, 3 samples
+reds <- hread(1:3, 1:2, d = "redsignal", dbn = dbpath)
 }

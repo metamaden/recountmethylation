@@ -35,6 +35,7 @@ assay data as an `RGChannelSet`.
 ('.h5') file and return the indexed table subset.
 }
 \examples{
-gsmvi <- c("GSM2465267", "GSM2814572")
-rg <- gds_idat2rg(gsmvi)
+# Not run
+# gsmvi <- c("GSM2465267", "GSM2814572")
+# rg <- gds_idat2rg(gsmvi)
 }

@@ -59,14 +59,13 @@ as a list of datasets or a single `RGChannelSet`
 object, with the option of including sample metadata.
 }
 \examples{
+# Not run
 # make samples list
-gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
-
+# gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
 # get list of data tables for a query
-ldat = getrg(gsmv = gsml, data.type = "df")
-
+# ldat = getrg(gsmv = gsml, data.type = "df")
 # get the RGChannel set object for a query
-rgset = getrg(gsmv = gsml, data.type = "se")
+# rgset = getrg(gsmv = gsml, data.type = "se")
 }
 \seealso{
 rgse()

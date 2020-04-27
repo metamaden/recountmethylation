@@ -37,6 +37,7 @@ Queries GDS IDATs and downloads, with exception handling.
 Files are downloaded
 }
 \examples{
-gsmvi <- c("GSM2465267", "GSM2814572")
-gds_idatquery(gsmvi)
+# Not run
+# gsmvi <- c("GSM2465267", "GSM2814572")
+# gds_idatquery(gsmvi)
 }

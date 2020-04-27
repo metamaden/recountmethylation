@@ -30,5 +30,6 @@ New filepath to dir with downloaded data.
 Uses RCurl to recursively download latest H5SE and HDF5 data objects the from server.
 }
 \examples{
-get_rmdl("h5se-test_gr", verbose = TRUE)
+# Not run
+# get_rmdl("h5se-test_gr", verbose = TRUE)
 }
