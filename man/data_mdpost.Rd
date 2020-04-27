@@ -19,8 +19,10 @@ A `data.frame` of all the sample metadata
 Retrieves all sample metadata from an HDF5 database.
 }
 \examples{
-# get all available sample metadata
-mdp <- data_mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
+path = system.file("extdata", "testh5", package = "recountmethylation")
+fn = list.files(path)
+dbpath = paste0(path, "/", fn)
+mdp <- data_mdpost(dbn = dbpath, dsn = "mdpost")
 }
 \seealso{
 hread()

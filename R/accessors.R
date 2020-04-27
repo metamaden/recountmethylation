@@ -199,8 +199,10 @@ hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
 #' the sample metadata and learned annotations.
 #' @return A `data.frame` of all the sample metadata
 #' @examples 
-#' # get all available sample metadata
-#' mdp <- data_mdpost(dbn = "remethdb2.h5", dsn = "mdpost")
+#' path = system.file("extdata", "testh5", package = "recountmethylation")
+#' fn = list.files(path)
+#' dbpath = paste0(path, "/", fn)
+#' mdp <- data_mdpost(dbn = dbpath, dsn = "mdpost")
 #' @seealso hread()
 #' @export
 data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){

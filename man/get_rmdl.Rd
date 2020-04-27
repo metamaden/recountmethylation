@@ -7,7 +7,8 @@
 get_rmdl(
   which.dn = c("h5se-test_gr", "h5se_gr", "h5se_gm", "h5se_rg", "\\\\.h5"),
   url = "https://recount.bio/data/",
-  dfp = "data",
+  dfp = "",
+  download = c("download", "filename"),
   verbose = TRUE
 )
 }
@@ -17,6 +18,8 @@ get_rmdl(
 \item{url}{Server URL containing assay data.}
 
 \item{dfp}{Target local directory for downloaded files.}
+
+\item{download}{Whether to download or just return latest filename.}
 
 \item{verbose}{Whether to return verbose messages.}
 }
