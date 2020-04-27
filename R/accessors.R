@@ -10,7 +10,8 @@
 #' @param download Whether to download or just return latest filename.
 #' @return New filepath to dir with downloaded data.
 #' @examples 
-#' get_rmdl("h5se-test_gr", verbose = TRUE)
+#' # Not run
+#' # get_rmdl("h5se-test_gr", verbose = TRUE)
 #' @export
 get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr", 
                                   "h5se_gm", "h5se_rg", "\\.h5"),
@@ -73,8 +74,9 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
 #' @param burl Base URL string for RCurl query
 #' @return Describes returned object
 #' @examples
-#' gsmvi <- c("GSM2465267", "GSM2814572")
-#' gds_idatquery(gsmvi)
+#' # Not run
+#' # gsmvi <- c("GSM2465267", "GSM2814572")
+#' # gds_idatquery(gsmvi)
 #' @export
 gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE, 
                           sys.cmd = "gunzip ", verbose = FALSE, dfp = "./idats/",
@@ -148,8 +150,9 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
 #' @param burl Base URL string for idat query (default "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/").
 #' @return object of class `RGChannelSet`
 #' @examples
-#' gsmvi <- c("GSM2465267", "GSM2814572")
-#' rg <- gds_idat2rg(gsmvi)
+#' # Not run
+#' # gsmvi <- c("GSM2465267", "GSM2814572")
+#' # rg <- gds_idat2rg(gsmvi)
 #' @export
 gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", 
                         verbose = FALSE, dfp = "./idats/", 
@@ -183,8 +186,12 @@ gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz",
 #' @param dbn Path to h5 database file.
 #' @return HDF5 database connection object.
 #' @examples
-#' # get red signal for first 2 probe addresses, first 3 samples
-#' st <- hread(1:3, 1:2, d = "redsignal", dbn = "remethdb2.h5")
+#' # Get tests data pointer
+#' path = system.file("extdata", "testh5", package = "recountmethylation")
+#' fn = list.files(path)
+#' dbpath = paste0(path, "/", fn)
+#' # red signal, first 2 assay addr, 3 samples
+#' reds <- hread(1:3, 1:2, d = "redsignal", dbn = dbpath)
 #' @export
 hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
     return(rhdf5::h5read(dbn, dsn, index = list(ri, ci)))
@@ -226,13 +233,12 @@ data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
 #' common subset instead
 #' @return A list of the matched datasets.
 #' @examples
-#' # make 2 mismatched datasets
+#' # get 2 data matrices
 #' ds1 <- matrix(seq(1, 10, 1), nrow = 5)
 #' ds2 <- matrix(seq(11, 20, 1), nrow = 5)
 #' rownames(ds1) <- rownames(ds2) <- paste0("row", seq(1, 5, 1))
 #' colnames(ds1) <- colnames(ds2) <- paste0("col", c(1, 2))
 #' ds2 <- ds2[rev(seq(1, 5, 1)), c(2, 1)]
-#' 
 #' # match row and column names
 #' lmatched = matchds(d1, d2, mi1 = "rows", mi2 = "rows")
 #' lmatched = matchds(lmatched[[1]], lmatched[[2]], 
@@ -282,12 +288,11 @@ matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
 #' @param verbose Whether to post status messages.
 #' @return Returns a `RGChannelSet` object from raw signal dataset queries.
 #' @examples 
+#' # Not run
 #' # get the list of datasets for all probe addresses, 3 samples
-#' gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
-#' ldat = getrg(gsmv = gsml, data.type = "df", metadata = FALSE)
-#' 
-#' # get the rg set object
-#' rg = rgse(ldat)
+#' # gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
+#' # ldat = getrg(gsmv = gsml, data.type = "df", metadata = FALSE)
+#' # rg = rgse(ldat) # get the rg set object
 #' @seealso getrg()
 #' @export
 rgse <- function(ldat, verbose = FALSE){
@@ -369,14 +374,13 @@ rgse <- function(ldat, verbose = FALSE){
 #' @return Returns either an `RGChannelSet` or list of 
 #' `data.frame` objects from dataset query matches.
 #' @examples
+#' # Not run
 #' # make samples list
-#' gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
-#' 
+#' # gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
 #' # get list of data tables for a query
-#' ldat = getrg(gsmv = gsml, data.type = "df")
-#' 
+#' # ldat = getrg(gsmv = gsml, data.type = "df")
 #' # get the RGChannel set object for a query
-#' rgset = getrg(gsmv = gsml, data.type = "se")
+#' # rgset = getrg(gsmv = gsml, data.type = "se")
 #' @seealso rgse()
 #' @export
 getrg <- function(gsmv = NULL, cgv = NULL,
