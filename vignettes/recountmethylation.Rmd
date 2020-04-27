@@ -25,6 +25,7 @@ output:
 ```{r setup}
 library(recountmethylation)
 library(HDF5Array)
+library(minfi)
 knitr::opts_chunk$set(eval = TRUE, echo = TRUE, 
                       warning = FALSE, message = FALSE)
 ```
@@ -46,7 +47,7 @@ Assay data are contained in the following directories:
 
 # DelayedArray workflows 
 
-Ideal workflows utilizing large DelayedArray objects will delay evaluations until absolutely necessary. In the following example, `getBeta` would not be assessed until the `summarize`.
+Ideal workflows utilizing large DelayedArray objects will delay evaluations until absolutely necessary. In the following example loading a large dataset at `h5fullsizepath`, the DNAm Beta-values aren't retrieved from the `DelayedArray` object until `summarize` is called on the first column.
 
 ```{r, eval = FALSE}
 h5large <- loadHDF5SummarizedExperiment(h5fullsizepath)
@@ -54,27 +55,87 @@ betamatrix <- getBeta(h5large) # this is delayed
 summarize(betamatrix[,1]) # causes getBeta evaluation
 ```
 
-You may consult `rm_delayedarray.Rmd` for example workflows using large DelayedArray objects. Note that not all functions are currently optimized for use with large DelayedArray objects.
+See the below example and `dasupport.Rmd` vignette for details.
 
 # Example
 
-For demonstration, we load the included test dataset.
+For demonstration, load the included test dataset. First, get the path to the test data directory and note its contents.
 
-```{r, testdat.dl}
+```{r testdatpath}
 testdatdn <- "remethdb_h5se-test_gr_00-00-01_1583780004"
-datpath <- system.file("inst/extdata", testdatdn, package = "recountmethylation")
-h5test <- loadHDF5SummarizedExperiment(datpath)
-dim(h5test)
+datpath <- system.file("extdata", testdatdn, package = "recountmethylation")
+print("files in data directory")
+list.files(datpath)
 ```
 
-Standard inspection and summaries may be used.
+Next, load the data and summarize. Standard inspection and summary functions may be used.
+
+```{r, testdat.dl}
+h5test <- loadHDF5SummarizedExperiment(datpath)
+
+print("dimensions")
+dim(h5test)
+
+print("class")
+class(h5test)
+
+print("head of colnames")
+head(colnames(h5test))
+
+print("head of rownames")
+head(rownames(h5test))
+```
+
+Probe annotations are retrieved using `getAnnotation`.
 
 ```{r}
-# data info
-class(h5test)
-dim(h5test)
-head(colnames(h5test))
-head(rownames(h5test))
+chr <- names(table(getAnnotation(h5test)$chr))
+min.pos <- min(getAnnotation(h5test)$pos)
+min.pos <- max(getAnnotation(h5test)$pos)
+
+print("genome coords:")
+print(paste0(chr, ":", min.pos, "-", min.pos))
+```
+
+Phenotype and experiment are retrieved using `pData`.
+
+```{r}
+pdat <- pData(h5test)
+
+print("class")
+class(pdat)
+
+print("dimensions")
+dim(pdat)
+
+print("colnames")
+colnames(pdat)
+```
+
+Finally, DNAm Beta-values are accessed using `getBeta`. Note the class change when `as.matrix` is called.
+
+```{r}
+bdelay <- getBeta(h5test)
+bmatrix <- as.matrix(bval)
+
+print("dim output on DelayedArray: ")
+print(dim(bdelay))
+
+print("dim output on matrix: ")
+print(dim(bmatrix))
+
+print("summary output on DelayedArray: ")
+print(summary(bdelay))
+
+print("summary output on matrix: ")
+print(summary(bmatrix))
+```
+
+Note that `DelayedArray` objects may not work as expected before a new data format is specified, such as with the following example using `summarize`.
+
+```{r}
+summary(bval)
+summary(bm)
 ```
 
 # Session info
