@@ -22,12 +22,11 @@ output:
     pdf_document: default
 ---
 
-```{r setup, include = FALSE, eval = TRUE}
+```{r setup}
 library(recountmethylation)
 library(HDF5Array)
-knitr::opts_chunk$set(eval = TRUE,
-    echo = TRUE, warning = FALSE,
-    message = FALSE)
+knitr::opts_chunk$set(eval = TRUE, echo = TRUE, 
+                      warning = FALSE, message = FALSE)
 ```
 
 # Overview
@@ -63,7 +62,7 @@ For demonstration, we load the included test dataset.
 
 ```{r, testdat.dl}
 testdatdn <- "remethdb_h5se-test_gr_00-00-01_1583780004"
-datpath <- system.file("extdata", testdatdn, package = "recountmethylation")
+datpath <- system.file("inst/extdata", testdatdn, package = "recountmethylation")
 h5test <- loadHDF5SummarizedExperiment(datpath)
 dim(h5test)
 ```
