@@ -82,7 +82,6 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
                           burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
                                         "geo/samples/")){
   bnv <- fnv <- c()
-  # check dest dir
   if(verbose){message("Checking dest dir dfp.")}
   if(!dir.exists(dfp)){
     message("Making new dest dir dfp.")
@@ -90,31 +89,22 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
     if(!tdir){stop("There was an issue making the new dest dir dfp.")}
   }
   for(gsmi in gsmvi){
-    # format URL for query to GDS
     url = paste0(burl, substr(gsmi, 1, nchar(gsmi)-3), 
-                 paste(rep("n", 3), collapse = ""), 
-                 "/", gsmi, "/suppl/")
+                 paste(rep("n", 3), collapse = ""), "/", gsmi, "/suppl/")
     # get urls to idats
-    fn = RCurl::getURL(url, ftp.use.epsv = FALSE, 
-                       dirlistonly = TRUE)
+    fn = RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE)
     fn <- gsub("\\\r", "", unlist(strsplit(fn, "\n")))
     idat.str <- paste0("\\.idat\\.", ext)
     idat.catch <- grepl(idat.str, fn)
     fn <- unlist(fn)[idat.catch]
-    # eval conditions
     check.cond <- length(fn) == 2
     fn.grn <- fn[grepl(paste0(".*Grn.idat\\.", ext, "($)"), fn)]
     fn.red <- fn[grepl(paste0(".*Red.idat\\.", ext, "($)"), fn)]
-    check.cond <- c(check.cond, 
-                    length(fn.grn) > 0, 
-                    length(fn.red) > 0)
+    check.cond <- c(check.cond, length(fn.grn) > 0, length(fn.red) > 0)
     if(check.cond[1] & check.cond[2] & 
        check.cond[3]){
-      # retain idat basenames
-      rg.patt <- "_Red.*|_Grn.*"
-      match.rg <- gsub(rg.patt, "", fn)
-      idatl <- unique(match.rg)
-      bnv = c(bnv, paste(dfp, idatl, sep = ""))
+      idatl <- unique(gsub("_Red.*|_Grn.*", "", fn))
+      bnv = c(bnv, paste(dfp, idatl, sep = "")) # gsm basenames
       for(f in fn){
         fnv <- c(fnv, f)
         url.dlpath <- paste(url, f, sep = "")
@@ -127,9 +117,8 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
         message(f)
       }
     } else{
-      if(verbose){message("Query didn't identify",
-                          " red and grn IDATs for ", 
-                          gsmi)}
+      if(verbose){message("Query didn't identify", 
+                          " red and grn IDATs for ", gsmi)}
     }
     if(verbose){message("Finished query for: ", gsmi)}
   }
