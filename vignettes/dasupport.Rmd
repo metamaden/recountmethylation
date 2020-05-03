@@ -22,23 +22,27 @@ output:
     pdf_document: default
 ---
 
-# Workflow examples
+```{r setup, echo = FALSE}
+suppressMessages(library(HDF5Array))
+suppressMessages(library(minfi))
+knitr::opts_chunk$set(eval = TRUE, echo = TRUE, 
+                      warning = FALSE, message = FALSE)
 
-```{r}
-library(minfi)
-library(HDF5Array)
+# recountmethylation
+library(recountmethylation)
 
-path <- "remethdb_h5se_gm_00-00-01_1583780004"
-h5gm <- loadHDF5SummarizedExperiment(path)
-
-
-# test preprocessing 
-pre.ill <- preprocessIllumina(mset)
-pre.noob <- preprocessNoob(mset)
-pre.swan <- preprocessSWAN(mset)
+# load test data
+testdatdn <- "remethdb_h5se-test_gr_00-00-01_1583780004"
+datpath <- system.file("extdata", testdatdn, package = "recountmethylation")
+h5gr <- loadHDF5SummarizedExperiment(datpath)
 
 ```
 
+# Tests standard preprocessing operations
+
+## Data retrieval
+
+## Data analysis
 
 # Differential methylation
 
