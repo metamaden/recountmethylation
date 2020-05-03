@@ -74,9 +74,8 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
 #' @param burl Base URL string for RCurl query
 #' @return Describes returned object
 #' @examples
-#' # Not run
-#' # gsmvi <- c("GSM2465267", "GSM2814572")
-#' # gds_idatquery(gsmvi)
+#' gsmvi <- c("GSM2465267", "GSM2814572")
+#' gds_idatquery(gsmvi)
 #' @export
 gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE, 
                           sys.cmd = "gunzip ", verbose = FALSE, dfp = "./idats/",
