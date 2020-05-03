@@ -22,7 +22,49 @@ output:
     pdf_document: default
 ---
 
+# Workflow examples
+
+```{r}
+library(minfi)
+library(HDF5Array)
+
+path <- "remethdb_h5se_gm_00-00-01_1583780004"
+h5gm <- loadHDF5SummarizedExperiment(path)
+
+
+# test preprocessing 
+pre.ill <- preprocessIllumina(mset)
+pre.noob <- preprocessNoob(mset)
+pre.swan <- preprocessSWAN(mset)
+
+```
+
+
+# Differential methylation
+
+
+
+```{r}
+
+mset <- mapToGenome(h5gm)
+
+path <- ""
+h5rg <- loadHDF5SummarizedExperiment("")
+pill <- preprocessIllumina(h5rg)
+pnoob <- preprocessNoob(pill)
+cb <- ComBat(pnoob)
+
+
+```
+
+
+
+
 # Session info
+
 ```{r}
 sessionInfo()
 ```
+
+
+# 
