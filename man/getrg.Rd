@@ -38,14 +38,14 @@ including both the red channel 'redsignal' and green channel
 
 \item{all.gsm}{Whether to query all available GSM IDs.}
 
+\item{all.cg}{Whether to query all available CpG probe addresses.}
+
 \item{metadata}{Whether to access available postprocessed 
-metadata for queries samples.}
+metadata for queried samples.}
 
 \item{md.dsn}{Name of metadata dataset in h5 file.}
 
 \item{verbose}{Whether to post status messages.}
-
-\item{all.cgv}{Whether to query all available CpG probe addresses.}
 }
 \value{
 Returns either an `RGChannelSet` or list of 

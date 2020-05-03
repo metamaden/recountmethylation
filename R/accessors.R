@@ -366,9 +366,9 @@ rgse <- function(ldat, verbose = FALSE){
 #' including both the red channel 'redsignal' and green channel 
 #' 'greensignal' datasets.
 #' @param all.gsm Whether to query all available GSM IDs.
-#' @param all.cgv Whether to query all available CpG probe addresses.
+#' @param all.cg Whether to query all available CpG probe addresses.
 #' @param metadata Whether to access available postprocessed 
-#' metadata for queries samples.
+#' metadata for queried samples.
 #' @param md.dsn Name of metadata dataset in h5 file.
 #' @param verbose Whether to post status messages.
 #' @return Returns either an `RGChannelSet` or list of 
