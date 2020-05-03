@@ -15,7 +15,7 @@ gds_idatquery(
 )
 }
 \arguments{
-\item{gsmvi}{Param description}
+\item{gsmvi}{Vector of GSM IDs}
 
 \item{ext}{Filename extension}
 
