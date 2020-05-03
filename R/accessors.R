@@ -64,7 +64,6 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
 #' IDATs query
 #'
 #' Queries GDS IDATs and downloads, with exception handling.
-#' Files are downloaded 
 #' @param gsmvi Vector of GSM IDs
 #' @param ext Filename extension
 #' @param expand Whether to expand compressed files.
