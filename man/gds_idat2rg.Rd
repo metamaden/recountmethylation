@@ -8,7 +8,6 @@ gds_idat2rg(
   gsmvi,
   rmdl = TRUE,
   ext = "gz",
-  verbose = FALSE,
   dfp = "./idats/",
   burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/", "geo/samples/")
 )
@@ -19,8 +18,6 @@ gds_idat2rg(
 \item{rmdl}{Whether to remove downloaded .*idat files (default TRUE).}
 
 \item{ext}{Filename extension (default "gz").}
-
-\item{verbose}{Whether to show verbose messages (default FALSE).}
 
 \item{dfp}{Destination file dir for idats.}
 
@@ -35,7 +32,6 @@ assay data as an `RGChannelSet`.
 ('.h5') file and return the indexed table subset.
 }
 \examples{
-# Not run
-# gsmvi <- c("GSM2465267", "GSM2814572")
-# rg <- gds_idat2rg(gsmvi)
+gsmvi <- c("GSM2465267", "GSM2814572")
+rg <- gds_idat2rg(gsmvi)
 }

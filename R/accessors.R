@@ -133,7 +133,6 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
 #' @param gsmvi A vector of GSM IDs (alphanumeric character strings).
 #' @param rmdl Whether to remove downloaded .*idat files (default TRUE).
 #' @param ext Filename extension (default "gz").
-#' @param verbose Whether to show verbose messages (default FALSE).
 #' @param dfp Destination file dir for idats.
 #' @param burl Base URL string for idat query (default "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/").
 #' @return object of class `RGChannelSet`
@@ -141,21 +140,19 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' rg <- gds_idat2rg(gsmvi)
 #' @export
-gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", 
-                        verbose = FALSE, dfp = "./idats/", 
+gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/", 
                         burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
                                       "geo/samples/")){
   dn = "" # download idats to cwd
   bnv = c() # store the idat basenames
   rt = try(gds_idatquery(gsmvi, burl, ext, verbose, dfp)) # idat query and download
   if(!is(rt) == "RGChannelSet"){
-    stop("Process ended with the following message: ",
-         rt[1])
+    stop("Process ended with the following message: ", rt[1])
   }
   rgdl = minfi::read.metharray(basenames = rt[["basenames"]])
   # file cleanup
   if(rmdl){
-    if(verbose){message("Removing downloaded files...")}
+    message("Removing downloaded files...")
     for(f in rt[["filenames"]]){
       file.remove(f)
     }
