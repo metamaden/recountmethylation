@@ -38,37 +38,15 @@ h5gr <- loadHDF5SummarizedExperiment(datpath)
 
 ```
 
-# Tests standard preprocessing operations
+# Preprocessing
 
-## Data retrieval
-
-## Data analysis
-
-# Differential methylation
-
-
+# Analysis
 
 ```{r}
-
-mset <- mapToGenome(h5gm)
-
-path <- ""
-h5rg <- loadHDF5SummarizedExperiment("")
-pill <- preprocessIllumina(h5rg)
-pnoob <- preprocessNoob(pill)
-cb <- ComBat(pnoob)
-
-
 ```
-
-
-
 
 # Session info
 
 ```{r}
 sessionInfo()
 ```
-
-
-# 
