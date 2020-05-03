@@ -138,9 +138,8 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
 #' @param burl Base URL string for idat query (default "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/").
 #' @return object of class `RGChannelSet`
 #' @examples
-#' # Not run
-#' # gsmvi <- c("GSM2465267", "GSM2814572")
-#' # rg <- gds_idat2rg(gsmvi)
+#' gsmvi <- c("GSM2465267", "GSM2814572")
+#' rg <- gds_idat2rg(gsmvi)
 #' @export
 gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", 
                         verbose = FALSE, dfp = "./idats/", 
