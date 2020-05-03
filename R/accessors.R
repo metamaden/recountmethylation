@@ -219,9 +219,11 @@ data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
 #' colnames(ds1) <- colnames(ds2) <- paste0("col", c(1, 2))
 #' ds2 <- ds2[rev(seq(1, 5, 1)), c(2, 1)]
 #' # match row and column names
-#' lmatched = matchds(d1, d2, mi1 = "rows", mi2 = "rows")
-#' lmatched = matchds(lmatched[[1]], lmatched[[2]], 
-#'     mi1 = "columns", mi2 = "columns)
+#' lmatched = matchds_1to2(ds1, ds2, mi1 = "rows", mi2 = "rows")
+#' lmatched = matchds_1to2(lmatched[[1]], lmatched[[2]], mi1 = "columns", mi2 = "columns")
+#' # check matches
+#' identical(rownames(lmatched[[1]]), rownames(lmatched[[2]]))
+#' identical(colnames(lmatched[[1]]), colnames(lmatched[[2]]))
 #' @export
 matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"), 
     mi2 = c("rows", "columns"), subset.match = FALSE){
