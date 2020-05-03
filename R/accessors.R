@@ -115,7 +115,7 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
       rg.patt <- "_Red.*|_Grn.*"
       match.rg <- gsub(rg.patt, "", fn)
       idatl <- unique(match.rg)
-      bnv = c(bnv, idatl)
+      bnv = c(bnv, paste(dfp, idatl, sep = ""))
       for(f in fn){
         fnv <- c(fnv, f)
         url.dlpath <- paste(url, f, sep = "")
