@@ -30,11 +30,10 @@ gds_idatquery(
 \item{burl}{Base URL string for RCurl query}
 }
 \value{
-Describes returned object
+Lists the basename paths and filenames of IDATs downloaded.
 }
 \description{
 Queries GDS IDATs and downloads, with exception handling.
-Files are downloaded
 }
 \examples{
 gsmvi <- c("GSM2465267", "GSM2814572")

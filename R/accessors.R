@@ -225,7 +225,7 @@ data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
 #' ds1m <- lmatched[[1]]
 #' ds2m <- lmatched[[2]]
 #' identical(rownames(ds1m), rownames(ds2m))
-#' identical(colnames(ds1m), colnames(ds2m)
+#' identical(colnames(ds1m), colnames(ds2m))
 #' @export
 matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"), 
     mi2 = c("rows", "columns"), subset.match = FALSE){
