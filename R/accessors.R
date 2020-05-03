@@ -71,7 +71,7 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
 #' @param verbose Whether to show verbose messages (TRUE/FALSE)
 #' @param dfp Download directory
 #' @param burl Base URL string for RCurl query
-#' @return Describes returned object
+#' @return Lists the basename paths and filenames of IDATs downloaded.
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' gds_idatquery(gsmvi)
