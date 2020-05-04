@@ -270,11 +270,11 @@ matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
 #' @param verbose Whether to post status messages.
 #' @return Returns a `RGChannelSet` object from raw signal dataset queries.
 #' @examples 
-#' # Not run
 #' # get the list of datasets for all probe addresses, 3 samples
-#' # gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
-#' # ldat = getrg(gsmv = gsml, data.type = "df", metadata = FALSE)
-#' # rg = rgse(ldat) # get the rg set object
+#' dbn <- system.file("extdata", "testh5", package = "recountmethylation")
+#' gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
+#' ldat = getrg(gsmv = gsml, dbn = dbn, data.type = "df", metadata = FALSE)
+#' rg = rgse(ldat) # get the rg set object
 #' @seealso getrg()
 #' @export
 rgse <- function(ldat, verbose = FALSE){
@@ -356,13 +356,11 @@ rgse <- function(ldat, verbose = FALSE){
 #' @return Returns either an `RGChannelSet` or list of 
 #' `data.frame` objects from dataset query matches.
 #' @examples
-#' # Not run
 #' # make samples list
-#' # gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
+#' dbn <- system.file("extdata", "testh5", package = "recountmethylation")
+#' gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
 #' # get list of data tables for a query
-#' # ldat = getrg(gsmv = gsml, data.type = "df")
-#' # get the RGChannel set object for a query
-#' # rgset = getrg(gsmv = gsml, data.type = "se")
+#' ldat = getrg(gsmv = gsml, dbn = dbn, data.type = "df")
 #' @seealso rgse()
 #' @export
 getrg <- function(gsmv = NULL, cgv = NULL,
