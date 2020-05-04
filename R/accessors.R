@@ -50,8 +50,7 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
     dll[[i]] <- try(download.file(fpath, paste0(dfp.dn, f)))
   }
   if(dll[[1]] == 0 & dll[[2]] == 0){
-    if(verbose){message("Download completed successfully. ",
-                        "Returning new path...")}
+    if(verbose){message("Finished download, returning file path.")}
     return(dfp.dn)
   } else{
     if(verbose){message("Download incomplete for file ", fl.clean[which(dll!=0)])}
