@@ -6,12 +6,12 @@
 #' @param which.dn  Type of data dir to be downloaded.
 #' @param url Server URL containing assay data.
 #' @param dfp Target local directory for downloaded files.
-#' @param verbose Whether to return verbose messages.
 #' @param download Whether to download or just return latest filename.
+#' @param verbose Whether to return verbose messages.
+#' @param sslver Whether to use server certificate check (default FALSE).
 #' @return New filepath to dir with downloaded data.
 #' @examples 
-#' # Not run
-#' # get_rmdl("h5se-test_gr", verbose = TRUE)
+#' get_rmdl("h5se-test_gr", verbose = TRUE)
 #' @export
 get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr", 
                                   "h5se_gm", "h5se_rg", "\\.h5"),
