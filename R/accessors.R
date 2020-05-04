@@ -5,7 +5,7 @@
 #' Uses RCurl to recursively download latest H5SE and HDF5 data objects the from server.
 #' @param which.dn  Type of data dir to be downloaded.
 #' @param url Server URL containing assay data.
-#' @param dfp Target local directory for downloaded files.
+#' @param dfp Target local directory for downloaded files (default "downloads").
 #' @param download Whether to download or just return latest filename.
 #' @param verbose Whether to return verbose messages.
 #' @param sslver Whether to use server certificate check (default FALSE).
@@ -16,7 +16,7 @@
 get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr", 
                                   "h5se_gm", "h5se_rg", "\\.h5"),
                      url = "https://recount.bio/data/", 
-                     dfp = "", download = c("download", "filename"),
+                     dfp = "downloads", download = c("download", "filename"),
                      verbose = TRUE, sslver = FALSE){
   if(verbose){message("Retrieving data dirnames from server...")}
   dn <- RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE,
