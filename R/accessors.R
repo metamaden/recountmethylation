@@ -28,8 +28,8 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
   dn.clean <- gsub('<.*', "", gsub('.*">', "", dn))
   if(download == "filename"){return(dn.clean)}
   if(!length(dn.clean) == 1){stop("There was a problem parsing the file string.")}
-  dfp.dn <- paste(c(dfp, dn.clean), collapse = "/")
   if(!dir.exists(dfp) & !dfp == ""){dct1 <- try(dir.create(dfp))}
+  dfp.dn <- paste(c(dfp, dn.clean), collapse = "/")
   dct2 <- try(dir.create(dfp.dn)) # h5 subdir try cond
   if(!(dct1 & dct2)){stop("There is a problem with the download destination path.")}
   if(verbose){message("Retrieving data files from server...")}
@@ -45,9 +45,10 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
   if(verbose){message("Downloading files...")}
   dll <- list()
   for(i in 1:length(fl.clean)){
-    f <- fl.clean[i]
-    fpath <- paste0(c(dn.url, f), collapse = "")
-    dll[[i]] <- try(download.file(fpath, paste0(dfp.dn, f)))
+    fpath <- paste0(c(dn.url, fl.clean[i]), collapse = "")
+    cf = RCurl::CFILE(paste0(dfp.dn, fl.clean[i]), mode="wb")
+    dll[[i]] <- try(RCurl::curlPerform(url = fpath, writedata = cf@ref,
+                       .opts = list(ssl.verifypeer = sslver)))
   }
   if(dll[[1]] == 0 & dll[[2]] == 0){
     if(verbose){message("Finished download, returning file path.")}
