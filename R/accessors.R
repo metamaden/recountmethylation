@@ -271,10 +271,13 @@ matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
 #' @return Returns a `RGChannelSet` object from raw signal dataset queries.
 #' @examples 
 #' # get the list of datasets for all probe addresses, 3 samples
-#' dbn <- system.file("extdata", "testh5", package = "recountmethylation")
+#' path <- system.file("extdata", "testh5", package = "recountmethylation")
+#' dbpath <- paste0(path, "/remethdbtest.h5")
 #' gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
-#' ldat = getrg(gsmv = gsml, dbn = dbn, data.type = "df", metadata = FALSE)
+#' ldat = getrg(gsmv = gsml, dbn = dbpath, data.type = "df", metadata = FALSE)
 #' rg = rgse(ldat) # get the rg set object
+#' class(rg)
+#' dim(getBeta(rg))
 #' @seealso getrg()
 #' @export
 rgse <- function(ldat, verbose = FALSE){
@@ -357,10 +360,15 @@ rgse <- function(ldat, verbose = FALSE){
 #' `data.frame` objects from dataset query matches.
 #' @examples
 #' # make samples list
-#' dbn <- system.file("extdata", "testh5", package = "recountmethylation")
+#' path <- system.file("extdata", "testh5", package = "recountmethylation")
+#' dbpath <- paste0(path, "/remethdbtest.h5")
 #' gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
 #' # get list of data tables for a query
-#' ldat = getrg(gsmv = gsml, dbn = dbn, data.type = "df")
+#' ldat = getrg(gsmv = gsml, dbn = dbpath, data.type = "df")
+#' names(ldat)
+#' dim(ldat[[1]])
+#' dim(ldat[[2]])
+#' dim(ldat[[3]])
 #' @seealso rgse()
 #' @export
 getrg <- function(gsmv = NULL, cgv = NULL,
