@@ -9,7 +9,8 @@ get_rmdl(
   url = "https://recount.bio/data/",
   dfp = "",
   download = c("download", "filename"),
-  verbose = TRUE
+  verbose = TRUE,
+  sslver = FALSE
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ get_rmdl(
 \item{download}{Whether to download or just return latest filename.}
 
 \item{verbose}{Whether to return verbose messages.}
+
+\item{sslver}{Whether to use server certificate check (default FALSE).}
 }
 \value{
 New filepath to dir with downloaded data.
@@ -30,6 +33,5 @@ New filepath to dir with downloaded data.
 Uses RCurl to recursively download latest H5SE and HDF5 data objects the from server.
 }
 \examples{
-# Not run
-# get_rmdl("h5se-test_gr", verbose = TRUE)
+get_rmdl("h5se-test_gr", verbose = TRUE)
 }
