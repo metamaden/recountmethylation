@@ -17,9 +17,10 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
                                   "h5se_gm", "h5se_rg", "\\.h5"),
                      url = "https://recount.bio/data/", 
                      dfp = "", download = c("download", "filename"),
-                     verbose = TRUE){
+                     verbose = TRUE, sslver = FALSE){
   if(verbose){message("Retrieving data dirnames from server...")}
-  dn <- RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE)
+  dn <- RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE,
+                      .opts = list(ssl.verifypeer = sslver))
   dn <- unlist(strsplit(dn, "\n"))
   catch.str <- paste0(".*", which.dn,".*")
   dn.catch <- grepl(catch.str, dn)
@@ -28,15 +29,13 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
   if(download == "filename"){return(dn.clean)}
   if(!length(dn.clean) == 1){stop("There was a problem parsing the file string.")}
   dfp.dn <- paste(c(dfp, dn.clean), collapse = "/")
-  if(!dir.exists(dfp) & !dfp == ""){
-    if(verbose){message("Making new dl dir ", dn)}
-    dct1 <- try(dir.create(dfp)) # dir try cond
-  }
+  if(!dir.exists(dfp) & !dfp == ""){dct1 <- try(dir.create(dfp))}
   dct2 <- try(dir.create(dfp.dn)) # h5 subdir try cond
-  if(!(dct1 & dct2)){stop("Unable to make new dir path for download.")}
+  if(!(dct1 & dct2)){stop("There is a problem with the download destination path.")}
   if(verbose){message("Retrieving data files from server...")}
   dn.url <- paste0(url, dn.clean)
-  fl = RCurl::getURL(dn.url, ftp.use.epsv = FALSE, dirlistonly = TRUE)
+  fl = RCurl::getURL(dn.url, ftp.use.epsv = FALSE, dirlistonly = TRUE,
+                     .opts = list(ssl.verifypeer = sslver))
   fl <- unlist(strsplit(fl, "\n"))
   fl.str <- paste0(c("assays.h5", "se.rds"), collapse = "|")
   fl.catch.str <- paste0(".*", fl.str,".*")
