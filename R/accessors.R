@@ -145,7 +145,7 @@ gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/",
   bnv = c() # store the idat basenames
   rt <- try(gds_idatquery(gsmvi = gsmvi, ext = ext, 
                           dfp = dfp, burl = burl))
-  if(is(rt) == "try-error"){stop("Process ended with message: ", rt[1])}
+  if(is(rt)[1] == "try-error"){stop("Process ended with message: ", rt[1])}
   rgdl = minfi::read.metharray(basenames = rt[["basenames"]])
   if(rmdl){
     message("Removing downloaded files...")
