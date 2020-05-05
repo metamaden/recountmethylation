@@ -27,7 +27,7 @@ gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
 ldat = getrg(gsmv = gsml, dbn = dbpath, data.type = "df", metadata = FALSE)
 rg = rgse(ldat) # get the rg set object
 class(rg)
-dim(getBeta(rg))
+dim(minfi::getBeta(rg))
 }
 \seealso{
 getrg()
