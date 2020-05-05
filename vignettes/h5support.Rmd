@@ -7,7 +7,7 @@ author:
   - name: Abhi Nellore
 package: recountmethylation
 abstract: >
-   Vignette for working with `recountmethylation` HDF5 database contents
+   Vignette for working with `recountmethylation` HDF5 database contents, available at https://recount.bio/data. See the main vignette, recountmethylation.Rmd, for details.
 vignette: >
     %\VignetteDepends{RCurl}
     %\VignetteEngine{knitr::knitr} 
@@ -63,13 +63,11 @@ The `recountmethylation` package can be installed from GitHub using `devtools::i
 # Data access
 
 We need to provide the name of the database file with extension `.h5`. 
-The entire Recount Methylation HDF5 database file, called `remethdb2.h5`, 
-is available for download [here](https://recount.bio/data/remethdb2.h5). 
+The entire Recount Methylation HDF5 database file called `remethdb2.h5`. 
+This vignette uses a small test dataset called `remethdbtest.h5`, which 
+includes DNAm red and green signal at chr22 for 30 samples. 
 
-For this vignette, we used a small test dataset available 
-[here](https://recount.bio/data/remethdbtest.h5), called `remethdbtest.h5`. 
-This test dataset contains DNAm red and green signal from 30 samples at just 
-the chromosome 22 probes. We can download this file to the current working directory as follows.
+First, we can obtain the path to the test dataset and summarize its contents.
 
 ```{r h5_details}
 path = system.file("extdata", "testh5", package = "recountmethylation")
@@ -78,12 +76,13 @@ dbpath = paste0(path, "/", fn)
 rhdf5::h5ls(dbpath)
 ```
 
-Datasets include separate entities for row and column names of each matrix, 
-denoted as "[dataset].[row/column]names". Data contained in each 
-respective object has a single format (e.g. `FLOAT`, `STRING`, etc.), 
-where row and column names as well as the metadata table are of type `STRING`).
+Note that dataset row and column names are stored separately from data matrices,
+denoted as "[dataset].[row/column]names". Data is homogeneous for each 
+object in the HDF5 file. That is, each data entity has a single type 
+(e.g. `FLOAT`, `STRING`, `STRING`).
 
-We can quickly access the entire metadata table for sample queries as follows.
+To identify and characterize samples in the HDF5 database, first access the 
+sample metadata.
 
 ```{r get_gsm_metadata}
 # get full gsm metadata
@@ -99,8 +98,7 @@ which are in turn under the GSE records
 [GSE93933](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE93933) and
 [GSE105018](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE105018). 
 
-Next, we can check available sample types and construct 
-a sample query from the sample metadata file.
+Next, check sample types and construct a sample query as follows.
 
 ```{r make_gsm_query}
 # check which samples available in h5 db
@@ -126,21 +124,23 @@ gsmvi = mdf$gsm[which.gsm]
 gsmvi
 ```
 
-Importantly, we described full methods for deriving sample metadata and learning annotations in the affiliated manuscript. In summary, we coerced various types of data mined directly from the GSE SOFT records into a uniform and predictable format. For the variables `disease` and `tissue`, we learned annotations as a series of labels separated by `;`, where samples can have one of seveal labels under a variable. This means exact term matches are best identified using `grepl(paste0("(^|;)", myterm, "($|;)", mdvariable)` and approximate term matches containing a queried string can use `grepl(paste0(".*", myterm, ".*", mdvariable)`. 
+For full details about the sample metadata, you may consult the package manuscript. In summary, the variables `disease` and `tissue` contain learned annotations separated by `;`, where samples can have one of several labels under the same variable. In terms of queries that use regular expressions, exact matches may use 
+`grepl(paste0("(^|;)", myterm, "($|;)", mdvariable)` 
+and approximate matches may use `grepl(paste0(".*", myterm, ".*", mdvariable)`, 
+where `myterm` is the term of interest and `mdvariable` is the column queried. 
 
-Additional metadata variables are included for sample preparation type under `storage` (e.g. ffpe or frozen), mined age under `age`, most likely sample type prediction from MetaSRA-pipeline under `sampletype`, and DNAm model-based predictions for age (`predage`), sex (`predsex`), and cell type fractions (`predcell.*` variables).
-
-Next, we can query a subset of the available array probes based on 
-location. We will select only the probes from chromosome 22 (the only chromosome included in the test dataset).
+Next, query a probe subset by genomic location (here we use `chrname` or chr22) using the array annotation file.
 
 ```{r make_cg_query}
 anno.name = "IlluminaHumanMethylation450kanno.ilmn12.hg19"
 man = eval(parse(text = paste(anno.name, "Manifest", sep = "::")))
 loc = eval(parse(text = paste(anno.name, "Locations", sep = "::")))
-# identical(rownames(loc), rownames(man))
 chrname = "chr22"
+# cpgs of interest
 cgfilt = rownames(loc[grepl(paste0("^", chrname, "$"), loc$chr),])
+# vector of queries addresses
 cgvi = unique(c(man[cgfilt,]$AddressA, man[cgfilt,]$AddressB))
+length(cgvi)
 ```
 
 With the queries constructed, we can proceed to extracting and storing the 
