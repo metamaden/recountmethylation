@@ -6,7 +6,7 @@
 #' @param which.dn  Type of data dir to be downloaded.
 #' @param url Server URL containing assay data.
 #' @param dfp Target local directory for downloaded files (default "downloads").
-#' @param download Whether to download or just return latest filename.
+#' @param download Whether to download (TRUE) or return queried filename (FALSE).
 #' @param verbose Whether to return verbose messages.
 #' @param sslver Whether to use server certificate check (default FALSE).
 #' @return New filepath to dir with downloaded data.
@@ -16,7 +16,7 @@
 get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr", 
                                   "h5se_gm", "h5se_rg", "\\.h5"),
                      url = "https://recount.bio/data/", 
-                     dfp = "downloads", download = c("download", "filename"),
+                     dfp = "downloads", download = TRUE,
                      verbose = TRUE, sslver = FALSE){
   if(verbose){message("Retrieving data dirnames from server...")}
   dn <- RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE,
@@ -26,7 +26,7 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
   dn.catch <- grepl(catch.str, dn)
   dn <- unlist(dn)[dn.catch]
   dn.clean <- gsub('<.*', "", gsub('.*">', "", dn))
-  if(download == "filename"){return(dn.clean)}
+  if(!download){return(dn.clean)}
   if(!length(dn.clean) == 1){stop("There was a problem parsing the file string.")}
   if(!dir.exists(dfp) & !dfp == ""){dct1 <- try(dir.create(dfp))}
   dfp.dn <- paste(c(dfp, dn.clean), collapse = "/")
