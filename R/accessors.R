@@ -277,7 +277,7 @@ matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
 #' ldat = getrg(gsmv = gsml, dbn = dbpath, data.type = "df", metadata = FALSE)
 #' rg = rgse(ldat) # get the rg set object
 #' class(rg)
-#' dim(getBeta(rg))
+#' dim(minfi::getBeta(rg))
 #' @seealso getrg()
 #' @export
 rgse <- function(ldat, verbose = FALSE){
