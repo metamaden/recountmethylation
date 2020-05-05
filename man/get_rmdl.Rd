@@ -8,7 +8,7 @@ get_rmdl(
   which.dn = c("h5se-test_gr", "h5se_gr", "h5se_gm", "h5se_rg", "\\\\.h5"),
   url = "https://recount.bio/data/",
   dfp = "downloads",
-  download = c("download", "filename"),
+  download = TRUE,
   verbose = TRUE,
   sslver = FALSE
 )
@@ -20,7 +20,7 @@ get_rmdl(
 
 \item{dfp}{Target local directory for downloaded files (default "downloads").}
 
-\item{download}{Whether to download or just return latest filename.}
+\item{download}{Whether to download (TRUE) or return queried filename (FALSE).}
 
 \item{verbose}{Whether to return verbose messages.}
 
