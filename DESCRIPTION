@@ -4,7 +4,7 @@ Title: Access and analyze the Recount Methylation database
 Authors@R: c(person(c("Sean", "K"), "Maden", role = c("cre", "aut"),
         email = "maden@ohsu.edu", comment = c(ORCID = "0000-0002-2212-4894")),
     person("Reid F", "Thompson", role = "aut", comment = c(ORCID = "0000-0003-3661-5296")),
-    person("Kasper D", "Hansen", role = "aut", email = "hansen@jhsph.edu", comment = c(ORCID = "")),
+    person("Kasper D", "Hansen", role = "aut", email = "hansen@jhsph.edu", comment = c(ORCID = "0000-0002-3303-4819")),
     person("Abhi", "Nellore", role = "aut", email = "nellore@ohsu.edu", comment = c(ORCID = "0000-0001-8145-1484")))
 Description: Access and analyze data from the recount methylation database.
 License: Artistic-2.0
