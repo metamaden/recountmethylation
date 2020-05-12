@@ -1,25 +1,26 @@
 ---
 title: "Advice for workflows with `recountmethylation` data objects and `DelayedArray`"
 author:
-  - name: Sean K. Maden
-  - name: Reid F. Thompson
-  - name: Kasper D. Hansen
-  - name: Abhi Nellore
+  - Sean K. Maden
+  - Reid F. Thompson
+  - Kasper D. Hansen
+  - Abhi Nellore
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 package: recountmethylation
 abstract: >
    Recommendations for data management and preprocessing tasks that effectively 
    utilize `DelayedArray` technology.
 vignette: >
     %\VignetteDepends{RCurl}
-    %\VignetteEngine{knitr::knitr} 
     %\VignetteIndexEntry{recountmethylation DelayedArray} 
     %\usepackage[UTF-8]{inputenc}
+    %\VignetteEngine{knitr::knitr} 
 output:
+    pdf_document: default
     BiocStyle::html_document:
         toc: true
         tocfloat: true
         code_folding: show
-    pdf_document: default
 ---
 
 ```{r setup, echo = FALSE}
@@ -27,15 +28,20 @@ suppressMessages(library(HDF5Array))
 suppressMessages(library(minfi))
 knitr::opts_chunk$set(eval = TRUE, echo = TRUE, 
                       warning = FALSE, message = FALSE)
+```
 
-# recountmethylation
+# Disclaimer
+
+```{r disclaimer, message = TRUE}
 library(recountmethylation)
+```
 
-# load test data
+# Load the Test Data
+
+```{r load_testdata}
 testdatdn <- "remethdb_h5se-test_gr_00-00-01_1583780004"
 datpath <- system.file("extdata", testdatdn, package = "recountmethylation")
 h5gr <- loadHDF5SummarizedExperiment(datpath)
-
 ```
 
 # Preprocessing

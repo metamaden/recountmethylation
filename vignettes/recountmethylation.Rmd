@@ -22,16 +22,18 @@ vignette: "%\\VignetteDepends{RCurl} %\\VignetteIndexEntry{bioc_vignette}  %\\us
   %\\VignetteEngine{knitr::knitr} \n"
 ---
 
-# Overview
-
-Note the disclaimer when loading recountmethylation.
-
 ```{r setup, echo = FALSE}
 suppressMessages(library(HDF5Array))
 suppressMessages(library(minfi))
 knitr::opts_chunk$set(eval = TRUE, echo = TRUE, 
                       warning = FALSE, message = FALSE)
-# recountmethylation
+```
+
+# Overview
+
+Note the disclaimer when loading recountmethylation.
+
+```{r disclaimer, message = TRUE}
 library(recountmethylation)
 ```
 
@@ -50,7 +52,7 @@ Queries to `recount.bio/data` can be handled using `get_rmdl()`. Targeted data a
 
 Ideal workflows utilizing large `DelayedArray` objects will delay evaluations until absolutely necessary. In the following example loading a large dataset at `h5fullsizepath`, the DNAm Beta-values aren't retrieved from the `DelayedArray` object until `summarize` is called on the first column.
 
-```{r, eval = FALSE}
+```{r delayedarray_workflow_example, eval = FALSE}
 h5large <- loadHDF5SummarizedExperiment(h5fullsizepath)
 betamatrix <- getBeta(h5large) # this is delayed 
 summarize(betamatrix[,1]) # causes getBeta evaluation
@@ -60,18 +62,18 @@ summarize(betamatrix[,1]) # causes getBeta evaluation
 
 This example illustrates how to load and handle the full-sized `recountmethylation` assay data objects. First, get the path to the test data directory and note its contents.
 
-```{r testdatpath}
+```{r get_testdata_path}
 testdatdn <- "remethdb_h5se-test_gr_00-00-01_1583780004"
 datpath <- system.file("extdata", testdatdn, package = "recountmethylation")
 ```
-```{r, echo = FALSE}
+```{r show_testdata_dir, echo = FALSE}
 print("files in data directory:")
 list.files(datpath)
 ```
 
 Next, load the data with `loadHDF5SummarizedExperiment` and inspect.
 
-```{r, testdat.dl, echo = FALSE}
+```{r testdata_summaries, echo = FALSE}
 h5test <- loadHDF5SummarizedExperiment(datpath)
 print("dimensions:")
 dim(h5test)
@@ -85,7 +87,7 @@ head(rownames(h5test))
 
 As with standard `SummarizedExperiment` objects, assay annotations are retrieved using `getAnnotation`.
 
-```{r}
+```{r manifest_summaries}
 chr <- names(table(getAnnotation(h5test)$chr))
 min.pos <- min(getAnnotation(h5test)$pos)
 min.pos <- max(getAnnotation(h5test)$pos)
@@ -94,7 +96,7 @@ print(paste0(chr, ":", min.pos, "-", min.pos))
 
 Similarly, sample and experiment data are retrieved using `pData`.
 
-```{r, echo = FALSE}
+```{r metadata_summaries, echo = FALSE}
 pdat <- pData(h5test)
 print("class:")
 class(pdat)
@@ -106,7 +108,7 @@ colnames(pdat)
 
 Finally, DNAm Beta-values are accessed using `getBeta`. As mentioned above, `DelayedArray` objects may not work as expected before operations such as class definitions or subsets are declared. Below this is demonstrated using `dim` and `summarize`.
 
-```{r}
+```{r dnamdata_summaries}
 bdelay <- getBeta(h5test)
 bmatrix <- as.matrix(bdelay)
 identical(dim(bdelay), dim(bmatrix))
@@ -116,6 +118,6 @@ identical(summary(bdelay), summary(bmatrix))
 You may consult the `dasupport.Rmd` vignette for more extensive examples making use of `DelayedArray` objects for methylation analysis.
 
 # Session info
-```{r}
+```{r get_sessioninfo}
 sessionInfo()
 ```

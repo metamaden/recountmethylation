@@ -1,28 +1,28 @@
 ---
 title: "HDF5 support"
 author:
-  - name: Sean K. Maden
-  - name: Reid F. Thompson
-  - name: Kasper D. Hansen
-  - name: Abhi Nellore
-package: recountmethylation
-abstract: >
-   Vignette for working with `recountmethylation` HDF5 database contents, available at https://recount.bio/data. See the main vignette, recountmethylation.Rmd, for details.
-vignette: >
-    %\VignetteDepends{RCurl}
-    %\VignetteIndexEntry{recountmethylation user's guide} 
-    %\usepackage[UTF-8]{inputenc}
-    %\VignetteEngine{knitr::knitr} 
+- Sean K. Maden
+- Reid F. Thompson
+- Kasper D. Hansen
+- Abhi Nellore
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-    pdf_document: default
-    BiocStyle::html_document:
-        toc: true
-        tocfloat: true
-        code_folding: show
+  pdf_document: default
+  BiocStyle::html_document:
+    code_folding: show
+    toc: yes
+    tocfloat: yes
+  html_document:
+    df_print: paged
+    toc: yes
+package: recountmethylation
+abstract: |
+  Vignette for working with `recountmethylation` HDF5 database contents, available at https://recount.bio/data. See the main vignette, recountmethylation.Rmd, for details.
+vignette: "%\\VignetteDepends{RCurl} %\\VignetteIndexEntry{recountmethylation user's
+  guide}  %\\usepackage[UTF-8]{inputenc} %\\VignetteEngine{knitr::knitr} \n"
 ---
 
 ```{r setup}
-library(recountmethylation)
 knitr::opts_chunk$set(eval = TRUE, echo = TRUE, 
                       warning = FALSE, message = FALSE)
 ```
@@ -47,18 +47,14 @@ can be either a list of datasets or a single object of class `RGChannelSet`,
 which inherits properties from the `SummarizedExperiment` class.
 
 # Disclaimer
-On loading `recountmethylation`, a disclaimer is provided.
-In summary, the `recountmethylation` R package can aid and expand research capabilities 
-in epigenetics cross-study analysis.
-Contained data does not presently build live, and presently data reflects 
-assays and metadata available as of March 2019.
-Data validation can be performed using `recountmethylation::rg_from_geo()`, and users
-may find the packages `GEOquery` and `GEOmetadb` useful.
+
+```{r disclaimer, message = TRUE}
+library(recountmethylation)
+```
 
 # Installation
 
 The `recountmethylation` package can be installed from GitHub using `devtools::install_github("metamaden/recountmethylation")`
-
 
 # Data access
 
