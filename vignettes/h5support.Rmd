@@ -29,14 +29,14 @@ knitr::opts_chunk$set(eval = TRUE, echo = TRUE,
 
 # Introduction
 
-This package provides accessor functions to query Recount Methylation 
+This package provides accessor functions to query the `recountmethylation` 
 database file, `remethdb2.h5`. The database stores relatively large red- and 
 green-channel raw signal tables in 
 [hierarchical data format](https://www.hdfgroup.org/), or "HDF5". These DNAm 
 signal tables have been extracted directly from IDAT files generated using the 
 Illumina HM450k array DNAm array platform. DNAm arrays were accessed from 
 the [Gene Expression Omnibus](https://www.ncbi.nlm.nih.gov/geo/) via the 
-GEO Data Sets database.
+GEO DataSets database.
 
 To help inform sample queries, the HDF5 database includes a sample metadata 
 table learned from GEO GSE 
@@ -47,7 +47,7 @@ can be either a list of datasets or a single object of class `RGChannelSet`,
 which inherits properties from the `SummarizedExperiment` class.
 
 # Disclaimer
-On loading `recountmethylation`, a disclaimer is provided. 
+On loading `recountmethylation`, a disclaimer is provided.
 In summary, the `recountmethylation` R package can aid and expand research capabilities 
 in epigenetics cross-study analysis.
 Contained data does not presently build live, and presently data reflects 
