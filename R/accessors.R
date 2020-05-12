@@ -3,6 +3,7 @@
 #' Get DNAm assay data.
 #'
 #' Uses RCurl to recursively download latest H5SE and HDF5 data objects the from server.
+#' 
 #' @param which.dn  Type of data dir to be downloaded.
 #' @param url Server URL containing assay data.
 #' @param dfp Target local directory for downloaded files (default "downloads").
@@ -63,6 +64,7 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
 #' IDATs query
 #'
 #' Queries GDS IDATs and downloads, with exception handling.
+#' 
 #' @param gsmvi Vector of GSM IDs
 #' @param ext Filename extension
 #' @param expand Whether to expand compressed files.
@@ -127,7 +129,7 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
 #'
 #' Queries and downloads GSM IDAT files in GDS, and returns
 #' assay data as an `RGChannelSet`.
-#' ('.h5') file and return the indexed table subset.
+#' 
 #' @param gsmvi A vector of GSM IDs (alphanumeric character strings).
 #' @param rmdl Whether to remove downloaded .*idat files (default TRUE).
 #' @param ext Filename extension (default "gz").
@@ -158,6 +160,7 @@ gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/",
 #'
 #' Get a dataset connection object from an HDF5 database 
 #' ('.h5') file and return the indexed table subset.
+#' 
 #' @param ri rows indices in dataset.
 #' @param ci columns indices in dataset.
 #' @param dsn Name of dataset or group of dataset to connect with.
