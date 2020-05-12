@@ -29,14 +29,14 @@ knitr::opts_chunk$set(eval = TRUE, echo = TRUE,
 
 # Introduction
 
-This package provides accessor functions to query Recount Methylation 
+This package provides accessor functions to query the `recountmethylation` 
 database file, `remethdb2.h5`. The database stores relatively large red- and 
 green-channel raw signal tables in 
 [hierarchical data format](https://www.hdfgroup.org/), or "HDF5". These DNAm 
 signal tables have been extracted directly from IDAT files generated using the 
 Illumina HM450k array DNAm array platform. DNAm arrays were accessed from 
 the [Gene Expression Omnibus](https://www.ncbi.nlm.nih.gov/geo/) via the 
-GEO Data Sets database.
+GEO DataSets database.
 
 To help inform sample queries, the HDF5 database includes a sample metadata 
 table learned from GEO GSE 
@@ -47,7 +47,7 @@ can be either a list of datasets or a single object of class `RGChannelSet`,
 which inherits properties from the `SummarizedExperiment` class.
 
 # Disclaimer
-On loading `recountmethylation`, a disclaimer is provided. 
+On loading `recountmethylation`, a disclaimer is provided.
 In summary, the `recountmethylation` R package can aid and expand research capabilities 
 in epigenetics cross-study analysis.
 Contained data does not presently build live, and presently data reflects 
@@ -62,12 +62,10 @@ The `recountmethylation` package can be installed from GitHub using `devtools::i
 
 # Data access
 
-We need to provide the name of the database file with extension `.h5`. 
-The entire Recount Methylation HDF5 database file called `remethdb2.h5`. 
-This vignette uses a small test dataset called `remethdbtest.h5`, which 
-includes DNAm red and green signal at chr22 for 30 samples. 
+`recountmethylation` requires as input a path to a valid `recountmethylation` HDF5 database. 
+This vignette uses a small test dataset called `remethdbtest.h5`, which includes DNAm red and green signal at chr22 for 30 samples. It can be downloaded [here](). The full database can be downloaded [here]().
 
-First, we can obtain the path to the test dataset and summarize its contents.
+First, enter the path to the test dataset and summarize its contents as below.
 
 ```{r h5_details}
 path = system.file("extdata", "testh5", package = "recountmethylation")
@@ -76,8 +74,7 @@ dbpath = paste0(path, "/", fn)
 rhdf5::h5ls(dbpath)
 ```
 
-Note that dataset row and column names are stored separately from data matrices,
-denoted as "[dataset].[row/column]names". Data is homogeneous for each 
+Note that dataset row and column names are stored separately from data matrices, which are denoted as "[dataset].[row/column]names". Data is homogeneous for each 
 object in the HDF5 file. That is, each data entity has a single type 
 (e.g. `FLOAT`, `STRING`, `STRING`).
 
@@ -216,7 +213,7 @@ dim(rgdl)
 identical(rownames(rgdl), rownames(se.rgi)) # check that cg addresses match
 ```
 
-We can then check for consistency between the methylation data returned 
+Now check for consistency between the methylation data returned 
 from the `recountmethylation` query and the fresh data downloads.
 
 ```{r rg_validate}
