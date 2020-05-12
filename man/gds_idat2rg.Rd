@@ -29,7 +29,6 @@ object of class `RGChannelSet`
 \description{
 Queries and downloads GSM IDAT files in GDS, and returns
 assay data as an `RGChannelSet`.
-('.h5') file and return the indexed table subset.
 }
 \examples{
 gsmvi <- c("GSM2465267", "GSM2814572")
