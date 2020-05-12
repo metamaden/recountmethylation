@@ -1,25 +1,25 @@
 ---
 title: "recountmethylation Bioconductor vignette"
-author: 
-  - name: Sean K. Maden
-  - name: Reid F. Thompson
-  - name: Kasper D. Hansen
-  - name: Abhi Nellore
-package: recountmethylation
-date: "4/4/2020"
-abstract: > 
-  This is the main vignette for the `recountmethylation` package.
-vignette: >
-    %\VignetteDepends{RCurl}
-    %\VignetteIndexEntry{bioc_vignette} 
-    %\usepackage[UTF-8]{inputenc}
-    %\VignetteEngine{knitr::knitr} 
+author:
+- Sean K. Maden
+- Reid F. Thompson
+- Kasper D. Hansen
+- Abhi Nellore
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-    pdf_document: default
-    BiocStyle::html_document:
-        toc: true
-        tocfloat: true
-        code_folding: show
+  pdf_document: default
+  BiocStyle::html_document:
+    code_folding: show
+    toc: yes
+    tocfloat: yes
+  html_document:
+    df_print: paged
+    toc: yes
+package: recountmethylation
+abstract: |
+  This is the main vignette for the `recountmethylation` package.
+vignette: "%\\VignetteDepends{RCurl} %\\VignetteIndexEntry{bioc_vignette}  %\\usepackage[UTF-8]{inputenc}
+  %\\VignetteEngine{knitr::knitr} \n"
 ---
 
 # Overview
