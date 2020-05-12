@@ -10,15 +10,15 @@ abstract: >
    Vignette for working with `recountmethylation` HDF5 database contents, available at https://recount.bio/data. See the main vignette, recountmethylation.Rmd, for details.
 vignette: >
     %\VignetteDepends{RCurl}
-    %\VignetteEngine{knitr::knitr} 
     %\VignetteIndexEntry{recountmethylation user's guide} 
     %\usepackage[UTF-8]{inputenc}
+    %\VignetteEngine{knitr::knitr} 
 output:
+    pdf_document: default
     BiocStyle::html_document:
         toc: true
         tocfloat: true
         code_folding: show
-    pdf_document: default
 ---
 
 ```{r setup}

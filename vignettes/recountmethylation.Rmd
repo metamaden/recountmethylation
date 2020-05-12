@@ -11,15 +11,15 @@ abstract: >
   This is the main vignette for the `recountmethylation` package.
 vignette: >
     %\VignetteDepends{RCurl}
-    %\VignetteEngine{knitr::knitr} 
     %\VignetteIndexEntry{bioc_vignette} 
     %\usepackage[UTF-8]{inputenc}
+    %\VignetteEngine{knitr::knitr} 
 output:
+    pdf_document: default
     BiocStyle::html_document:
         toc: true
         tocfloat: true
         code_folding: show
-    pdf_document: default
 ---
 
 # Overview
@@ -65,7 +65,7 @@ testdatdn <- "remethdb_h5se-test_gr_00-00-01_1583780004"
 datpath <- system.file("extdata", testdatdn, package = "recountmethylation")
 ```
 ```{r, echo = FALSE}
-print("files in data directory")
+print("files in data directory:")
 list.files(datpath)
 ```
 
@@ -73,19 +73,19 @@ Next, load the data with `loadHDF5SummarizedExperiment` and inspect.
 
 ```{r, testdat.dl, echo = FALSE}
 h5test <- loadHDF5SummarizedExperiment(datpath)
-print("dimensions")
+print("dimensions:")
 dim(h5test)
-print("class")
+print("class:")
 class(h5test)
-print("head of colnames")
+print("head of colnames:")
 head(colnames(h5test))
-print("head of rownames")
+print("head of rownames:")
 head(rownames(h5test))
 ```
 
 As with standard `SummarizedExperiment` objects, assay annotations are retrieved using `getAnnotation`.
 
-```{r, echo = TRUE}
+```{r}
 chr <- names(table(getAnnotation(h5test)$chr))
 min.pos <- min(getAnnotation(h5test)$pos)
 min.pos <- max(getAnnotation(h5test)$pos)
@@ -96,11 +96,11 @@ Similarly, sample and experiment data are retrieved using `pData`.
 
 ```{r, echo = FALSE}
 pdat <- pData(h5test)
-print("class")
+print("class:")
 class(pdat)
-print("dimensions")
+print("dimensions:")
 dim(pdat)
-print("colnames")
+print("colnames:")
 colnames(pdat)
 ```
 
