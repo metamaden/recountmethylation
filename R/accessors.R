@@ -28,7 +28,7 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
   dn.clean <- gsub('<.*', "", gsub('.*">', "", dn))
   if(!download){return(dn.clean)}
   if(!length(dn.clean) == 1){stop("There was a problem parsing the file string.")}
-  if(!dir.exists(dfp) & !dfp == ""){dct1 <- try(dir.create(dfp))}
+  dct1 <- ifelse(!dir.exists(dfp) & !dfp == "", try(dir.create(dfp)), TRUE)
   dfp.dn <- paste(c(dfp, dn.clean), collapse = "/")
   dct2 <- try(dir.create(dfp.dn)) # h5 subdir try cond
   if(!(dct1 & dct2)){stop("There is a problem with the download destination path.")}
