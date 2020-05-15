@@ -1,0 +1,88 @@
+---
+title: "Data Analysis"
+author:
+- Sean K. Maden
+- Reid F. Thompson
+- Kasper D. Hansen
+- Abhi Nellore
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  pdf_document: default
+  BiocStyle::html_document:
+    code_folding: show
+    toc: yes
+    tocfloat: yes
+  html_document:
+    df_print: paged
+    toc: yes
+package: recountmethylation
+abstract: |
+  This vignette shows analyses that utilize recountmethylation
+vignette: "%\\VignetteDepends{RCurl} %\\VignetteIndexEntry{bioc_vignette}  %\\usepackage[UTF-8]{inputenc}
+  %\\VignetteEngine{knitr::knitr} \n"
+---
+
+
+```{r}
+library(knitr)
+kable(sst.tissue)
+```
+
+
+```{r setup, echo = FALSE}
+knitr::opts_chunk$set(eval = FALSE, echo = TRUE, 
+                      warning = FALSE, message = FALSE)
+suppressMessages(library(HDF5Array))
+suppressMessages(library(minfi))
+suppressMessages(library(recountmethylation))
+```
+
+# Introduction
+
+This vignette walks through various subset and query operations that can be performed on HDF5-SummarizedExperiment data objects.
+
+# Delayed evaluations
+
+HDF5-SummarizedExperiment objects use a DelayedArray backend as defined by classes in the HDF5 package. This means execution of certain functions is "delayed" or postponed until downstream functions demand or trigger an evaluation. Other summary functions like `dim()` or `dimnames()` may further be executed rapidly with the data out of active memory. Because DNAm assay tables accessed through `recountmethylation` are both wide (e.g. 480,000+ probes/assays) and tall (35,000+ samples), this functionality greatly expedites certain routine operations.
+
+# Download GenomicRanges data
+
+Download the GenomicRanges data from the server with `get_rmdl("h5se_gr")`, then load using the path to the downloaded directory containing the `assays` and `se.rds` files.
+
+```{r load_h5segr}
+grpath <- "remethdb_h5se_gr_00-00-01_1583780004"
+loadHDF5SummarizedExperiment(grpath)
+```
+
+# Delayed evaluations
+
+and won't be able to comfortably load 
+the full-sized data objects into active 
+memory on a personal machine., 
+and  interested in a subset of samples. 
+
+Certain evaluations
+will be delayed
+
+for example
+
+the 
+DNAm Beta-values aren't 
+retrieved from 
+the `DelayedArray` 
+object until `summarize` 
+is called on the 
+first column.
+
+```{r delayedarray_workflow_example, eval = FALSE}
+h5large <- loadHDF5SummarizedExperiment(h5fullsizepath)
+betamatrix <- getBeta(h5large) # this is delayed 
+summarize(betamatrix[,1]) # causes getBeta evaluation
+```
+
+# Session info
+
+```{r get_sessioninfo}
+sessionInfo()
+```
+

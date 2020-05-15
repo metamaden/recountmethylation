@@ -287,9 +287,7 @@ rgse <- function(ldat, verbose = FALSE){
     if(!("greensignal" %in% names(ldat) & "redsignal" %in% names(ldat))){
         stop(paste0("Invalid datasets list passed."))
     }
-    if(verbose){
-        message("Matching probe IDs in signal matrices...")
-    }
+    if(verbose){message("Matching probe IDs in signal matrices...")}
     rga <- ldat[["redsignal"]]; gga <- ldat[["greensignal"]]
     lm.rg <- matchds_1to2(rga, gga, "rows", "rows")
     lm.rg <- matchds_1to2(lm.rg[[1]], lm.rg[[2]], "columns", "columns")
@@ -379,9 +377,8 @@ getrg <- function(gsmv = NULL, cgv = NULL,
     dsv = c("redsignal", "greensignal"), all.gsm = FALSE, 
     all.cg = TRUE, metadata = TRUE, md.dsn = "mdpost", 
     verbose = FALSE){
-    if((length(gsmv) < 2 & !all.gsm) | (length(cgv) == 0 & !all.cg) | 
-       (all.gsm & all.cg)){
-        stop("Invalid query Review GSM and probe ID args.")
+    if((length(gsmv) < 2 & !all.gsm) | (length(cgv) == 0 & !all.cg)){
+        stop("Invalid query, review GSM and probe ID args.")
     }
     ldat <- list() # datasets list
     for(d in dsv){
