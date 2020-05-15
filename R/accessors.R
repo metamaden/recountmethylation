@@ -293,18 +293,11 @@ rgse <- function(ldat, verbose = FALSE){
     lm.rg <- matchds_1to2(lm.rg[[1]], lm.rg[[2]], "columns", "columns")
     cgidmatch <- identical(rownames(lm.rg[[1]]), rownames(lm.rg[[2]]))
     gsmidmatch <- identical(colnames(lm.rg[[1]]), colnames(lm.rg[[2]]))
-    if(!cgidmatch){
-        stop("Couldn't probe IDs.")
-    }
-    if(!gsmidmatch){
-        stop("Couldn't match GSM IDs for signal data.")
-    }
+    if(!cgidmatch){stop("Couldn't probe IDs.")}
+    if(!gsmidmatch){stop("Couldn't match GSM IDs for signal data.")}
     if("metadata" %in% names(ldat)){
-        gsmidv <- unique(c(colnames(lm.rg[[1]]), 
-                           colnames(lm.rg[[2]])))
-        if(verbose){
-            message("Checking metadata...")
-        }
+        gsmidv <- unique(c(colnames(lm.rg[[1]]), colnames(lm.rg[[2]])))
+        if(verbose){message("Checking metadata...")}
         mdp <- ldat[["metadata"]]; mdp$gsm <- as.character(mdp$gsm)
         gsmov <- gsmidv[!gsmidv %in% mdp$gsm]; numo <- length(gsmov)
         if(numo > 0){
@@ -316,9 +309,7 @@ rgse <- function(ldat, verbose = FALSE){
         rownames(mdp) <- mdp$gsm
         lm.pr <- matchds_1to2(mdp, lm.rg[[1]], "rows", "columns")
         mdmatchid <- identical(rownames(lm.pr[[1]]), colnames(lm.pr[[2]]))
-        if(!mdmatchid){
-            stop("Couldn't match GSM IDs for md and signal data.")
-        }
+        if(!mdmatchid){stop("Couldn't match GSM IDs for md and signal data.")}
     }
     anno <- c("IlluminaHumanMethylation450k", "ilmn12.hg19")
     names(anno) <- c("array", "annotation")
@@ -406,7 +397,7 @@ getrg <- function(gsmv = NULL, cgv = NULL,
     if(metadata){
         mdpost <- data_mdpost(dbn = dbn, dsn = md.dsn)
         mdpost$gsm <- as.character(mdpost$gsm)
-        ldat[["metadata"]] <- mdpost[mdpost$gsm %in% gsmv,]
+        ldat[["metadata"]] <- mdpost[mdpost$gsm %in% rownames(ddat),]
     }
     if(data.type == "df"){
         if(verbose){message("Returning the datasets list...")}
