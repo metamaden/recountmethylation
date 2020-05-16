@@ -1,0 +1,199 @@
+---
+title: "recountmethylation Users Guide"
+author:
+- Sean K. Maden
+- Reid F. Thompson
+- Kasper D. Hansen
+- Abhi Nellore
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  pdf_document: 
+    toc: yes
+    toc_depth: 2
+  BiocStyle::html_document:
+    code_folding: show
+    toc: yes
+    tocfloat: yes
+  html_document:
+    df_print: paged
+    toc: yes
+bibliography: bibliography.bib
+package: recountmethylation
+vignette: "%\\VignetteDepends{RCurl} %\\VignetteIndexEntry{bioc_vignette}  %\\usepackage[UTF-8]{inputenc}
+  %\\VignetteEngine{knitr::knitr} \n"
+---
+
+```{r setup, echo = FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Introduction
+
+The `recountmethylation` package enables convenient access to compilations of DNA methylation (DNAm) assay data and metadata available on the data server (https://recount.bio/data/). Compilations include data from over 35,000 records in the Gene Expression Omnibus (GEO). Data are contained in 4 main files (1 HDF5 `.h5` database and 3 types of `HDF5-SummarizedExperiment` files), which can be downloaded using `get_rmdl`.
+
+This guide shows how to use `recountmethylation` to load, summarize, query, and validate compilation datasets with 2 compact example files. Some background about DNAm arrays, DNAm measurement, and `SummarizedExperiment` object classes is assumed. Consult the `data_analyses.Rmd` vignette for examples of more in-depth analyses.
+
+## Disclaimer
+
+```{r disclaimer, message = TRUE, eval = TRUE}
+library(recountmethylation)
+```
+
+## Data source and background
+
+Data is from bulk human tissues and cell lines available in the Gene Expression Omnibus as of March 2019. Samples were run on Infinium HM450K arrays, a popular 2-channel array platform that uses BeadArray technology to probe over 480,000 CpG loci genome-wide. These probes have enriched coverage at CG islands, genes, and enhancers (@sandoval_validation_2011).
+
+For a given sample, the array reader generates a pair of intensity files (IDATs), one each for the red and green color channels. In addition to BeadArray probe signals, IDATs contain control probe signals for quality evaluations @noauthor_illumina_2010. These paired channel tables are typically read into `SummarizedExperiment` objects and processed with Bioconductor packages such as `minfi` and `ChAMP`.
+
+## Compilation methods and file usage
+
+DNAm 2-color channel intensity tables were stored in an HDF5 database using `rhdf5` and `HDF5` packages, then converted into 3 `HDF5-SummarizedExperiment` objects using the `HDF5Array` package. 
+
+The `HDF5-SummarizedExperiment` files will likely be the most convenient when working from an R session. For workflows requiring an HDF5 database, the `.h5` database file is also provided and is supported with several functions in `recountmethylation`.
+
+## File downloads
+
+The latest compilation files can be downloaded from the data server (https://recount.bio/data/). The `get_rmdl` function can be used to detect and download the latest file version if multiple versions are available, where the `which.dn` argument specifies the target file (either "h5se_gr", "h5se_gm", "h5se_rg", or "\\.h5").
+
+## Sample and study metadata
+
+Sample and study metadata tables are included with DNAm data. These contain GEO record IDs for samples (GSM) and studies (GSE), record titles, learned labels for tissue and disease, sample type predictions, model-based predictions, etc. For details, refer to the manuscript @maden_human_2020. Retrieve metadata from `HDF5-SummarizedExperiment` files using `minfi::pData(object)`, where `object` points to the loaded file path. For an `.h5` file, use `get_mdpost(filepath)` (see examples).
+
+# HDF5-SummarizedExperiment files and example
+
+The `HDF5-SummarizedExperiment` files are provided in 3 distinct types of `SummarizedExperiment` objects. These use DelayedArray backends that enable rapid data summaries and queries without the need to manage database connections. The `RGChannelSet` is the most comprehensive and includes red and green channel intensities for control and genome-mapping probe sets. The `GenomicMethylSet` object contains methylated and unmethylated signals, and the `GenomicRatioSet` set contains DNAm fractions or Beta-values. Additional details are as follows:
+
+* name: `remethdb_h5se_gm_00-00-01_1583780004`, class: `GenomicMethylSet`, which.dn: `h5se_gm`, size: 86 Gb
+* name: `remethdb_h5se_gr_00-00-01_1583780004`, class: `GenomicRatioSet`, which.dn: `h5se_gr`, size: 132 Gb
+* name: `remethdb_h5se_rg_00-00-01_1583780004`, class: `RGChannelSet`, which.dn: `h5se_rg`, size: 119 Gb
+
+## Scripts using DelayedArray objects
+
+When writing scripts that use `HDF5-SummarizedExperiment` files, note that functions making use of the DelayedArray backend have delayed execution. In other words, their execution is postponed until triggerd by certain operations downstream.
+
+## Load the example file
+
+Obtain the path, then load the file with the `loadHDF5SummarizedExperiment` function from `HDF5Array`.
+
+```{r fpath_h5se, eval = TRUE}
+library(HDF5Array)
+fn <- "remethdb_h5se-test_gr_00-00-01_1583780004"
+h5se.path <- system.file("extdata", fn, package = "recountmethylation")
+gr <- loadHDF5SummarizedExperiment(h5se.path)
+```
+
+While `gr` is of class `r class(gr)[1]`, the DNAm fractions matrix returned by `getBeta` is of class `r class(getBeta(gr))[1]`.
+
+## Directory structure
+
+The contents of the data directory for this file include the paired files `r list.files(h5se.path)[1]` and `r list.files(h5se.path)[2]`. Directories lacking full versions of these files won't be properly recognized when `loadHDF5SummarizedExperiment` is called, and this may indicate an issue with the download attempt.
+
+## Example data inspection and extraction
+
+Inspect the dataset using standard functions like `class`, `dim`, and `summarize`.
+
+```{r}
+class(gr)
+dim(gr)
+head(colnames(gr))
+head(rownames(gr))
+summary(gr)
+```
+
+The `SummarizedExperiment` is a multidimensional array object. Individual datasets can be extracted with functions from `minfi`. 
+
+```{r}
+pd <- pData(gr) # metadata
+bm <- getBeta(gr) # dnam fractions or beta-values
+an <- getAnnotation(gr) # platform annotations
+```
+
+# HDF5 database and example
+
+HDF5, or hierarchical data format 5, is convenient for storage and access of matrices with tall-and-wide dimensions and non-sparse characteristics, including tables of array-wide DNAm signals for tens of thousands of samples. HDF5 datasets are homogeneous, and they use chunking and compression to expedite queries and reduce disk occupancy. An HDF5 database is provided as a single 120Gb `.h5` file with the following details:
+
+* name: `remethdb2.h5`, which.dn: `\\.h5`, class: HDF5 database, size: 120 Gb
+
+## Summarize the example database
+
+Obtain the path to the example `.h5` file and summarize its contents using `h5ls` from `rhdf5`.
+
+```{r fpath_h5}
+library(rhdf5)
+path <- system.file("extdata", "testh5", package = "recountmethylation")
+h5fn <- list.files(path)
+h5.path <- paste0(path, "/", h5fn)
+h5ls(h5.path)
+```
+
+## Extract metadata
+
+Use `data_mdpost` to retrieve just the metadata table. 
+
+```{r}
+pd1 <- data_mdpost(h5.path)
+```
+
+## Generate an `RGChannelSet` from samples and probes queries
+
+Alternatively, use `getrg` to obtain a complete `RGChannelSet` from the database.
+
+```{r}
+rg.all <- getrg(dbn = h5.path, all.gsm = TRUE, verbose = TRUE)
+dim(rg.all)
+```
+
+The example data contains data for `r ncol(rg.all)` samples and `r nrow(rg.all)` probes. Data subsets can also be obtained with `getrg`. Get a sample subset by passing a vector of GSM IDs to `gsmv`.
+
+```{r}
+gsm.query <- c("GSM2465267", "GSM2814572", "GSM2815642", "GSM2337429")
+rg.gsmv <- getrg(gsmv = gsm.query, dbn = h5.path)
+dim(rg.gsmv)
+```
+
+Subset on both probes and samples by also passing a vector of probe addresses to `cgv` (e.g. the bead address integers, *not* the cgid's) and setting `all.cgv = FALSE`.
+
+```{r}
+cg.query <- c("10601475", "10603366", "10603418", "10605304", "10605460", "10608343")
+rg.cgv <- getrg(gsmv = gsm.query, cgv = cg.query, all.cg = FALSE, dbn = h5.path)
+dim(rg.cgv)
+```
+
+# Validate DNAm fractions
+
+As the disclaimer notes, it is good practice to validate the compiled data against the latest available files online. 
+
+## Download and read IDATs from GEO
+
+First, obtain an `RGChannelSet` from downloaded GEO IDATs by passing a vector of valid GSM IDs to `gsmv` in the function `gds_idat2rg`.
+
+```{r}
+gsmv <- c("GSM2465267", "GSM2814572", "GSM2815642", "GSM2337429", "GSM1038308")
+rg.geo <- gds_idat2rg(gsmv)
+dim(rg.geo)
+```
+
+## Compare DNAm fractions
+
+Next, compare DNAm fractions or Beta-values. First, subset and match columns and rows between the downloaded and compiled data, and finally compare the data matrices extracted using `minfi::getBeta`.
+
+```{r}
+# match rows and columns
+colnames(rg.geo) <- gsub("_.*", "", colnames(rg.geo))
+int.gsm <- intersect(colnames(rg.geo), colnames(rg.all))
+rg.h5sub <- rg.all[, int.gsm] # subset h5 data
+rg.geosub <- rg.geo[rownames(rg.h5sub), int.gsm] # subset geo data
+# extract bvals
+bval.geosub <- getBeta(rg.geosub)
+bval.h5 <- getBeta(rg.h5sub)
+# compare
+identical(bval.geosub, bval.h5)
+```
+
+# Session info
+
+```{r get_sessioninfo}
+sessionInfo()
+```
+
+# Works Cited
