@@ -106,10 +106,10 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
       idatl <- unique(gsub("_Red.*|_Grn.*", "", fn))
       bnv = c(bnv, paste(dfp, idatl, sep = "")) # gsm basenames
       for(f in fn){
-        fnv <- c(fnv, f)
         url.dlpath <- paste(url, f, sep = "")
         dest.fpath <- paste(dfp, f, sep = "")
         download.file(url.dlpath, dest.fpath)
+        fnv <- c(fnv, dest.fpath)
         if(expand){
           if(verbose){message("Expanding compressed file...")}
           system(paste0(sys.cmd, dest.fpath))

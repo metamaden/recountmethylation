@@ -7,7 +7,9 @@ author:
 - Abhi Nellore
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-  pdf_document: default
+  pdf_document:
+    toc: yes
+    toc_depth: 3
   BiocStyle::html_document:
     code_folding: show
     toc: yes
@@ -15,70 +17,122 @@ output:
   html_document:
     df_print: paged
     toc: yes
-package: recountmethylation
-abstract: |
-  This vignette shows analyses that utilize recountmethylation
+bibliography: bibliography.bib
+package: recountmethylations
 vignette: "%\\VignetteDepends{RCurl} %\\VignetteIndexEntry{bioc_vignette}  %\\usepackage[UTF-8]{inputenc}
   %\\VignetteEngine{knitr::knitr} \n"
 ---
 
-
-```{r}
-library(knitr)
-kable(sst.tissue)
-```
-
-
 ```{r setup, echo = FALSE}
-knitr::opts_chunk$set(eval = FALSE, echo = TRUE, 
-                      warning = FALSE, message = FALSE)
 suppressMessages(library(HDF5Array))
 suppressMessages(library(minfi))
 suppressMessages(library(recountmethylation))
+suppressMessages(library(knitr))
+opts_chunk$set(eval = FALSE, echo = TRUE, 
+               warning = FALSE, message = FALSE)
 ```
 
-# Introduction
+# Overview
 
-This vignette walks through various subset and query operations that can be performed on HDF5-SummarizedExperiment data objects.
+Analyses of DNAm array data can pose certain distinct challenges not encounted when working with smaller datasets. This vignette shows a minimal (e.g. minimum number of dependencies for plots, etc.) analysis workflow working from the full-sized `RGChannelSet`, an `HDF5-SummarizedExperiment` object using DelayedArray backend.
 
-# Delayed evaluations
+(summary of sample quantities analyzed)
 
-HDF5-SummarizedExperiment objects use a DelayedArray backend as defined by classes in the HDF5 package. This means execution of certain functions is "delayed" or postponed until downstream functions demand or trigger an evaluation. Other summary functions like `dim()` or `dimnames()` may further be executed rapidly with the data out of active memory. Because DNAm assay tables accessed through `recountmethylation` are both wide (e.g. 480,000+ probes/assays) and tall (35,000+ samples), this functionality greatly expedites certain routine operations.
+## Outline
 
-# Download GenomicRanges data
+Samples from blood and brain will be identified and characterized.
 
-Download the GenomicRanges data from the server with `get_rmdl("h5se_gr")`, then load using the path to the downloaded directory containing the `assays` and `se.rds` files.
+This includes tables of summary statistics. Certain metadata variables will be used to further filter samples so that only tissue samples (e.g. not cell lines, primary cells, etc.) are included.
 
-```{r load_h5segr}
-grpath <- "remethdb_h5se_gr_00-00-01_1583780004"
-loadHDF5SummarizedExperiment(grpath)
+Control metrics, including Illumina metrics and log2 methylated/unmethylated signals, will be generated and evaluated. Summaries will be generated for samples groups, studies, etc. Samples with outlying low signals will then be removed. This section will make use of several functions and summarizations that use functions from the `minfi` package (@aryee_minfi:_2014).
+
+Next, noob normalization will be applied. The impact of normalization will be evaluated by comparing Study ID variance contributions before and after noob-norm (@triche_low-level_2013).
+
+# Data summaries and quality assurance
+
+The data will be obtained and loaded. Samples of interest will be subsetted and summarized. Control metrics will be generated for the sample, and samples will be removed based on quality filters.
+
+## Download and load RGChannelSet data
+
+Download the 119Gb dataset with `get_rmdl`, and load the data with the returned path.
+
+```{r}
+# path <- get_rmdl("h5se_rg")
+library(HDF5Array)
+path <- "remethdb_h5se_rg_00-00-01_1583780004"
+rg <- loadHDF5SummarizedExperiment(path)
 ```
 
-# Delayed evaluations
+## Filter and summarize blood and brain tissue samples
 
-and won't be able to comfortably load 
-the full-sized data objects into active 
-memory on a personal machine., 
-and  interested in a subset of samples. 
+Query the metadata to isolate blood and brain tissue samples using a string match.
 
-Certain evaluations
-will be delayed
-
-for example
-
-the 
-DNAm Beta-values aren't 
-retrieved from 
-the `DelayedArray` 
-object until `summarize` 
-is called on the 
-first column.
-
-```{r delayedarray_workflow_example, eval = FALSE}
-h5large <- loadHDF5SummarizedExperiment(h5fullsizepath)
-betamatrix <- getBeta(h5large) # this is delayed 
-summarize(betamatrix[,1]) # causes getBeta evaluation
+```{r}
+varname <- "tissue"
+mdvar <- mdpost[,varname]
+terms <- c("blood", "brain")
+strict.regex <- paste0("(^|;)",terms,"($|;)")
+cond.match <- grepl(strict.regex, mdvar)|grepl(strict.regex, mdvar)
+mdf <- mdpost[,cond.match] # filtered metadata
 ```
+
+Next obtain key summary statistics to better understand the idnetified samples.
+
+```{r}
+sstable <- matrix(ncol = 10)
+kable(sstable)
+```
+
+To check experiment contexts for matching samples, evaluate the most frequent co-occurring labels as follows.
+
+```{r}
+# get labels
+tx.labels <- unlist(strsplit(mdf$tissue, ";"))
+dx.labels <- unlist(strsplit(mdf$tissue, ";"))
+# get label frequencies
+dt.tx <- as.data.frame(table(tx.terms))
+dt.dx <- as.data.frame(table(dx.terms))
+dt.tx <- dt.tx[rev(order(dt.tx[,2])),]
+dt.tx <- dt.tx[rev(order(dt.dx[,2])),]
+# display tables
+kable(dt.tx[c(1:20),])
+kable(dt.dx[c(1:20),])
+```
+
+## Quality assurance and filters
+ctrl_signal()
+
+```{r}
+# minfi qc
+controlStripPlot()
+densityPlot()
+```
+
+## Normalization and assessments
+
+## Principal component analysis
+
+## Summary statistics, final
+
+```{r}
+kable(sstable)
+```
+
+# Differential methylation analyses
+
+## Modeling potential confounders
+
+## T-tests
+
+## F-tests 
+
+# Results summaries
+
+## Enriched regions
+
+## Enriched genes
+
+# Conclusions
 
 # Session info
 
@@ -86,3 +140,4 @@ summarize(betamatrix[,1]) # causes getBeta evaluation
 sessionInfo()
 ```
 
+# Works Cited
