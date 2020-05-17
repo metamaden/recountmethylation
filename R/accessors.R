@@ -27,6 +27,10 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
   dn.catch <- grepl(catch.str, dn)
   dn <- unlist(dn)[dn.catch]
   dn.clean <- gsub('<.*', "", gsub('.*">', "", dn))
+  dn.clean <- dn.clean[!grepl(".*test.*", dn.clean)] # remove matches to test datasets
+  if(length(dn.clean) > 1){
+      stop("Error parsing server filenames. Is `which.dn` a valid string?")
+    }
   if(!download){return(dn.clean)}
   if(!length(dn.clean) == 1){stop("There was a problem parsing the file string.")}
   dct1 <- ifelse(!dir.exists(dfp) & !dfp == "", try(dir.create(dfp)), TRUE)
