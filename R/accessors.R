@@ -28,18 +28,16 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
   dn <- unlist(dn)[dn.catch]
   dn.clean <- gsub('<.*', "", gsub('.*">', "", dn))
   dn.clean <- dn.clean[!grepl(".*test.*", dn.clean)] # remove matches to test datasets
-  if(length(dn.clean) > 1){
-      stop("Error parsing server filenames. Is `which.dn` a valid string?")
-    }
+  if(length(dn.clean) > 1){stop("Error parsing filenames. Is `which.dn` valid?")}
   if(!download){return(dn.clean)}
   if(!length(dn.clean) == 1){stop("There was a problem parsing the file string.")}
   dct1 <- ifelse(!dir.exists(dfp) & !dfp == "", try(dir.create(dfp)), TRUE)
   dfp.dn <- paste(c(dfp, dn.clean), collapse = "/")
   dct2 <- try(dir.create(dfp.dn)) # h5 subdir try cond
   if(!(dct1 & dct2)){stop("There is a problem with the download destination path.")}
-  if(!dfp.dn == "\\.h5"){
+  dn.url <- paste0(url, dn.clean)
+  if(!which.dn == "\\.h5"){
     if(verbose){message("Retrieving data files from server...")}
-    dn.url <- paste0(url, dn.clean)
     fl = RCurl::getURL(dn.url, ftp.use.epsv = FALSE, dirlistonly = TRUE,
                        .opts = list(ssl.verifypeer = sslver))
     fl <- unlist(strsplit(fl, "\n"))
@@ -57,7 +55,7 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
     dll[[i]] <- try(RCurl::curlPerform(url = fpath, writedata = cf@ref,
                        .opts = list(ssl.verifypeer = sslver)))
   }
-  if(dll[[1]] == 0 & dll[[2]] == 0){
+  if(length(dll[dll==0]) == length(dll)){
     if(verbose){message("Finished download, returning file path.")}
     return(dfp.dn)
   } else{
