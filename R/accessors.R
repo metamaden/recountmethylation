@@ -46,8 +46,8 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
     fl.catch <- grepl(fl.catch.str, fl)
     fl <- unlist(fl)[fl.catch]
     fl.clean <- gsub('<.*', "", gsub('.*">', "", fl))
-  } else{fl.clean <- dn.clean}
-  if(verbose){message("Downloading files...")}
+  } else{fl.clean <- ""}
+  if(verbose){message("Downloading file(s)...")}
   dll <- list()
   for(i in 1:length(fl.clean)){
     fpath <- paste0(c(dn.url, fl.clean[i]), collapse = "")
