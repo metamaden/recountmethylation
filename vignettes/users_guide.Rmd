@@ -61,11 +61,11 @@ Sample and study metadata tables are included with DNAm data. These contain GEO 
 
 # HDF5-SummarizedExperiment files and example
 
-The `HDF5-SummarizedExperiment` files are provided in 3 distinct types of `SummarizedExperiment` objects. These use DelayedArray backends that enable rapid data summaries and queries without the need to manage database connections. The `RGChannelSet` is the most comprehensive and includes red and green channel intensities for control and genome-mapping probe sets. The `GenomicMethylSet` object contains methylated and unmethylated signals, and the `GenomicRatioSet` set contains DNAm fractions or Beta-values. Additional details are as follows:
+The `HDF5-SummarizedExperiment` files are provided in 3 distinct types of `SummarizedExperiment` objects. These use DelayedArray backends that enable rapid data summaries and queries without the need to manage database connections. The `RGChannelSet` and `GenomicMethylSet` objects contain unnormalized data, while within-sample normalization was performed on `GenomicRatioSet` data using out-of-band or "noob" method (@triche_low-level_2013). The `RGChannelSet` contains red and green channel intensities for control and genome-mapping probe sets and is the most comprehensive, while the `GenomicMethylSet` object contains methylated and unmethylated signals, and the `GenomicRatioSet` set contains DNAm fractions or Beta-values. Additional details are as follows:
 
-* name: `remethdb_h5se_gm_00-00-01_1583780004`, class: `GenomicMethylSet`, which.dn: `h5se_gm`, size: 86 Gb
-* name: `remethdb_h5se_gr_00-00-01_1583780004`, class: `GenomicRatioSet`, which.dn: `h5se_gr`, size: 132 Gb
-* name: `remethdb_h5se_rg_00-00-01_1583780004`, class: `RGChannelSet`, which.dn: `h5se_rg`, size: 119 Gb
+* name: `remethdb_h5se_gm_00-00-01_1583780004`, class: `GenomicMethylSet`, which.dn: `h5se_gm`, size: 86 Gb, note: contains noob-normalized data
+* name: `remethdb_h5se_gr_00-00-01_1583780004`, class: `GenomicRatioSet`, which.dn: `h5se_gr`, size: 132 Gb, note: contains non-normalized data
+* name: `remethdb_h5se_rg_00-00-01_1583780004`, class: `RGChannelSet`, which.dn: `h5se_rg`, size: 119 Gb, note: contains non-normalized data
 
 ## Scripts using DelayedArray objects
 
@@ -79,7 +79,7 @@ Obtain the path, then load the file with the `loadHDF5SummarizedExperiment` func
 library(HDF5Array)
 fn <- "remethdb_h5se-test_gr_00-00-01_1583780004"
 h5se.path <- system.file("extdata", fn, package = "recountmethylation")
-gr <- loadHDF5SummarizedExperiment(h5se.path)
+gr.h5se <- loadHDF5SummarizedExperiment(h5se.path)
 ```
 
 While `gr` is of class `r class(gr)[1]`, the DNAm fractions matrix returned by `getBeta` is of class `r class(getBeta(gr))[1]`.
@@ -93,26 +93,26 @@ The contents of the data directory for this file include the paired files `r lis
 Inspect the dataset using standard functions like `class`, `dim`, and `summarize`.
 
 ```{r}
-class(gr)
-dim(gr)
-head(colnames(gr))
-head(rownames(gr))
-summary(gr)
+class(gr.h5se)
+dim(gr.h5se)
+head(colnames(gr.h5se))
+head(rownames(gr.h5se))
+summary(gr.h5se)
 ```
 
 The `SummarizedExperiment` is a multidimensional array object. Individual datasets can be extracted with functions from `minfi`. 
 
 ```{r}
-pd <- pData(gr) # metadata
-bm <- getBeta(gr) # dnam fractions or beta-values
-an <- getAnnotation(gr) # platform annotations
+pd <- pData(gr.h5se) # metadata
+bm <- getBeta(gr.h5se) # dnam fractions or beta-values
+an <- getAnnotation(gr.h5se) # platform annotations
 ```
 
 # HDF5 database and example
 
 HDF5, or hierarchical data format 5, is convenient for storage and access of matrices with tall-and-wide dimensions and non-sparse characteristics, including tables of array-wide DNAm signals for tens of thousands of samples. HDF5 datasets are homogeneous, and they use chunking and compression to expedite queries and reduce disk occupancy. An HDF5 database is provided as a single 120Gb `.h5` file with the following details:
 
-* name: `remethdb2.h5`, which.dn: `\\.h5`, class: HDF5 database, size: 120 Gb
+* name: `remethdb_00-00-01_1583780004.h5`, which.dn: `\\.h5`, class: HDF5 database, size: 120 Gb
 
 ## Summarize the example database
 
@@ -139,8 +139,8 @@ pd1 <- data_mdpost(h5.path)
 Alternatively, use `getrg` to obtain a complete `RGChannelSet` from the database.
 
 ```{r}
-rg.all <- getrg(dbn = h5.path, all.gsm = TRUE, verbose = TRUE)
-dim(rg.all)
+rg.h5 <- getrg(dbn = h5.path, all.gsm = TRUE, verbose = TRUE)
+dim(rg.h5)
 ```
 
 The example data contains data for `r ncol(rg.all)` samples and `r nrow(rg.all)` probes. Data subsets can also be obtained with `getrg`. Get a sample subset by passing a vector of GSM IDs to `gsmv`.
@@ -165,29 +165,51 @@ As the disclaimer notes, it is good practice to validate the compiled data again
 
 ## Download and read IDATs from GEO
 
-First, obtain an `RGChannelSet` from downloaded GEO IDATs by passing a vector of valid GSM IDs to `gsmv` in the function `gds_idat2rg`.
+First, obtain an `RGChannelSet` from downloaded GEO IDATs by passing a vector of valid GSM IDs to `gsmv` in the function `gds_idat2rg`. Note the downloaded IDATs are removed by default from the download directory.
 
 ```{r}
-gsmv <- c("GSM2465267", "GSM2814572", "GSM2815642", "GSM2337429", "GSM1038308")
+gsmv <- c("GSM2465267", "GSM2814572", "GSM2815642", "GSM2337429", 
+          "GSM1038308", "GSM1038309")
 rg.geo <- gds_idat2rg(gsmv)
 dim(rg.geo)
 ```
 
 ## Compare DNAm fractions
 
-Next, compare DNAm fractions or Beta-values. First, subset and match columns and rows between the downloaded and compiled data, and finally compare the data matrices extracted using `minfi::getBeta`.
+Next, compare DNAm fractions or Beta-values. First, subset and match columns and rows between the downloaded and compiled data, and finally compare the data matrices extracted using `getBeta`. Do this for the non-normalized `RGChannelSet` derived from the `.h5` HDF5 file as follows.
 
 ```{r}
 # match rows and columns
 colnames(rg.geo) <- gsub("_.*", "", colnames(rg.geo))
 int.gsm <- intersect(colnames(rg.geo), colnames(rg.all))
-rg.h5sub <- rg.all[, int.gsm] # subset h5 data
+rg.h5sub <- rg.h5[, int.gsm] # subset h5 data
 rg.geosub <- rg.geo[rownames(rg.h5sub), int.gsm] # subset geo data
 # extract bvals
-bval.geosub <- getBeta(rg.geosub)
-bval.h5 <- getBeta(rg.h5sub)
+b1 <- as.matrix(getBeta(rg.h5sub))
+b2 <- as.matrix(getBeta(rg.geosub))
 # compare
-identical(bval.geosub, bval.h5)
+identical(b1, b2)
+```
+
+Next, validate against noob-normalized `GenomicRangesSet` data after performing noob normalization on `rg.geo`.
+
+```{r}
+# match rows and columns
+colnames(gr.h5se) <- gsub("\\..*", "", colnames(gr.h5se))
+int.gsm <- intersect(colnames(rg.geo), colnames(gr.h5se)) # subset on gsm ids
+rg.geosub <- rg.geo[,int.gsm]
+ms.geosub <- preprocessNoob(rg.geosub)
+#int.cg <- intersect(rownames(ms.geosub), rownames(gr.h5se)) # subset on cgids
+#ms.geosub <- ms.geosub[int.cg,]
+# match axis orders
+o1 <- order(match(colnames(ms.geosub), colnames(gr.h5se)))
+o2 <- order(match(rownames(ms.geosub), rownames(gr.h5se)))
+ms.geosub <- ms.geosub[o2, o1]
+# get bval matrices
+b1 <- as.matrix(getBeta(gr.h5se))
+b2 <- as.matrix(getBeta(ms.geosub))
+# compare
+identical(b1, b2)
 ```
 
 # Session info
