@@ -33,10 +33,14 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
   if(!length(dn.clean) == 1){stop("There was a problem parsing the file string.")}
   dct1 <- ifelse(!dir.exists(dfp) & !dfp == "", try(dir.create(dfp)), TRUE)
   dfp.dn <- paste(c(dfp, dn.clean), collapse = "/")
-  dct2 <- try(dir.create(dfp.dn)) # h5 subdir try cond
-  if(!(dct1 & dct2)){stop("There is a problem with the download destination path.")}
+  if(which.dn == "\\.h5"){dct2 <- try(file.create(dfp.dn))} else{
+      dct2 <- try(dir.create(dfp.dn))
+      }
+  if(!(dct1 & dct2)){
+      stop("There is a problem with the download destination path.")
+    }
   dn.url <- paste0(url, dn.clean)
-  if(!which.dn == "\\.h5"){
+  if(which.dn == "\\.h5"){fl.clean <- ""} else{
     if(verbose){message("Retrieving data files from server...")}
     fl = RCurl::getURL(dn.url, ftp.use.epsv = FALSE, dirlistonly = TRUE,
                        .opts = list(ssl.verifypeer = sslver))
@@ -46,7 +50,7 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
     fl.catch <- grepl(fl.catch.str, fl)
     fl <- unlist(fl)[fl.catch]
     fl.clean <- gsub('<.*', "", gsub('.*">', "", fl))
-  } else{fl.clean <- ""}
+  }
   if(verbose){message("Downloading file(s)...")}
   dll <- list()
   for(i in 1:length(fl.clean)){
