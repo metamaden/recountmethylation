@@ -4,7 +4,9 @@
 #'
 #' Uses RCurl to recursively download latest H5SE and HDF5 data objects the from server.
 #' 
-#' @param which.dn  Type of data dir to be downloaded.
+#' @param which.dn  Type of data dir to be downloaded ("h5se_gr", "h5se_gm", or "h5se_rg" for 
+#' GenomicRanges, GenomicMethylSet, and RGChannelSet HDF5-SummarizedExperiment objects, "remethdb2.h5" for 
+#' HFD5 database with red and green signal tables, and "h5se-test_gr" or "remethdbtest.h5" for test compilations).
 #' @param url Server URL containing assay data.
 #' @param dfp Target local directory for downloaded files (default "downloads").
 #' @param download Whether to download (TRUE) or return queried filename (FALSE).
@@ -14,8 +16,8 @@
 #' @examples 
 #' get_rmdl("h5se-test_gr", verbose = TRUE)
 #' @export
-get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr", 
-                                  "h5se_gm", "h5se_rg", "\\.h5"),
+get_rmdl <- function(which.dn = c("h5se_gr", "h5se_gm", "h5se_rg", "remethdb2.h5",
+                                  "h5se-test_gr", "remethdbtest.h5"),
                      url = "https://recount.bio/data/", 
                      dfp = "downloads", download = TRUE,
                      verbose = TRUE, sslver = FALSE){
@@ -27,20 +29,19 @@ get_rmdl <- function(which.dn = c("h5se-test_gr", "h5se_gr",
   dn.catch <- grepl(catch.str, dn)
   dn <- unlist(dn)[dn.catch]
   dn.clean <- gsub('<.*', "", gsub('.*">', "", dn))
-  dn.clean <- dn.clean[!grepl(".*test.*", dn.clean)] # remove matches to test datasets
   if(length(dn.clean) > 1){stop("Error parsing filenames. Is `which.dn` valid?")}
   if(!download){return(dn.clean)}
   if(!length(dn.clean) == 1){stop("There was a problem parsing the file string.")}
   dct1 <- ifelse(!dir.exists(dfp) & !dfp == "", try(dir.create(dfp)), TRUE)
   dfp.dn <- paste(c(dfp, dn.clean), collapse = "/")
-  if(which.dn == "\\.h5"){dct2 <- try(file.create(dfp.dn))} else{
+  if(grepl(".*\\.h5$", which.dn)){dct2 <- try(file.create(dfp.dn))} else{
       dct2 <- try(dir.create(dfp.dn))
       }
   if(!(dct1 & dct2)){
       stop("There is a problem with the download destination path.")
     }
   dn.url <- paste0(url, dn.clean)
-  if(which.dn == "\\.h5"){fl.clean <- ""} else{
+  if(grepl(".*\\.h5$", which.dn)){fl.clean <- ""} else{
     if(verbose){message("Retrieving data files from server...")}
     fl = RCurl::getURL(dn.url, ftp.use.epsv = FALSE, dirlistonly = TRUE,
                        .opts = list(ssl.verifypeer = sslver))

@@ -4,7 +4,7 @@ author:
 - Sean K. Maden
 - Reid F. Thompson
 - Kasper D. Hansen
-- Abhi Nellore
+- Abhinav Nellore
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   pdf_document: 
@@ -54,6 +54,12 @@ The `HDF5-SummarizedExperiment` files will likely be the most convenient when wo
 ## File downloads
 
 The latest compilation files can be downloaded from the data server (https://recount.bio/data/). The `get_rmdl` function can be used to detect and download the latest file version if multiple versions are available, where the `which.dn` argument specifies the target file (either "h5se_gr", "h5se_gm", "h5se_rg", or "\\.h5").
+
+For example, download the test GenomicRanges dataset as follows.
+
+```{r}
+get_rmdl("h5se-test_gr")
+```
 
 ## Sample and study metadata
 
@@ -112,7 +118,7 @@ an <- getAnnotation(gr.h5se) # platform annotations
 
 HDF5, or hierarchical data format 5, is convenient for storage and access of matrices with tall-and-wide dimensions and non-sparse characteristics, including tables of array-wide DNAm signals for tens of thousands of samples. HDF5 datasets are homogeneous, and they use chunking and compression to expedite queries and reduce disk occupancy. An HDF5 database is provided as a single 120Gb `.h5` file with the following details:
 
-* name: `remethdb_00-00-01_1583780004.h5`, which.dn: `\\.h5`, class: HDF5 database, size: 120 Gb
+* name: `remethdb2.h5`, which.dn: `\\.h5`, class: HDF5 database, size: 120 Gb
 
 ## Summarize the example database
 
