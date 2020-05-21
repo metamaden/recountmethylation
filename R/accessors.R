@@ -392,13 +392,17 @@ getrg <- function(gsmv = NULL, cgv = NULL,
             cnd <- rhdf5::h5read(dbn, paste(d, "colnames", sep = ".")) 
             if(all.cg){
               cgvp <- seq(1, length(cnd), 1)
+              if(verbose){message("Retrieving all available CpG IDs.")}
             } else{
               cgvp <- which(cnd %in% cgv)
+              if(verbose){message("Found ", length(cgvp)," of ", length(cgv), " CpG addresses.")}
             }
             if(all.gsm){
               gsmvp <- seq(1, length(rnd), 1)
+              if(verbose){message("Retrieving all available GSM IDs.")}
             } else{
               gsmvp <- which(rnd %in% gsmv)
+              if(verbose){message("Found ", length(gsmvp)," of ", length(gsmv), " GSM IDs.")}
             }
             if(length(gsmvp) < 2){stop("Not enough valid GSM IDs found.")}
         }
