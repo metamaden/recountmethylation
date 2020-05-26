@@ -5,7 +5,10 @@
 \title{Get DNAm assay data.}
 \usage{
 get_rmdl(
-  which.dn = c("h5se-test_gr", "h5se_gr", "h5se_gm", "h5se_rg", "\\\\.h5"),
+  fn = NULL,
+  show.files = FALSE,
+  which.class = c("rg", "gm", "gr", "test"),
+  which.type = c("h5se", "h5"),
   url = "https://recount.bio/data/",
   dfp = "downloads",
   download = TRUE,
@@ -14,7 +17,9 @@ get_rmdl(
 )
 }
 \arguments{
-\item{which.dn}{Type of data dir to be downloaded.}
+\item{which.class}{Class of file to download (either `rg`, `gm`, `gr`, or `test`).}
+
+\item{which.type}{Type of file (either `h5` for HDF5 file or `h5se` for HDF5-SummarizedExperiment).}
 
 \item{url}{Server URL containing assay data.}
 

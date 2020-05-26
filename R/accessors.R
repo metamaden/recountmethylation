@@ -1,12 +1,59 @@
 #!/usr/bin/env R
 
+
+#' servermatrix
+#'
+#' Get a matrix of database files from the recount server. Called by get_rmdl.
+#' @param dn Server data returned from RCurl.
+#' @param printmatrix Whether to print the data matrix to console (default TRUE).
+#' @param verbose Whether to show verbose messages (default FALSE).
+#' @param recursive Whether to recursively grab file sizes for h5se object (default TRUE).
+#' @returns dm matrix of server files and file metadata
+#' @examples 
+#' dn <- RCurl::getURL("https://recount.bio/data/", .opts = list(ssl.verifypeer = sslver))
+#' sm <- servermatrix(dn)
+#' @seealso get_rmdl
+#' @export
+servermatrix <- function(dn, url = "https://recount.bio/data/", 
+                         printmatrix = TRUE, verbose = FALSE, recursive = TRUE){
+  dn <- RCurl::getURL(url, .opts = list(ssl.verifypeer = sslver))
+  dt <- unlist(strsplit(dn, "\r\n"))
+  dt <- gsub('(.*\">|/</a>|</a>)', "", dt)
+  dt <- dt[grepl("remethdb", dt)]
+  drows <- lapply(as.list(dt), function(x){
+    return(unlist(strsplit(gsub("[ ]+", ";", x), ";")))
+  })
+  dm <- do.call(rbind, drows)
+  colnames(dm) <- c("filename", "date", "time", "size (bytes)")
+  if(recursive){
+    sv <- c() # file sizes vector
+    fnv <- dm[grepl("h5se", dm[,1]), 1]
+    for(f in fnv){
+      fv <- RCurl::getURL(paste0(url, f, "/"), dirlistonly = TRUE, 
+                          .opts = list(ssl.verifypeer = sslver))
+      fvv <- unlist(strsplit(fv, "\r\n"))
+      which.start <- which(grepl("Index", fvv))[2] + 1
+      which.end <- which(grepl("/pre", fvv)) - 1
+      fvf <- fvv[which.start:which.end]
+      fniv <- c()
+      for(fni in fvf){
+        name <- gsub('.*\">', '', gsub("</a>.*", "", fni))
+        size <- gsub(".* ", "", fni)
+        fniv <- c(fniv, paste0("`", name, "`", " = ", size))
+      }
+      sv <- c(sv, paste(fniv, collapse = ";"))
+    }
+  }
+  dm[grepl("h5se", dm[,1]), 4] <- sv
+  return(dm)
+}
+
 #' Get DNAm assay data.
 #'
 #' Uses RCurl to recursively download latest H5SE and HDF5 data objects the from server.
 #' 
-#' @param which.dn  Type of data dir to be downloaded ("h5se_gr", "h5se_gm", or "h5se_rg" for 
-#' GenomicRanges, GenomicMethylSet, and RGChannelSet HDF5-SummarizedExperiment objects, "remethdb2.h5" for 
-#' HFD5 database with red and green signal tables, and "h5se-test_gr" or "remethdbtest.h5" for test compilations).
+#' @param which.class  Class of file to download (either `rg`, `gm`, `gr`, or `test`).
+#' @param which.type Type of file (either `h5` for HDF5 file or `h5se` for HDF5-SummarizedExperiment).
 #' @param url Server URL containing assay data.
 #' @param dfp Target local directory for downloaded files (default "downloads").
 #' @param download Whether to download (TRUE) or return queried filename (FALSE).
@@ -16,41 +63,63 @@
 #' @examples 
 #' get_rmdl("h5se-test_gr", verbose = TRUE)
 #' @export
-get_rmdl <- function(which.dn = c("h5se_gr", "h5se_gm", "h5se_rg", "remethdb2.h5",
-                                  "h5se-test_gr", "remethdbtest.h5"),
+get_rmdl <- function(fn = NULL, show.files = FALSE, 
+                     which.class = c("rg", "gm", "gr", "test"),
+                     which.type = c("h5se", "h5"),
                      url = "https://recount.bio/data/", 
                      dfp = "downloads", download = TRUE,
                      verbose = TRUE, sslver = FALSE){
   if(verbose){message("Retrieving data dirnames from server...")}
-  dn <- RCurl::getURL(url, ftp.use.epsv = FALSE, dirlistonly = TRUE,
+  # set up rcurl call
+  ftpuseopt <- ifelse(show.files, FALSE, TRUE)
+  dirlistopt <- ifelse(show.files, FALSE, TRUE)
+  dn <- RCurl::getURL(url, ftp.use.epsv = ftpuseopt, dirlistonly = dirlistopt,
                       .opts = list(ssl.verifypeer = sslver))
-  dn <- unlist(strsplit(dn, "\n"))
-  catch.str <- paste0(".*", which.dn,".*")
-  dn.catch <- grepl(catch.str, dn)
-  dn <- unlist(dn)[dn.catch]
-  dn.clean <- gsub('<.*', "", gsub('.*">', "", dn))
-  if(length(dn.clean) > 1){stop("Error parsing filenames. Is `which.dn` valid?")}
-  if(!download){return(dn.clean)}
-  if(!length(dn.clean) == 1){stop("There was a problem parsing the file string.")}
-  dct1 <- ifelse(!dir.exists(dfp) & !dfp == "", try(dir.create(dfp)), TRUE)
-  dfp.dn <- paste(c(dfp, dn.clean), collapse = "/")
-  if(grepl(".*\\.h5$", which.dn)){dct2 <- try(file.create(dfp.dn))} else{
-      dct2 <- try(dir.create(dfp.dn))
-      }
-  if(!(dct1 & dct2)){
-      stop("There is a problem with the download destination path.")
+  if(verbose){message("Getting file data from server.")}
+  sm <- servermatrix(dn)
+  if(show.files & !download){
+    if(verbose){message("Showing server file data")}
+    prmatrix(sm)
+  }
+  if(is.null(fn)){
+    # clean query results
+    str1 <- ifelse(which.type == "h5", "\\.", ".*")
+    str2 <- ifelse(which.type == "h5", "$", ".*")
+    typestr <- paste0(str1, which.type, str2)
+    filt.type <- grepl(paste0(".*", which.type,".*"), sm[,1])
+    filt.all <- filt.type & grepl(paste0(".*", which.class,".*"), sm[,1])
+    dnc <- sm[filt.all, 1]
+    if(length(dnc) == 0){
+      stop("No files of class and type found.")
+    } else if(length(dnc) > 1){
+      tsv <- as.numeric(gsub(".*_", "", dnc)) # timestamps
+      tsf <- which(tsv == max(tsv))[1] # first instance
+      dnc <- dnc[tsf]
     }
-  dn.url <- paste0(url, dn.clean)
-  if(grepl(".*\\.h5$", which.dn)){fl.clean <- ""} else{
-    if(verbose){message("Retrieving data files from server...")}
-    fl = RCurl::getURL(dn.url, ftp.use.epsv = FALSE, dirlistonly = TRUE,
-                       .opts = list(ssl.verifypeer = sslver))
-    fl <- unlist(strsplit(fl, "\n"))
-    fl.str <- paste0(c("assays.h5", "se.rds"), collapse = "|")
-    fl.catch.str <- paste0(".*", fl.str,".*")
-    fl.catch <- grepl(fl.catch.str, fl)
-    fl <- unlist(fl)[fl.catch]
-    fl.clean <- gsub('<.*', "", gsub('.*">', "", fl))
+  } else{
+    dnc <- fn
+    check.cond1 <- grepl("(\\.h5$|.*h5se.*)", dnc)
+    check.cond2 <- dnc %in% sm[,1]
+    condpass <- check.cond1 & check.cond2
+    if(!condpass){stop("Provided fn not found on server.")}
+  }
+  if(!download){
+    message("File confirmed on server. Returning.")
+    return(dnc)
+  }
+  # manage download loc
+  dct1 <- ifelse(!dir.exists(dfp) & !dfp == "", try(dir.create(dfp)), TRUE)
+  dfp.dn <- paste(c(dfp, dnc), collapse = "/")
+  if(which.type == "h5"){
+    dct2 <- try(file.create(dfp.dn))
+  } else{dct2 <- try(dir.create(dfp.dn))}
+  if(!(dct1 & dct2)){
+    stop("There was a problem with the download dest. Do you have write access?")
+  }
+  dn.url <- paste0(url, dnc)
+  if(which.type == "h5"){fl.clean <- ""} else{
+    fnv <- unlist(strsplit(as.character(sm[2,4]), ";"))
+    fl.clean <- gsub("( .*|`)", "", fnv)
   }
   if(verbose){message("Downloading file(s)...")}
   dll <- list()
