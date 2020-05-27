@@ -16,7 +16,6 @@
 #' @export
 servermatrix <- function(dn, url = "https://recount.bio/data/", 
                          printmatrix = TRUE, verbose = FALSE, recursive = TRUE){
-  dn <- RCurl::getURL(url, .opts = list(ssl.verifypeer = sslver))
   dt <- unlist(strsplit(dn, "\r\n"))
   dt <- gsub('(.*\">|/</a>|</a>)', "", dt)
   dt <- dt[grepl("remethdb", dt)]
@@ -28,6 +27,7 @@ servermatrix <- function(dn, url = "https://recount.bio/data/",
   if(recursive){
     sv <- c() # file sizes vector
     fnv <- dm[grepl("h5se", dm[,1]), 1]
+    fnexclude <- c()
     for(f in fnv){
       fv <- RCurl::getURL(paste0(url, f, "/"), dirlistonly = TRUE, 
                           .opts = list(ssl.verifypeer = sslver))
@@ -41,10 +41,15 @@ servermatrix <- function(dn, url = "https://recount.bio/data/",
         size <- gsub(".* ", "", fni)
         fniv <- c(fniv, paste0("`", name, "`", " = ", size))
       }
+      # check for h5se completeness
+      cond.assays <- length(fniv[grepl("assays", fniv)]) == 1
+      cond.se <- length(fniv[grepl("se", fniv)]) == 1
       sv <- c(sv, paste(fniv, collapse = ";"))
+      if(!(cond.assays & cond.se)){fnexclude <- c(fnexclude, f)}
     }
   }
   dm[grepl("h5se", dm[,1]), 4] <- sv
+  dm <- dm[!dm[,1] %in% fnexclude,] # filter incomplete h5se files
   return(dm)
 }
 
