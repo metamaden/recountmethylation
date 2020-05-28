@@ -28,7 +28,7 @@ dm matrix of server files and file metadata
 Get a matrix of database files from the recount server. Called by get_rmdl.
 }
 \examples{
-dn <- RCurl::getURL("https://recount.bio/data/", .opts = list(ssl.verifypeer = sslver))
+dn <- RCurl::getURL("https://recount.bio/data/", .opts = list(ssl.verifypeer = FALSE))
 sm <- servermatrix(dn)
 }
 \seealso{

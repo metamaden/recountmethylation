@@ -17,6 +17,11 @@ get_rmdl(
 )
 }
 \arguments{
+\item{fn}{Name of file to download, or NULL if downloading the default file identified from 
+using which.class and which.type (default NULL).}
+
+\item{show.files}{Whether to print or store detailed server file information (default FALSE).}
+
 \item{which.class}{Class of file to download (either `rg`, `gm`, `gr`, or `test`).}
 
 \item{which.type}{Type of file (either `h5` for HDF5 file or `h5se` for HDF5-SummarizedExperiment).}
@@ -38,5 +43,5 @@ New filepath to dir with downloaded data.
 Uses RCurl to recursively download latest H5SE and HDF5 data objects the from server.
 }
 \examples{
-get_rmdl("h5se-test_gr", verbose = TRUE)
+get_rmdl(which.class = "test", which.type = "h5se")
 }

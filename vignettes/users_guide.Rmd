@@ -19,8 +19,7 @@ output:
     toc: yes
 bibliography: bibliography.bib
 package: recountmethylation
-vignette: "%\\VignetteDepends{RCurl} %\\VignetteIndexEntry{bioc_vignette}  %\\usepackage[UTF-8]{inputenc}
-  %\\VignetteEngine{knitr::knitr} \n"
+vignette: "%\\VignetteDepends{RCurl} %\\VignetteIndexEntry{bioc_vignette}  %\\usepackage[UTF-8]{inputenc} %\\VignetteEngine{knitr::knitr}\n"
 ---
 
 ```{r setup, echo = FALSE}
