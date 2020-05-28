@@ -615,3 +615,8 @@ grid.arrange(lhmplot$hm.mean.plot, lhmplot$hm.var.plot,
              layout_matrix = matrix(c(rep(1, 7), rep(2, 4)), nrow = 1),
              bottom = "Tissue", left = "Annotation/Region Type")
 dev.off()
+
+#-----------
+# rdata file
+#-----------
+# make the .RData file for vignette to load

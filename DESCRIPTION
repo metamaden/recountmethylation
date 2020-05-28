@@ -23,7 +23,9 @@ Imports:
 Suggests:
     HDF5Array,
     knitr,
-    testthat
+    testthat,
+    ggplot2,
+    gridExtra
 VignetteBuilder: knitr
 biocViews: DNAMethylation, Epigenetics, Microarray, MethylationArray
 RoxygenNote: 7.1.0
