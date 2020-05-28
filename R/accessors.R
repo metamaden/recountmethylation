@@ -10,7 +10,7 @@
 #' @param recursive Whether to recursively grab file sizes for h5se object (default TRUE).
 #' @returns dm matrix of server files and file metadata
 #' @examples 
-#' dn <- RCurl::getURL("https://recount.bio/data/", .opts = list(ssl.verifypeer = sslver))
+#' dn <- RCurl::getURL("https://recount.bio/data/", .opts = list(ssl.verifypeer = FALSE))
 #' sm <- servermatrix(dn)
 #' @seealso get_rmdl
 #' @export
