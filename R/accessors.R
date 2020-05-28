@@ -453,7 +453,7 @@ rgse <- function(ldat, verbose = FALSE){
 #' @seealso rgse()
 #' @export
 getrg <- function(gsmv = NULL, cgv = NULL,
-    dbn = "remethdb2.h5", data.type = c("se", "df"),
+    dbn = "remethdb2.h5", data.type = c("se"),
     dsv = c("redsignal", "greensignal"), all.gsm = FALSE, 
     all.cg = TRUE, metadata = TRUE, md.dsn = "mdpost", 
     verbose = FALSE){
@@ -495,8 +495,7 @@ getrg <- function(gsmv = NULL, cgv = NULL,
     if(data.type == "df"){
         if(verbose){message("Returning the datasets list...")}
         robj <- ldat
-    }
-    if(data.type == "se"){
+    } else if(data.type == "se"){
         if(verbose){message("Forming the RGChannelSet...")}
         robj <- rgse(ldat = ldat, verbose = verbose)
     }
