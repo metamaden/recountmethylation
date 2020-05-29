@@ -72,6 +72,7 @@ Obtain the path, then load the file with the `loadHDF5SummarizedExperiment` func
 
 ```{r fpath_h5se, eval = TRUE}
 library(HDF5Array)
+library(SummarizedExperiment)
 dnpath <- get_rmdl(which.class = "test", which.type = "h5se")
 gr.h5se <- loadHDF5SummarizedExperiment(dnpath)
 ```
@@ -113,7 +114,7 @@ Obtain the path to the example `.h5` file and summarize its contents using `h5ls
 ```{r fpath_h5}
 library(rhdf5)
 dbpath <- get_rmdl(which.class = "test", which.type = "h5")
-h5ls(h5.path)
+h5ls(dbpath)
 ```
 
 ## Extract metadata
