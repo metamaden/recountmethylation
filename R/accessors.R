@@ -101,7 +101,9 @@ get_rmdl <- function(fn = NULL, show.files = FALSE,
     if(length(dnc) == 0){
       stop("No files of class and type found.")
     } else if(length(dnc) > 1){
-      tsv <- as.numeric(gsub(".*_", "", dnc)) # timestamps
+      tsstr <- gsub("(.*_|\\.h5)", "", dnc)
+      tsv <- suppressWarnings(as.numeric(tsstr)) # timestamps
+      tsv <- tsv[!is.na(tsv)] # rm files without timestamp
       tsf <- which(tsv == max(tsv))[1] # first instance
       dnc <- dnc[tsf]
     }
