@@ -48,11 +48,18 @@ For a given sample, the array reader generates a pair of intensity files (IDATs)
 
 DNAm 2-color channel intensity tables were stored in an HDF5 database using `rhdf5` and `HDF5` packages, then converted into 3 `HDF5-SummarizedExperiment` objects using the `HDF5Array` package. 
 
-The `HDF5-SummarizedExperiment` files will likely be the most convenient when working from an R session. For workflows requiring an HDF5 database, the `.h5` database file is also provided and is supported with several functions in `recountmethylation`.
+The `HDF5-SummarizedExperiment` files will likely be the most convenient when working from an R session. For workflows requiring an HDF5 database, an `h5` database file containing red and green channel signals is also provided and supported by functions in `recountmethylation`.
 
 ## File downloads
 
-The latest compilation files can be downloaded from the data server (https://recount.bio/data/). The `get_rmdl` function can be used to detect and download the latest file version if multiple versions are available, where the `which.dn` argument specifies the target file (either "h5se_gr", "h5se_gm", "h5se_rg", or "\\.h5").
+The latest compilation files can be downloaded from the data server with the `get_rmdl` function. In `get_rmdl`, specify the arguments `which.class` (either rg, gm, gr, or test) and `which.type` (either "h5se" or "h5") to automatically download the latest versions of files. The filename argument `fn` may also be specified to download a specific file. 
+
+Setting `show.files = TRUE` returns server file details. Download the test datasets and print the server files table to console as follows.
+
+```{r}
+st <- get_rmdl(show.files = TRUE, download = FALSE)
+```
+
 
 ## Sample and study metadata
 
