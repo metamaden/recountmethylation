@@ -577,7 +577,7 @@ This vignette described cross-study analyses using data objects accessible with 
 
 # Session info
 
-```{r get_sessioninfo}
+```{r get_sessioninfo, eval = TRUE}
 sessionInfo()
 ```
 
