@@ -54,23 +54,13 @@ The `HDF5-SummarizedExperiment` files will likely be the most convenient when wo
 
 The latest compilation files can be downloaded from the data server (https://recount.bio/data/). The `get_rmdl` function can be used to detect and download the latest file version if multiple versions are available, where the `which.dn` argument specifies the target file (either "h5se_gr", "h5se_gm", "h5se_rg", or "\\.h5").
 
-For example, download the test GenomicRanges dataset as follows.
-
-```{r}
-get_rmdl(which.class = "test", which.type = "h5se")
-```
-
 ## Sample and study metadata
 
 Sample and study metadata tables are included with DNAm data. These contain GEO record IDs for samples (GSM) and studies (GSE), record titles, learned labels for tissue and disease, sample type predictions, model-based predictions, etc. For details, refer to the manuscript @maden_human_2020. Retrieve metadata from `HDF5-SummarizedExperiment` files using `minfi::pData(object)`, where `object` points to the loaded file path. For an `.h5` file, use `get_mdpost(filepath)` (see examples).
 
 # HDF5-SummarizedExperiment files and example
 
-The `HDF5-SummarizedExperiment` files are provided in 3 distinct types of `SummarizedExperiment` objects. These use DelayedArray backends that enable rapid data summaries and queries without the need to manage database connections. The `RGChannelSet` and `GenomicMethylSet` objects contain unnormalized data, while within-sample normalization was performed on `GenomicRatioSet` data using out-of-band or "noob" method (@triche_low-level_2013). The `RGChannelSet` contains red and green channel intensities for control and genome-mapping probe sets and is the most comprehensive, while the `GenomicMethylSet` object contains methylated and unmethylated signals, and the `GenomicRatioSet` set contains DNAm fractions or Beta-values. Additional details are as follows:
-
-* name: `remethdb_h5se_gm_00-00-01_1583780004`, class: `GenomicMethylSet`, which.dn: `h5se_gm`, size: 86 Gb, note: contains noob-normalized data
-* name: `remethdb_h5se_gr_00-00-01_1583780004`, class: `GenomicRatioSet`, which.dn: `h5se_gr`, size: 132 Gb, note: contains non-normalized data
-* name: `remethdb_h5se_rg_00-00-01_1583780004`, class: `RGChannelSet`, which.dn: `h5se_rg`, size: 119 Gb, note: contains non-normalized data
+The `HDF5-SummarizedExperiment` files are provided in 3 distinct types of `SummarizedExperiment` objects. These use DelayedArray backends that enable rapid data summaries and queries without the need to manage database connections. The `RGChannelSet` and `GenomicMethylSet` objects contain unnormalized data, while within-sample normalization was performed on `GenomicRatioSet` data using out-of-band or "noob" method (@triche_low-level_2013). The `RGChannelSet` contains red and green channel intensities for control and genome-mapping probe sets and is the most comprehensive, while the `GenomicMethylSet` object contains methylated and unmethylated signals, and the `GenomicRatioSet` set contains DNAm fractions or Beta-values.
 
 ## Scripts using DelayedArray objects
 
@@ -82,9 +72,8 @@ Obtain the path, then load the file with the `loadHDF5SummarizedExperiment` func
 
 ```{r fpath_h5se, eval = TRUE}
 library(HDF5Array)
-fn <- "remethdb_h5se-test_gr_00-00-01_1583780004"
-h5se.path <- system.file("extdata", fn, package = "recountmethylation")
-gr.h5se <- loadHDF5SummarizedExperiment(h5se.path)
+dnpath <- get_rmdl(which.class = "test", which.type = "h5se")
+gr.h5se <- loadHDF5SummarizedExperiment(dnpath)
 ```
 
 While `gr` is of class `r class(gr)[1]`, the DNAm fractions matrix returned by `getBeta` is of class `r class(getBeta(gr))[1]`.
@@ -115,9 +104,7 @@ an <- getAnnotation(gr.h5se) # platform annotations
 
 # HDF5 database and example
 
-HDF5, or hierarchical data format 5, is convenient for storage and access of matrices with tall-and-wide dimensions and non-sparse characteristics, including tables of array-wide DNAm signals for tens of thousands of samples. HDF5 datasets are homogeneous, and they use chunking and compression to expedite queries and reduce disk occupancy. An HDF5 database is provided as a single 120Gb `.h5` file with the following details:
-
-* name: `remethdb2.h5`, which.dn: `\\.h5`, class: HDF5 database, size: 120 Gb
+HDF5, or hierarchical data format 5, is convenient for storage and access of matrices with tall-and-wide dimensions and non-sparse characteristics, including tables of array-wide DNAm signals for tens of thousands of samples. HDF5 datasets are homogeneous, and they use chunking and compression to expedite queries and reduce disk occupancy.
 
 ## Summarize the example database
 
@@ -125,9 +112,7 @@ Obtain the path to the example `.h5` file and summarize its contents using `h5ls
 
 ```{r fpath_h5}
 library(rhdf5)
-path <- system.file("extdata", "testh5", package = "recountmethylation")
-h5fn <- list.files(path)
-h5.path <- paste0(path, "/", h5fn)
+dbpath <- get_rmdl(which.class = "test", which.type = "h5")
 h5ls(h5.path)
 ```
 
