@@ -2,10 +2,10 @@
 [<img style="float: right;" src = "inst/figures/remeth_hexsticker.png" height="180"/>](https://recount.bio/data)
 # Authors
 
-Sean K. Maden, Reid F. Thompson, Kasper D. Hansen, Abhi Nellore
+Sean K. Maden, Reid F. Thompson, Kasper D. Hansen, Abhinav Nellore
 
 # Manuscript
-Sean K. Maden, Reid F. Thompson, Kasper D. Hansen, Abhi Nellore. "Human methylome variation across
+Sean K. Maden, Reid F. Thompson, Kasper D. Hansen, Abhinav Nellore. "Human methylome variation across
  Infinium 450K raw data on the Gene Expression Omnibus." 2019 (preprint in preparation for submission).
 
 # Installation and data access
@@ -40,7 +40,7 @@ latest available records.
 If you use this package in published research, 
 please cite the accompanying manuscript:
 
-Sean K. Maden, Reid F. Thompson, Kasper D. Hansen, Abhi Nellore. Human methylome variation across
+Sean K. Maden, Reid F. Thompson, Kasper D. Hansen, Abhinav Nellore. Human methylome variation across
 Infinium 450K raw data on the Gene Expression Omnibus. 2019 (preprint in preparation).
 
 
