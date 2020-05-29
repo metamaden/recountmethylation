@@ -8,7 +8,7 @@ getrg(
   gsmv = NULL,
   cgv = NULL,
   dbn = "remethdb2.h5",
-  data.type = c("se", "df"),
+  data.type = c("se"),
   dsv = c("redsignal", "greensignal"),
   all.gsm = FALSE,
   all.cg = TRUE,

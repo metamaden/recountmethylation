@@ -6,6 +6,7 @@
 \usage{
 servermatrix(
   dn,
+  sslver = FALSE,
   url = "https://recount.bio/data/",
   printmatrix = TRUE,
   verbose = FALSE,
@@ -14,6 +15,8 @@ servermatrix(
 }
 \arguments{
 \item{dn}{Server data returned from RCurl.}
+
+\item{sslver}{Whether to use SSL certificate authentication for server connection (default FALSE).}
 
 \item{printmatrix}{Whether to print the data matrix to console (default TRUE).}
 
