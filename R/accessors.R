@@ -133,8 +133,9 @@ get_rmdl <- function(fn = NULL, show.files = FALSE,
   if(verbose){message("Downloading file(s)...")}
   dll <- list()
   for(i in 1:length(fl.clean)){
-    fpath <- paste0(c(dn.url, fl.clean[i]), collapse = "")
-    cf = RCurl::CFILE(paste0(dfp.dn, fl.clean[i]), mode="wb")
+    fpath <- paste(dn.url, fl.clean[i], sep = "/")
+    destpath <- paste(dfp.dn, fl.clean[i], sep = "/")
+    cf = RCurl::CFILE(destpath, mode="wb")
     dll[[i]] <- try(RCurl::curlPerform(url = fpath, writedata = cf@ref,
                        .opts = list(ssl.verifypeer = sslver)))
   }
