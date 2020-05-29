@@ -17,7 +17,7 @@ latest available records.
 If you use this package in published research, 
 please cite the accompanying manuscript:
 
-Sean K. Maden, Reid F. Thompson, Kasper D. Hansen, Abhi Nellore. Human methylome variation across
+Sean K. Maden, Reid F. Thompson, Kasper D. Hansen, Abhinav Nellore. Human methylome variation across
 Infinium 450K raw data on the Gene Expression Omnibus. 2019 (preprint in preparation).
 
 \n***************************************")	
