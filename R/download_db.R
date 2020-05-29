@@ -155,3 +155,81 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
   }
   return(NULL)
 }
+
+
+##' @name download_h5se_gr
+##' @rdname download_h5se_gr
+##'
+##' @title Functions to download latest or recommended versions of the DNAm datasets.
+##'
+##' @description Functions that download the latest or recommended versions of DNAm datasets by calling get_rmdl().
+##'  Data files can be of either `HDF5-SummarizedExperiment` or `HDF5` type. Data types include red and green 
+##'  signals for HDF5 files, or `RGChannelSet` ("rg"), `MethylSet` ("gm"), or `GenomicRatioSet` ("gr") for 
+##'  HDF5-SummarizedExperiment files. Files include sample metadata.
+##' @param dfp Download destination directory
+##' @param verbose  Whether to return verbose status messages (default FALSE)
+##' @seealso get_rmdl, getrg, data_mdpost
+##' @return file path
+NULL
+
+##' @rdname download_h5se_gr
+##' @examples
+##' # download_h5se_gr()
+##' @export
+download_h5se_gr <- function(verbose = FALSE, dfp = "downloads"){
+  dpath <- get_rmdl(which.class = "gr", dfp = dfp, which.type = "h5se")
+  return(dpath)
+}
+
+##' @rdname download_h5se_gr
+##' @examples
+##' # download_h5se_gm()
+##' @export
+download_h5se_gm <- function(verbose = FALSE, dfp = "downloads"){
+  dpath <- get_rmdl(which.class = "gm", dfp = dfp, which.type = "h5se")
+  return(dpath)
+}
+
+##' @rdname download_h5se_gr
+##' @examples
+##' # download_h5se_rg()
+##' @export
+download_h5se_rg <- function(verbose = FALSE, dfp = "downloads"){
+  dpath <- get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5se")
+  return(dpath)
+}
+
+##' @rdname download_h5se_gr
+##' @examples
+##' # download_h5_rg()
+##' @export
+download_h5_rg <- function(verbose = FALSE, dfp = "downloads"){
+  dpath <- get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5")
+  return(dpath)
+}
+
+##' @rdname download_h5se_gr
+##' @examples
+##' download_h5se_test()
+##' @export
+download_h5se_test <- function(verbose = FALSE, dfp = "downloads"){
+  dpath <- try(get_rmdl(which.class = "test", dfp = dfp, which.type = "h5se"))
+  return(dpath)
+}
+
+##' @rdname download_h5se_gr
+##' @examples
+##' download_h5_test()
+##' @export
+download_h5_test <- function(verbose = FALSE, dfp = "downloads"){
+  dpath <- get_rmdl(which.class = "test", dfp = dfp, which.type = "h5")
+  return(dpath)
+}
+
+
+
+
+
+
+
+
