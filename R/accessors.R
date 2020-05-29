@@ -5,6 +5,7 @@
 #'
 #' Get a matrix of database files from the recount server. Called by get_rmdl.
 #' @param dn Server data returned from RCurl.
+#' @param sslver Whether to use SSL certificate authentication for server connection (default FALSE).
 #' @param printmatrix Whether to print the data matrix to console (default TRUE).
 #' @param verbose Whether to show verbose messages (default FALSE).
 #' @param recursive Whether to recursively grab file sizes for h5se object (default TRUE).
@@ -14,7 +15,7 @@
 #' sm <- servermatrix(dn)
 #' @seealso get_rmdl
 #' @export
-servermatrix <- function(dn, url = "https://recount.bio/data/", 
+servermatrix <- function(dn, sslver = FALSE, url = "https://recount.bio/data/", 
                          printmatrix = TRUE, verbose = FALSE, recursive = TRUE){
   dt <- unlist(strsplit(dn, "\r\n"))
   dt <- gsub('(.*\">|/</a>|</a>)', "", dt)

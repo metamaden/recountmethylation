@@ -57,7 +57,7 @@ The latest compilation files can be downloaded from the data server (https://rec
 For example, download the test GenomicRanges dataset as follows.
 
 ```{r}
-get_rmdl("h5se-test_gr")
+get_rmdl(which.class = "test", which.type = "h5se")
 ```
 
 ## Sample and study metadata
