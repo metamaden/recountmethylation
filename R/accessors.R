@@ -95,7 +95,7 @@ get_rmdl <- function(fn = NULL, show.files = FALSE,
     str1 <- ifelse(which.type == "h5", "\\.", ".*")
     str2 <- ifelse(which.type == "h5", "$", ".*")
     typestr <- paste0(str1, which.type, str2)
-    filt.type <- grepl(paste0(".*", which.type,".*"), sm[,1])
+    filt.type <- grepl(typestr, sm[,1])
     filt.all <- filt.type & grepl(paste0(".*", which.class,".*"), sm[,1])
     dnc <- sm[filt.all, 1]
     if(length(dnc) == 0){
