@@ -132,22 +132,17 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
   for(i in 1:length(fl.clean)){
     fpath <- ifelse(fl.clean[[i]] == "", dn.url, paste(dn.url, fl.clean[i], sep = "/"))
     destpath <- ifelse(fl.clean[[i]] == "", dfp.dn, paste(dfp.dn, fl.clean[i], sep = "/"))
-    cf = RCurl::CFILE(destpath, mode="wb")
-    dll[[i]] <- try(RCurl::curlPerform(url = fpath, writedata = cf@ref,
-                                       .opts = list(ssl.verifypeer = sslver)))
-    close(fpath)
-  }
-  if(tryload){
-    if(which.type == "h5se"){
-      tdl <- try(HDF5Array::loadHDF5SummarizedExperiment(dfp.dn))
-    } else{
-      # rhdf5::h5closeAll()
-      tdl <- try(rhdf5::h5ls(dfp.dn))
-    }
-    if(!tdl){stop("Problem loading download. The file may be corrupted.")}
+    trydl = try(download.file(url = fpath, destfile = destpath, 
+                              .opts = list(ssl.verifypeer = sslver)))
   }
   if(length(dll[dll==0]) == length(dll)){
-    if(verbose){message("Finished download, returning file path.")}
+    if(verbose){message("Completed download.")}
+    if(tryload){ message("Testing file load.")
+      if(which.type == "h5se"){
+        tdl <- try(HDF5Array::loadHDF5SummarizedExperiment(dfp.dn))
+      } else{tdl <- try(rhdf5::h5ls(dfp.dn))}
+      if(class(tdl)=="try-error"){message("Problem loading, download may be corrupt.")}
+    }
     return(dfp.dn)
   } else{
     if(verbose){message("Download incomplete for file ", fl.clean[which(dll!=0)])}
@@ -171,58 +166,52 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
 ##' @seealso get_rmdl, getrg, data_mdpost
 ##' @return file path
 NULL
-
 ##' @rdname download_h5se_gr
 ##' @examples
 ##' # download_h5se_gr()
 ##' @export
 download_h5se_gr <- function(verbose = FALSE, dfp = "downloads"){
-  dpath <- get_rmdl(which.class = "gr", dfp = dfp, which.type = "h5se")
+  dpath <- get_rmdl(which.class = "gr", dfp = dfp, which.type = "h5se", verbose = verbose)
   return(dpath)
 }
-
 ##' @rdname download_h5se_gr
 ##' @examples
 ##' # download_h5se_gm()
 ##' @export
 download_h5se_gm <- function(verbose = FALSE, dfp = "downloads"){
-  dpath <- get_rmdl(which.class = "gm", dfp = dfp, which.type = "h5se")
+  dpath <- get_rmdl(which.class = "gm", dfp = dfp, which.type = "h5se", verbose = verbose)
   return(dpath)
 }
-
 ##' @rdname download_h5se_gr
 ##' @examples
 ##' # download_h5se_rg()
 ##' @export
 download_h5se_rg <- function(verbose = FALSE, dfp = "downloads"){
-  dpath <- get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5se")
+  dpath <- get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5se", verbose = verbose)
   return(dpath)
 }
-
 ##' @rdname download_h5se_gr
 ##' @examples
 ##' # download_h5_rg()
 ##' @export
 download_h5_rg <- function(verbose = FALSE, dfp = "downloads"){
-  dpath <- get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5")
+  dpath <- get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5", verbose = verbose)
   return(dpath)
 }
-
 ##' @rdname download_h5se_gr
 ##' @examples
 ##' download_h5se_test()
 ##' @export
 download_h5se_test <- function(verbose = FALSE, dfp = "downloads"){
-  dpath <- try(get_rmdl(which.class = "test", dfp = dfp, which.type = "h5se"))
+  dpath <- get_rmdl(which.class = "test", dfp = dfp, which.type = "h5se", verbose = verbose)
   return(dpath)
 }
-
 ##' @rdname download_h5se_gr
 ##' @examples
 ##' download_h5_test()
 ##' @export
 download_h5_test <- function(verbose = FALSE, dfp = "downloads"){
-  dpath <- get_rmdl(which.class = "test", dfp = dfp, which.type = "h5")
+  dpath <- get_rmdl(which.class = "test", dfp = dfp, which.type = "h5", verbose = verbose)
   return(dpath)
 }
 

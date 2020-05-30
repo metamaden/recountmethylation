@@ -57,7 +57,7 @@ The latest compilation files can be downloaded from the data server with the `ge
 Setting `show.files = TRUE` returns server file details. Download the test datasets and print the server files table to console as follows.
 
 ```{r}
-st <- get_rmdl(show.files = TRUE, download = FALSE)
+get_rmdl(show.files = TRUE, download = FALSE)
 ```
 
 
@@ -79,9 +79,8 @@ Obtain the path, then load the file with the `loadHDF5SummarizedExperiment` func
 
 ```{r fpath_h5se, eval = TRUE}
 library(HDF5Array)
-library(SummarizedExperiment)
-dnpath <- get_rmdl(which.class = "test", which.type = "h5se")
-gr.h5se <- loadHDF5SummarizedExperiment(dnpath)
+path <- download_h5se_test()
+h5se <- loadHDF5SummarizedExperiment(paste0("/", path, "/"))
 ```
 
 While `gr` is of class `r class(gr)[1]`, the DNAm fractions matrix returned by `getBeta` is of class `r class(getBeta(gr))[1]`.
