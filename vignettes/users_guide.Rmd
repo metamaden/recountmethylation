@@ -27,9 +27,9 @@ suppressMessages(library(knitr))
 knitr::opts_chunk$set(echo = TRUE, eval = TRUE, warning = FALSE, message = FALSE)
 ```
 
-# Introduction
+# Introduction and overview
 
-The `recountmethylation` package enables convenient access to databases of sample assays and metadata from over 35,000 GSM records in the Gene Expression Omnibus (GEO). Database files are offered in 2 principal types, either `HDF5-SummarizedExperiment` or `HDF5`. This User's Guide describes the database files, formats, and classes, and demonstrates basic data acquisition and handling with 2 test files. Some background about DNAm arrays, DNAm measurement, and `SummarizedExperiment` objects is assumed. Consult the Data Analyses vignette for more analysis examples.
+This User's Guide shows how to use the `recountmethylation` package to access large databases of DNA methylation (DNAm) array assays and sample metadata compiled from the Gene Expression Omnibus (GEO). Data were compiled from over 35,000 GSM samples and over 350 GSE study records. Some background about DNAm arrays, DNAm measurement, and `SummarizedExperiment` objects is provided below. For additional info, consult the Data Analyses vignette and @maden_human_2020.
 
 ## Disclaimer
 
@@ -37,25 +37,9 @@ The `recountmethylation` package enables convenient access to databases of sampl
 library(recountmethylation)
 ```
 
-## DNAm arrays and workflows background
+## Database files and access
 
-Databases include human samples run on the Illumina Infinium HM450K BeadArray platform. HM450K is a popular 2-channel platform that probes over 480,000 CpG loci genome-wide, with enriched coverage at CG islands, genes, and enhancers (@sandoval_validation_2011). 
-
-Array processing generates 2 intensity files (IDATs) per sample, one each for the red and green color channels. These raw files also contain control signals useful for quality evaluations @noauthor_illumina_2010. 
-
-## Database files
-
-Database files include 1 `h5` file and 3 `HDF5-SummarizedExperiment` directories. The `HDF5-SummarizedExperiment` files combine the benefits of `HDF5` and `SummarizedExperiment` for handling large datasets, and they use DelayedArray backend technology to allow rapid data summaries. These will be the most convenient data type to work with for R users. The HDF5 database is also provided, and access is supported in `recountmethylation`. HDF5, short for hierarchical data format 5, combines compression and chunking to handle large datasets. The `h5` database file contains red and green signal information and sample metadata.
-
-## SummarizedExperiment classes
-
-Sample IDATs can be read into an R session as an object of class `RGChannelSet`, a type of `SummarizedExperiment`. This object class contains slots for assay matrices, sample metadata, and experiment metadata for DNAm array platforms. Typical workflows convert `RGChannelSet` data into new objects classes like `MethylSet` or `RatioSet` as a result of preprocessing, normalization, etc. While, not all IDAT information is accessible from every object class, the tradeoff is that more processed objects may be smaller and/or faster to access.
-
-Access has been provided to 3 classes of SummarizedExperiment. First, an unnormalized `RGChannelSet` including red and green signals is provided. Second, an unnormalized `MethylSet`, which includes methylated and unmethylated signals. Finally, a normalized `GenomicRatioSet` that contains DNAm fractions. Normalization used the out-of-band signal, or "noob", method, a type of within-sample normalization effective for removing signal technical artifacts (triche_low-level_2013).
-
-## Database files and downloads
-
-The latest available database files are as follows.
+Database access, including downloads and file loads, are managed by the `get_db` functions. These download and access the latest available database files (see `?get_db` and examples for details). Note you will need between 90-120 Gb of disk space to store a single database file. Files pair sample metadata with assays including red and green channel signals, methylated and unmethylated level signals, and DNAm fractions in 3 `HDF5-SummarizedExperiment` entities, and red and green signals in an `HDF5` `h5` database. Details about the latest files are as follows.
 
 ```{r, echo = FALSE}
 url = "https://recount.bio/data/"
@@ -66,20 +50,38 @@ dn <- RCurl::getURL(url, ftp.use.epsv = ftpuseopt, dirlistonly = dirlistopt,
                     .opts = list(ssl.verifypeer = sslver))
 sm <- as.data.frame(servermatrix(dn, sslver), stringsAsFactors = FALSE)
 sdf <- as.data.frame(sm)
-tsv <- as.numeric(gsub(".*_", "", sdf[,1]))
+tsv <- as.numeric(gsub("(.*_|\\.h5)", "", sdf[,1]))
 sdff <- sdf[which(tsv == max(tsv, na.rm = TRUE)),]
 kable(sdff)
 ```
 
-Note you will need between 80-120Gb of free space to store a single compilation file.
+# Background
 
-Database downloads are managed entirely from `recountmethylation` with the `get_db` set of functions. These manage downloads and access for the latest database files.  See `?get_db` for more info.
+This section includes essential background about DNAm array platforms, assays and file types, and sample metadata.
+
+## DNAm arrays
+
+Databases include human samples run on the Illumina Infinium HM450K BeadArray platform. HM450K is a popular 2-channel platform that probes over 480,000 CpG loci genome-wide, with enriched coverage at CG islands, genes, and enhancers (@sandoval_validation_2011). Array processing generates 2 intensity files (IDATs) per sample, one each for the red and green color channels. These raw files also contain control signals useful for quality evaluations @noauthor_illumina_2010. 
+
+HM450K probes use either of 2 bead technologies, known as Type I and Type II, where the majority (72%) of probes use the latter. For Type II probes, a single bead assay informs a single probe, while Type I probes use 2 beads each. Practically, this means the bead-specific matrices found in `RGChannelSet` objects are larger than the probe-specific matrices found in derived object types (e.g. 622,399 assays for red/green signal matrices versus 485,512 assays for methylated/unmethylated signal, DNAm fractions matrices, see below).
+
+## SummarizedExperiment object classes
+
+DNAm array sample IDATs can be read into an R session as an object of class `RGChannelSet`, a type of `SummarizedExperiment`. These objects support analyses of high-throughput genomics datasets, and they include slots for assay matrices, sample metadata, and experiment metadata. During a typical workflow, normalization and preprocessing convert `RGChannelSet` objects into new types like `MethylSet` and `RatioSet`. While not all IDAT information is accessible from every object type (e.g. only `RGChannelSet`s can contain control assays), derived objects like `MethylSet`s and `RatioSet`s may be smaller and/or faster to access.
+
+Three `SummarizedExperiment` databases are provided as `HDF5-SummarizedExperiment` files, including an unnormalized `RGChannelSet` (red/green signals), an unnormalized `MethylSet` (methylated/unmethylated signals) and a normalized `GenomicRatioSet` (DNAm fractions). For the latter, DNAm fractions (logit2 Beta-values, or M-values) were normalized using the out-of-band signal or "noob" method, an effective within-sample normalization that removes signal artifacts (@triche_low-level_2013).
+
+## Database file types
+
+Database files are stored as either `HDF5` or `HDF5-SummarizedExperiment`. For most R users, the latter files will be most convenient to work with. `HDF5`, or hierarchical data format 5, combines compression and chunking for convenient handling of large datasets. `HDF5-SummarizedExperiment` files combine the benefits of `HDF5` and `SummarizedExperiment` entities using a DelayedArray-powered backend. Once an `HDF5-SummarizedExperiment` file is loaded, it can be treated similarly to a `SummarizedExperiment` object in active memory. That is, summary and subset operations execute rapidly, and realization of large data chunks in active memory is delayed until called for by the script (see examples).
 
 ## Sample and study metadata
 
-Sample and study metadata tables are included with DNAm data. These contain GEO record IDs for samples (GSM) and studies (GSE), record titles, learned labels for tissue and disease, sample type predictions, model-based predictions, etc (see @maden_human_2020 for details). To access sample metadata from a database file, see the examples below.
+Sample metadata are included with DNAm assays in database files. These include GEO record IDs for samples (GSM) and studies (GSE), record titles, learned labels for tissue and disease, sample type predictions, model-based predictions, etc (see @maden_human_2020 for details). Access sample metadata from `SummarizedExperiment` objects using the `pData` minfi function (see examples).
 
 # HDF5-SummarizedExperiment files and example
+
+This example shows basic handling for `HDF5-SummarizedExperiment` (a.k.a. "h5se") files. For "h5se" files, the `getdb` function returns information about the entire file, and it can be treated similar to an object loaded in active memory.
 
 ## Obtain the test database
 
@@ -125,6 +127,8 @@ colnames(h5se.bm) <- h5se.test$gsm
 kable(head(h5se.bm))
 ```
 
+Note that rows in these fractions matrices map to CpG probe IDs.
+
 Finally, access the manifest information, including genome coordinates and region info, using `getAnnotation`.
 
 ```{r}
@@ -142,11 +146,13 @@ kable(head(an))
 
 # HDF5 database and example
 
+This example shows basic handling for `HDF5` `h5` files.
+
 ## Obtain the test database
 
-Download the test `h5` file and get its path.
+Download the test `h5` file with `getdb_h5_test`. Not that for `h5` files, the `getdb` function simply returns the database path.
 
-```{r, eval = FALSE}
+```{r}
 h5.test <- getdb_h5_test()
 ```
 
@@ -154,32 +160,28 @@ h5.test <- getdb_h5_test()
 
 Read the datasets into an `RGChannelSet` using `getrg`.
 
-```{r, eval = FALSE}
+```{r}
 h5.rg <- getrg(dbn = h5.test, all.gsm = TRUE)
 ```
 
 As above, use `pData` and `getAnnotation` to get sample metadata and array manifest information. Since this is an `RGChannelSet` object, green and red signals are accessible using `getRed` and `getGreen`.
 
-```{r, eval = FALSE}
-h5.red <- getRed(rg.h5)
-h5.green <- getGreen(rg.h5)
+```{r}
+h5.red <- getRed(h5.rg)
+h5.green <- getGreen(h5.rg)
 dim(h5.red)
 ```
-```{r, eval = FALSE}
-kable(head(reds))
+```{r}
+kable(head(h5.red))
 ```
-```{r, eval = FALSE}
-kable(head(greens))
+```{r}
+kable(head(h5.green))
 ```
-```{r, eval = FALSE}
-identical(rownames(reds), rownames(greens))
+```{r}
+identical(rownames(h5.red), rownames(h5.green))
 ```
 
-Note that signal matrices have bead address identifiers instead of the probe cg ids seen above. 
-
-```{r, eval = FALSE}
-head(rownames(reds))
-```
+Note the rows in these color channel signal matrices have bead address identifiers rather than probe CpG probe IDs.
 
 # Validate DNAm datasets
 
@@ -190,44 +192,47 @@ As the disclaimer notes, it is good practice to validate the compiled data again
 Obtain a new `RGChannelSet` from downloaded GEO IDATs with `gds_idat2rg`, specifying the test dataset GSM IDs in the `gsmv` argument.
 
 ```{r}
-# gsmv <- c(colnames(h5.test), colnames(h5se.test))
-gsmv <- gsub("\\..*", "", colnames(h5se.test))
+gsmv <- c("GSM1038308", "GSM1038309")
 geo.rg <- gds_idat2rg(gsmv)
+colnames(geo.rg) <- gsub("\\_.*", "", colnames(geo.rg))
 ```
 
 ## Compare DNAm signals
 
-Compare unnormalized the red and green signal.
+Compare red and green signal matrices from the `HDF5` database after matching on their row labels.
 
-```{r, eval = FALSE}
+```{r}
 geo.red <- getRed(geo.rg)
 geo.green <- getGreen(geo.rg)
+int.addr <- intersect(rownames(geo.red), rownames(h5.red))
+geo.red <- geo.red[int.addr,]
+geo.green <- geo.green[int.addr,]
+geo.red <- geo.red[order(match(rownames(geo.red), rownames(h5.red))),]
+geo.green <- geo.green[order(match(rownames(geo.green), rownames(h5.green))),]
+identical(rownames(geo.red), rownames(h5.red))
+identical(rownames(geo.green), rownames(h5.green))
+class(h5.red) <- "integer"
+class(h5.green) <- "integer"
 ```
-```{r, eval = FALSE}
+```{r}
 identical(geo.red, h5.red)
 ```
-```{r, eval = FALSE}
+```{r}
 identical(geo.green, h5.green)
 ```
 
 ## Compare DNAm Beta-values
 
-Next, compare GEO and test data noob-normalized DNAm Beta-values. Note that noob is a within-sample normalization, and so we can subset to the samples of interest after `preprocessNoob`.
+Next, normalize the downloaded data using `preprocessNoob`, and compare noob-normalized Beta-values from the `HDF5-SummarizedExperiment` example after matching row indices.
 
 ```{r}
 geo.gr <- preprocessNoob(geo.rg)
-colnames(geo.gr) <- gsub("_.*", "", colnames(geo.gr))
-colnames(h5se.test) <- gsub("\\..*", "", colnames(h5se.test))
-```
-```{r}
 geo.bm <- as.matrix(getBeta(geo.gr))
 h5se.bm <- as.matrix(h5se.bm)
-geo.bm <- geo.bm[rownames(geo.bm) %in% rownames(h5se.bm),]
+int.cg <- intersect(rownames(geo.bm), rownames(h5se.bm))
+geo.bm <- geo.bm[int.cg,]
 geo.bm <- geo.bm[order(match(rownames(geo.bm), rownames(h5se.bm))),]
-```
-```{r}
 identical(rownames(geo.bm), rownames(h5se.bm))
-identical(colnames(geo.bm), colnames(h5se.bm))
 ```
 ```{r}
 identical(geo.bm, h5se.bm)
