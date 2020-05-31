@@ -152,72 +152,145 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
 }
 
 
-##' @name download_h5se_gr
-##' @rdname download_h5se_gr
-##'
-##' @title Functions to download latest or recommended versions of the DNAm datasets.
-##'
-##' @description Functions that download the latest or recommended versions of DNAm datasets by calling get_rmdl().
-##'  Data files can be of either `HDF5-SummarizedExperiment` or `HDF5` type. Data types include red and green 
-##'  signals for HDF5 files, or `RGChannelSet` ("rg"), `MethylSet` ("gm"), or `GenomicRatioSet` ("gr") for 
-##'  HDF5-SummarizedExperiment files. Files include sample metadata.
-##' @param dfp Download destination directory
-##' @param verbose  Whether to return verbose status messages (default FALSE)
-##' @seealso get_rmdl, getrg, data_mdpost
-##' @return file path
+#' @name dldb
+#' @rdname dldb
+#'
+#' @title Functions to download latest or recommended versions of the DNAm datasets.
+#'
+#' @description Functions that download the latest or recommended versions of DNAm datasets by calling get_rmdl().
+#'  Data files can be of either `HDF5-SummarizedExperiment` or `HDF5` type. Data types include red and green 
+#'  signals for HDF5 files, or `RGChannelSet` ("rg"), `MethylSet` ("gm"), or `GenomicRatioSet` ("gr") for 
+#'  HDF5-SummarizedExperiment files. Files include sample metadata.
+#' @param dfp Download destination directory
+#' @param verbose  Whether to return verbose status messages (default FALSE)
+#' @seealso get_rmdl, getrg, data_mdpost
+#' @return file path
 NULL
-##' @rdname download_h5se_gr
-##' @examples
-##' # download_h5se_gr()
-##' @export
-download_h5se_gr <- function(verbose = FALSE, dfp = "downloads"){
+#' @rdname dldb
+#' @examples
+#' # download_h5se_gr()
+#' @export
+dldb_h5se_gr <- function(verbose = FALSE, dfp = "downloads"){
   dpath <- get_rmdl(which.class = "gr", dfp = dfp, which.type = "h5se", verbose = verbose)
   return(dpath)
 }
-##' @rdname download_h5se_gr
-##' @examples
-##' # download_h5se_gm()
-##' @export
-download_h5se_gm <- function(verbose = FALSE, dfp = "downloads"){
+#' @rdname dldb
+#' @examples
+#' # download_h5se_gm()
+#' @export
+dldb_h5se_gm <- function(verbose = FALSE, dfp = "downloads"){
   dpath <- get_rmdl(which.class = "gm", dfp = dfp, which.type = "h5se", verbose = verbose)
   return(dpath)
 }
-##' @rdname download_h5se_gr
-##' @examples
-##' # download_h5se_rg()
-##' @export
-download_h5se_rg <- function(verbose = FALSE, dfp = "downloads"){
+#' @rdname dldb
+#' @examples
+#' # download_h5se_rg()
+#' @export
+dldb_h5se_rg <- function(verbose = FALSE, dfp = "downloads"){
   dpath <- get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5se", verbose = verbose)
   return(dpath)
 }
-##' @rdname download_h5se_gr
-##' @examples
-##' # download_h5_rg()
-##' @export
-download_h5_rg <- function(verbose = FALSE, dfp = "downloads"){
+#' @rdname dldb
+#' @examples
+#' # download_h5_rg()
+#' @export
+dldb_h5_rg <- function(verbose = FALSE, dfp = "downloads"){
   dpath <- get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5", verbose = verbose)
   return(dpath)
 }
-##' @rdname download_h5se_gr
-##' @examples
-##' download_h5se_test()
-##' @export
-download_h5se_test <- function(verbose = FALSE, dfp = "downloads"){
+#' @rdname dldb
+#' @examples
+#' download_h5se_test()
+#' @export
+dldb_h5se_test <- function(verbose = FALSE, dfp = "downloads"){
   dpath <- get_rmdl(which.class = "test", dfp = dfp, which.type = "h5se", verbose = verbose)
   return(dpath)
 }
-##' @rdname download_h5se_gr
-##' @examples
-##' download_h5_test()
-##' @export
-download_h5_test <- function(verbose = FALSE, dfp = "downloads"){
+#' @rdname dldb
+#' @examples
+#' download_h5_test()
+#' @export
+dldb_h5_test <- function(verbose = FALSE, dfp = "downloads"){
   dpath <- get_rmdl(which.class = "test", dfp = dfp, which.type = "h5", verbose = verbose)
   return(dpath)
 }
 
-
-
-
+#' @name getdb
+#' @rdname getdb
+#'
+#' @title Functions to download and access database files.
+#'
+#' @description Combines download and load for database files. Default behavior downloads database files to 
+#' "downloads" directory. 
+#' @param name Name of database file, optional (default NULL).
+#' @param dfp Folder to search for object, optional (default "downloads").
+#' @seealso dldb, get_rmdl
+#' @return SummarizedExperiment object (for h5se) or file path for (h5).
+NULL
+#' @rdname getdb
+#' @examples
+#' getdb_h5se_test()
+#' @export
+getdb_h5se_test <- function(name = NULL, dfp = "downloads"){
+  # parse path and download
+  dbpath <- FALSE
+  if(!is.null(name)){
+    dbpath <- paste(dfp, name, sep = "/")
+    if(!exists(dbpath)){
+      message("Dataset file not found at dfp.")
+    } else{
+      message("Dataset file found at dfp.")
+    }
+  } else{
+    message("Downloading database...")
+    dbpath <- try(dldb_h5se_test(dfp = dfp))
+    if(!class(dbpath) == "try-errror"){
+      message("Download completed.")
+    } else{stop("Problem with download.")}
+  }
+  # parse load
+  if(class(dbpath) == "try-error"){stop("Problem with dbpath.")} else{
+    message("Loading database file.")
+    dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
+  }
+  if(class(dbf) == "try-error"){stop("Problem loading file.")} else{
+    message("Database file loaded.")
+    return(dbf)
+  }
+  return(NULL)
+}
+#' @rdname getdb
+#' @examples
+#' getdb_h5se_test()
+#' @export
+getdb_h5_test <- function(name = NULL, dfp = "downloads"){
+  # parse path and download
+  dbpath <- FALSE
+  if(!is.null(name)){
+    dbpath <- paste(dfp, name, sep = "/")
+    if(!exists(dbpath)){
+      message("Dataset file not found at dfp.")
+    } else{
+      message("Dataset file found at dfp.")
+    }
+  } else{
+    message("Downloading database...")
+    dbpath <- try(dldb_h5_test(dfp = dfp))
+    if(!class(dbpath) == "try-errror"){
+      message("Download completed.")
+    } else{stop("Problem with download.")}
+  }
+  # parse load
+  if(class(dbpath) == "try-error"){stop("Problem with dbpath.")} else{
+    message("Loading database file.")
+    dbf <- try(suppressMessages(rhdf5::h5ls(dbpath)))
+  }
+  if(class(dbf) == "try-error"){stop("Problem loading file.")} else{
+    message("Database file loaded.")
+    return(dbpath)
+  }
+  return(NULL)
+}
 
 
 

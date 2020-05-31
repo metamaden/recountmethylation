@@ -305,8 +305,7 @@ rgse <- function(ldat, verbose = FALSE){
 #' dim(ldat[[3]])
 #' @seealso rgse()
 #' @export
-getrg <- function(gsmv = NULL, cgv = NULL,
-    dbn = "remethdb2.h5", data.type = c("se"),
+getrg <- function(dbn, gsmv = NULL, cgv = NULL, data.type = c("se"),
     dsv = c("redsignal", "greensignal"), all.gsm = FALSE, 
     all.cg = TRUE, metadata = TRUE, md.dsn = "mdpost", 
     verbose = FALSE){
