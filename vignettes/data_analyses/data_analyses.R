@@ -103,13 +103,13 @@ makevp <- function(lfilt, ltxcg){
   colnames(bpdf.var) = c("var", "tissue")
   
   vp1 = ggplot(bpdf.mean, aes(x = tissue, y = mean, fill = tissue)) + 
-    geom_violin(trim = F, show.legend = F) + theme_bw() + 
-    theme(axis.text.x = element_text(angle = 90)) + 
+    geom_violin(trim = F, show.legend = F, draw_quantiles = c(0.5)) + 
+    theme_bw() + theme(axis.text.x = element_text(angle = 90)) + 
     ggtitle("") + xlab("") + ylab("Mean")
   
   vp2 = ggplot(bpdf.var, aes(x = tissue, y = var, fill = tissue)) + 
-    geom_violin(trim = F, show.legend = F) + theme_bw() + 
-    theme(axis.text.x = element_text(angle = 90)) + 
+    geom_violin(trim = F, show.legend = F, draw_quantiles = c(0.5)) + 
+    theme_bw() + theme(axis.text.x = element_text(angle = 90)) + 
     ggtitle("") + xlab("") + ylab("Variance")
   
   return(list("vp.mean" = vp1, "vp.var" = vp2))
