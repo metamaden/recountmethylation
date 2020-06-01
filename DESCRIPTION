@@ -22,6 +22,8 @@ Imports:
     minfi,
     rhdf5,
     S4Vectors,
+    utils,
+    base,
     RCurl,
     methods,
     utils
