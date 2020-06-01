@@ -337,44 +337,85 @@ jpeg("vp_storage.jpg", 5, 3, units = "in", res = 400)
 ggplot(vp, aes(x = group, y = signal, color = group)) + 
   scale_color_manual(values = c("meth.ffpe" = "orange", "unmeth.ffpe" = "orange", 
                                 "meth.frozen" = "purple", "unmeth.frozen" = "purple")) +
-  geom_violin() + theme_bw() + theme(legend.position = "none")
+  geom_violin(draw_quantiles = c(0.5)) + theme_bw() + theme(legend.position = "none")
 dev.off()
 
 #-----------------------------------------------------------------
 # example 3 -- Tissue-specific DNAm variation in liver and adipose
 #-----------------------------------------------------------------
 # get samples GSM IDs
-fn <- "old/nct_7tissues_gsm7k.rda" # GSM IDs of interest
-gsmv <- get(load(fn))
 tv <- c("liver", "adipose")
-tstr <- paste0(".*", tv, ".*")
-mdf <- md[md$gsm %in% gsmv & grepl(paste(tstr, collapse = "|"), md$tissue),]
-mdf$sgroup <- ifelse(grepl(tstr[1], mdf$tissue), tv[1], tv[2])
-# get samples summary
+tvstr <- paste0(".*", tv, ".*")
+tfiltstr <- paste0("(", paste(tvstr, collapse = "|"), ")")
+tissue.filt <- grepl(tfiltstr, md$tissue)
+cx.filt <- !grepl("cancer", md$disease)
+mdf <- md[tissue.filt & cx.filt,]
+mdf$sgroup <- ifelse(grepl(tv[1], mdf$tissue), tv[1], tv[2])
+table(mdf$sgroup)
+# adipose   liver 
+# 119     133
+
 sst.tvar <- get_sst(sgroup.labs = c("liver", "adipose"), mdf)
 
-# get signal data
-l2med.meth <- log2(apply(getMeth(gm), 2, median))
-l2med.unmeth <- log2(apply(getUnmeth(gm), 2, median))
-lqc <- list("l2med.meth" = l2med.meth, "l2med.unmeth" = l2med.unmeth, "gsmv" = gsmv)
+# subset gm, append sgroup, map to genome
+ms <- gm[,colnames(gm) %in% rownames(mdf)]
+ms <- ms[,order(match(colnames(ms), rownames(mdf)))]
+identical(colnames(ms), rownames(mdf))
+ms$sgroup <- mdf$sgroup
+ms <- mapToGenome(ms)
+dim(ms)
+
+# get log2 medians
+meth.tx <- getMeth(ms)
+unmeth.tx <- getUnmeth(ms)
+blocks <- getblocks(slength = ncol(ms), bsize = 10)
+# process data in blocks
+l2m <- matrix(nrow = 0, ncol = 2)
+for(i in 1:length(blocks)){
+  b <- blocks[[i]]
+  gmff <- gmf[, b]
+  methb <- as.matrix(meth.tx[, b])
+  unmethb <- as.matrix(unmeth.tx[, b])
+  l2meth <- l2unmeth <- c()
+  for(c in 1:ncol(methb)){
+    l2meth <- c(l2meth, log2(median(methb[,c])))
+    l2unmeth <- c(l2unmeth, log2(median(unmethb[,c])))
+  }
+  l2m <- rbind(l2m, matrix(c(l2meth, l2unmeth), ncol = 2))
+  message(i)
+}
+lqc <- list("l2med.meth" = l2m[,1], "l2med.unmeth" = l2m[,2], 
+            "gsmv" = ms$gsm, "sgroup" = ms$sgroup)
+save(lqc, file = "lqc_2tissues.rda")
 
 # plot signal data
 jpeg("qc_2tissues.jpg", 5, 5, units = "in", res = 400)
 plot(lqc[["l2med.meth"]], lqc[["l2med.unmeth"]], 
-     col = ifelse(names(lqc[["gsmv"]]) == "adipose", "red", "blue"),
+     col = ifelse(lqc[["sgroup"]] == "adipose", "red", "blue"),
      xlab = "Methylated Signal (log2 medians)",
      ylab = "Unmethylated Signal (log2 medians)")
 legend("bottomright", legend = c("adipose", "liver"), col = c("red", "blue"), pch = c(1,1))
 dev.off()
 
-# do normalization and study ID linear adjustments
-lgr <- lmd <- lb <- lan <- list()
+# ggplot signal data
+ds <- as.data.frame(do.call(cbind, lqc))
+ds$tissue <- as.factor(ds$sgroup)
+ds$l2med.meth <- as.numeric(ds$l2med.meth)
+ds$l2med.unmeth <- as.numeric(ds$l2med.unmeth)
+ggplot(ds, aes(x = l2med.meth, y = l2med.unmeth, color = tissue)) + 
+  geom_point(alpha = 0.2, cex = 3) + theme_bw() +
+  scale_color_manual(values = c("liver" = "blue", "adipose" = "red"))
+
+# do study ID adj on normalized data
+lmv <- lgr <- lmd <- lb <- lan <- list()
 tv <- c("adipose", "liver")
 # get noob norm data
-dn <- grdn
-gr <- loadHDF5SummarizedExperiment(dn)
+gr <- gr[,colnames(gr) %in% colnames(ms)]
+gr <- gr[,order(match(colnames(gr), colnames(ms)))]
+identical(colnames(gr), colnames(ms))
+gr$sgroup <- ms$sgroup
+# do study ID adj
 for(t in tv){
-  # do noob normalization
   lmv[[t]] <- gr[, gr$sgroup == t]
   msi <- lmv[[t]]
   madj <- limma::removeBatchEffect(getM(msi), batch = msi$gseid)
@@ -388,47 +429,40 @@ for(t in tv){
   # make betavals list
   lb[[t]] <- getBeta(lgr[[t]]) # beta values list
 }
+save(lgr, file = "lgr_2tissues.rda")
+save(lb, file = "lbetaval_2tissues.rda")
 
-# ANOVAs
-lan <- list() # results list
-for(t in c("adipose", "liver")){
+# prepare ANOVAs
+lan <- lvar <- list()
+for(t in tv){
   lan[[t]] <- list("pval" = matrix(ncol = 9, nrow = 0),
                    "var.fract" = matrix(ncol = 9, nrow = 0))
 }
-# define vars
-var.gseid.adipose <- as.factor(lmd[[1]]$gseid)
-var.gseid.liver <- as.factor(lmd[[2]]$gseid)
-var.predsex.adipose <- as.factor(lmd[[1]]$predsex)
-var.predsex.liver <- as.factor(lmd[[2]]$predsex)
-var.predage.adipose <- as.numeric(lmd[[1]]$predage)
-var.predage.liver <- as.numeric(lmd[[2]]$predage)
-var.predcellCD8T.adipose <- as.numeric(lmd[[1]]$predcell.CD8T)
-var.predcellCD8T.liver <- as.numeric(lmd[[2]]$predcell.CD8T)
-var.predcellCD4T.adipose <- as.numeric(lmd[[1]]$predcell.CD4T)
-var.predcellCD4T.liver <- as.numeric(lmd[[2]]$predcell.CD4T)
-var.predcellNK.adipose <- as.numeric(lmd[[1]]$predcell.NK)
-var.predcellNK.liver <- as.numeric(lmd[[2]]$predcell.NK)
-var.predcellBcell.adipose <- as.numeric(lmd[[1]]$predcell.Bcell)
-var.predcellBcell.liver <- as.numeric(lmd[[2]]$predcell.Bcell)
-var.predcellMono.adipose <- as.numeric(lmd[[1]]$predcell.Mono)
-var.predcellMono.liver <- as.numeric(lmd[[2]]$predcell.Mono)
-var.predcellGran.adipose <- as.numeric(lmd[[1]]$predcell.Gran)
-var.predcellGran.liver <- as.numeric(lmd[[2]]$predcell.Gran)
-# run anovas
-bv <- lb[[1]]
+# define ANOVA vars
+cnf <- c("gseid", "predsex", "predage", "predcell.CD8T",
+         "predcell.CD4T", "predcell.NK", "predcell.Bcell",
+         "predcell.Mono", "predcell.Gran")
+for(ti in 1:length(lmd)){
+  for(c in cnf){
+    if(c %in% c("gseid", "predsex")){
+      lvar[[names(lmd)[ti]]][[c]] <- as.factor(lmd[[ti]][,c])
+    } else{
+      lvar[[names(lmd)[ti]]][[c]] <- as.numeric(lmd[[ti]][,c])
+    }
+  }
+}
+
+# run ANOVAs
+bv <- lb[[1]] # get a full beta-values data set
 for(r in 1:nrow(bv)){
   for(t in tv){
     datr <- as.numeric(lb[[t]][r,])
-    if(t == "adipose"){
-      ld <- lm(datr ~ var.gseid.adipose + var.predsex.adipose + var.predage.adipose + var.predcellCD8T.adipose +
-                 var.predcellCD4T.adipose + var.predcellNK.adipose + var.predcellBcell.adipose +
-                 var.predcellMono.adipose + var.predcellGran.adipose)
-    } else{
-      ld <- lm(datr ~ var.gseid.liver + var.predsex.liver + var.predage.liver + var.predcellCD8T.liver +
-                 var.predcellCD4T.liver + var.predcellNK.liver + var.predcellBcell.liver +
-                 var.predcellMono.liver + var.predcellGran.liver)
-    }
+    tvar <- lvar[[t]]
+    # do multiple regression and anova
+    ld <- lm(datr ~ tvar[[1]] + tvar[[2]] + tvar[[3]] + tvar[[4]] +
+               tvar[[5]] + tvar[[6]] + tvar[[7]] + tvar[[8]] + tvar[[9]])
     an <- anova(ld)
+    # get and store results
     ap <- an[c(1:9),5]
     av <- round(100*an[c(1:4),2]/sum(an[,2]), 3)
     lan[[t]][["pval"]] <- rbind(lan[[t]][["pval"]], ap)
@@ -436,12 +470,10 @@ for(r in 1:nrow(bv)){
   }
   message(r)
 }
-
-# assign dimnames
+save(lan, file = "lanova_2tissues.rda")
+# organize the ANOVA results in the `lan` object
 rnv <- rownames(bv)
-cnv <- c("gseid", "predsex", "predage", "predcell.CD8T", "predcell.CD4T",
-         "predcell.NK", "predcell.Bcell", "predcell.Mono", "predcell.Gran")
-colnames(lan[[1]]$pval) <- colnames(lan[[1]]$var.fract) <- colnames(lan[[2]]$pval) <- colnames(lan[[2]]$var.fract) <- cnv
+colnames(lan[[1]]$pval) <- colnames(lan[[1]]$var.fract) <- colnames(lan[[2]]$pval) <- colnames(lan[[2]]$var.fract) <- cnf
 rownames(lan[[1]]$pval) <- rownames(lan[[1]]$var.fract) <- rownames(lan[[2]]$pval) <- rownames(lan[[2]]$var.fract) <- rnv
 save(lan, file = "lanova_2tissues.rda")
 

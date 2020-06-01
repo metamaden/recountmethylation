@@ -255,7 +255,7 @@ ggplot(ds, aes(x = meth.l2med, y = unmeth.l2med, color = storage)) +
   scale_color_manual(values = c("ffpe" = "orange", "frozen" = "purple"))
 ```
 
-Next, make separate violin plots for each signal and storage type.
+Next, make separate violin plots, with horizontal bars at distribution medians, for each signal and storage type.
 
 ```{r, eval = TRUE}
 vp <- matrix(nrow = 0, ncol = 2)
@@ -282,11 +282,16 @@ Filter on a vector of GSM IDs of interest `gsmv` (e.g. samples from studies of i
 
 ```{r}
 tv <- c("liver", "adipose")
-tstr <- paste0(".*", tv, ".*")
-mdf <- md[md$gsm %in% gsmv & grepl(paste(tstr, collapse = "|"), md$tissue),]
-mdf$sgroup <- ifelse(grepl(tstr[1], mdf$tissue), tv[1], tv[2])
-# get samples summary
-sst.tvar <- get_sst(sgroup.labs = tv, mdf)
+tvstr <- paste0(".*", tv, ".*")
+tfiltstr <- paste0("(", paste(tvstr, collapse = "|"), ")")
+tissue.filt <- grepl(tfiltstr, md$tissue)
+cx.filt <- !grepl("cancer", md$disease)
+mdf <- md[tissue.filt & cx.filt,]
+mdf$sgroup <- ifelse(grepl(tv[1], mdf$tissue), tv[1], tv[2])
+table(mdf$sgroup)
+# adipose   liver 
+# 119     133
+sst.tvar <- get_sst(sgroup.labs = c("liver", "adipose"), mdf)
 ```
 
 Summarize the sample groups.
@@ -297,33 +302,55 @@ kable(sst.tvar, align = "c") # table display
 
 ## Access DNAm data and plot signals by tissue
 
-Access the `MethylSet` compilation. Append the `sgroup` term and map the array data using genome annotations.
+Subset the `MethylSet` compilation, append `sgroup`, and map it to the genome.
 
 ```{r}
+ms <- gm[,colnames(gm) %in% rownames(mdf)]
+ms <- ms[,order(match(colnames(ms), rownames(mdf)))]
+identical(colnames(ms), rownames(mdf))
+# [1] TRUE
 ms$sgroup <- mdf$sgroup
 ms <- mapToGenome(ms)
+dim(ms)
+# [1] 485512    252
 ```
 
-For quality assessment, calculate log2 median signals. Do not use blocking as in Example 2, as the dataset here is relatively small.
+For quality assessment, calculate log2 median signals. As above, process the data in blocks to track progress.
 
 ```{r}
-l2med.meth <- log2(apply(getMeth(ms), 2, median))
-l2med.unmeth <- log2(apply(getUnmeth(ms), 2, median))
-lqc <- list("l2med.meth" = l2med.meth, "l2med.unmeth" = l2med.unmeth, "gsmv" = gsmv)
+# get log2 medians
+meth.tx <- getMeth(ms)
+unmeth.tx <- getUnmeth(ms)
+blocks <- getblocks(slength = ncol(ms), bsize = 10)
+# process data in blocks
+l2m <- matrix(nrow = 0, ncol = 2)
+for(i in 1:length(blocks)){
+  b <- blocks[[i]]
+  gmff <- gmf[, b]
+  methb <- as.matrix(meth.tx[, b])
+  unmethb <- as.matrix(unmeth.tx[, b])
+  l2meth <- l2unmeth <- c()
+  for(c in 1:ncol(methb)){
+    l2meth <- c(l2meth, log2(median(methb[,c])))
+    l2unmeth <- c(l2unmeth, log2(median(unmethb[,c])))
+  }
+  l2m <- rbind(l2m, matrix(c(l2meth, l2unmeth), ncol = 2))
+  message(i)
+}
+lqc <- list("l2med.meth" = l2med.meth, "l2med.unmeth" = l2med.unmeth, 
+            "gsmv" = ms$gsm)
 ```
 
 Make a scatter plot of the signals by tissue type after corecing `lqc` to a data frame.
 
 ```{r, eval = TRUE}
 ds <- as.data.frame(do.call(cbind, lqc))
-ds$tissue <- as.factor(gsub("\\..*", "", rownames(ds)))
-ds[,1] <- as.numeric(ds[,1])
-ds[,2] <- as.numeric(ds[,2])
-
+ds$tissue <- as.factor(ds$sgroup)
+ds$l2med.meth <- as.numeric(ds$l2med.meth)
+ds$l2med.unmeth <- as.numeric(ds$l2med.unmeth)
 ggplot(ds, aes(x = l2med.meth, y = l2med.unmeth, color = tissue)) + 
   geom_point(alpha = 0.2, cex = 3) + theme_bw() +
   scale_color_manual(values = c("liver" = "blue", "adipose" = "red"))
-
 ```
 
 ## Perform linear correction on DNAm for study IDs
@@ -331,17 +358,28 @@ ggplot(ds, aes(x = l2med.meth, y = l2med.unmeth, color = tissue)) +
 Access the normalized DNAm Beta-values accessed from the `GenomicRatio` data compilation loaded to the `gr` variable. Perform linear correction on GSE ID using the M-values (logit2-converted Beta-values) with the `removeBatchEffect` function from `limma`.
 
 ```{r}
-gr$sgroup <- mdf$sgroup
-lgr <- lmd <- lb <- lan <- list()
+# do study ID adj on normalized data
+lmv <- lgr <- lmd <- lb <- lan <- list()
+tv <- c("adipose", "liver")
+# get noob norm data
+gr <- gr[,colnames(gr) %in% colnames(ms)]
+gr <- gr[,order(match(colnames(gr), colnames(ms)))]
+identical(colnames(gr), colnames(ms))
+gr$sgroup <- ms$sgroup
+# do study ID adj
 for(t in tv){
   lmv[[t]] <- gr[, gr$sgroup == t]
-  gri <- lmv[[t]]
-  madj <- limma::removeBatchEffect(getM(gri), batch = gri$gseid)
-  lgr[[t]] <- GenomicRatioSet(GenomicRanges::granges(gri), M = madj, 
-                               annotation = annotation(gri))
+  msi <- lmv[[t]]
+  madj <- limma::removeBatchEffect(getM(msi), batch = msi$gseid)
+  # store adjusted data in a new se object
+  lgr[[t]] <- GenomicRatioSet(GenomicRanges::granges(msi), M = madj, 
+                              annotation = annotation(msi))
+  # append samples metadata
   lmd[[t]] <- pData(lgr[[t]]) <- pData(lmv[[t]])
+  # append preprocessing metadata
   metadata(lgr[[t]]) <- list("preprocess" = "noobbeta;removeBatchEffect_gseid")
-  lb[[t]] <- getBeta(lgr[[t]])
+  # make betavals list
+  lb[[t]] <- getBeta(lgr[[t]]) # beta values list
 }
 ```
 
@@ -350,20 +388,22 @@ for(t in tv){
 Prepare data for ANOVAs. Convert variables to either factor or numeric.
 
 ```{r}
-# prep anova results list
-lan <- list()
+# prepare ANOVAs
+lan <- lvar <- list()
 for(t in tv){
   lan[[t]] <- list("pval" = matrix(ncol = 9, nrow = 0),
-                 "var.fract" = matrix(ncol = 9, nrow = 0))
+                   "var.fract" = matrix(ncol = 9, nrow = 0))
 }
-# define vars
-lvar <- list()
+# define ANOVA vars
+cnf <- c("gseid", "predsex", "predage", "predcell.CD8T",
+         "predcell.CD4T", "predcell.NK", "predcell.Bcell",
+         "predcell.Mono", "predcell.Gran")
 for(ti in 1:length(lmd)){
-  for(c in colnames(lmd[[ti]])){
+  for(c in cnf){
     if(c %in% c("gseid", "predsex")){
-      lvar[[ti]][[c]] <- as.factor(lmd[[ti]][,c])
+      lvar[[names(lmd)[ti]]][[c]] <- as.factor(lmd[[ti]][,c])
     } else{
-      lvar[[ti]][[c]] <- as.numeric(lmd[[ti]][,c])
+      lvar[[names(lmd)[ti]]][[c]] <- as.numeric(lmd[[ti]][,c])
     }
   }
 }
@@ -389,20 +429,11 @@ for(r in 1:nrow(bv)){
   }
   message(r)
 }
-```
-
-Organize the ANOVA results in the `lan` object.
-
-```{r}
+# organize the ANOVA results in the `lan` object
 rnv <- rownames(bv)
-cnv <- c("gseid", "predsex", "predage", "predcell.CD8T", "predcell.CD4T",
-         "predcell.NK", "predcell.Bcell", "predcell.Mono", "predcell.Gran")
-for(ti in 1:length(lan)){
-  for(d in 1:length(lan[[ti]])){
-    colnames(lan[[ti]][[d]]) <- cnv
-    rownames(lan[[ti]][[d]]) <- rnv
-  }
-}
+colnames(lan[[1]]$pval) <- colnames(lan[[1]]$var.fract) <- colnames(lan[[2]]$pval) <- colnames(lan[[2]]$var.fract) <- cnf
+rownames(lan[[1]]$pval) <- rownames(lan[[1]]$var.fract) <- rownames(lan[[2]]$pval) <- rownames(lan[[2]]$var.fract) <- rnv
+save(lan, file = "lanova_2tissues.rda")
 ```
 
 Next, filter probes. First retain just autosomal probes. Then filter on confounder-specific variance contributions with a 0.001 adjusted p-value minimum and 10% variance maximum. Use the Benjamini-Hotchberg method by setting `method = "BH"` in `p.adjust`. Store filtered `GenomicRanges` objects for each tissue in the `lgr.filt` list.
@@ -556,7 +587,7 @@ anno <- anno[,c("Name", "UCSC_RefGene_Name", "Relation_to_Island")]
 anno <- anno[rownames(anno) %in% unique(unlist(ltxcg)),]
 ```
 
-Make violin plots of probe set DNAm using the `makevp()` helper function. This coerces the data into a data set usable in `ggplot2`, and returns plot objects for DNAm means and variances of probe sets in the `lvp` list. Arrange the plot objects with `grid.arrange`.
+Make violin plots, with horizontal bars at distribution medians, for DNAm of each probe set using the `makevp()` helper function. This coerces the data into a data set usable in `ggplot2`, and returns plot objects for DNAm means and variances of probe sets in the `lvp` list. Arrange the plot objects with `grid.arrange`.
 
 ```{r, eval = TRUE}
 lvp <- makevp(lfcg, ltxcg)
