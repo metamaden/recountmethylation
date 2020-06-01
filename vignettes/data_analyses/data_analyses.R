@@ -5,27 +5,28 @@
 # Currently running this with hdf5 db
 # Rerun with h5se RGChannelSet when this is working (e.g. syncs to server, etc.)
 
-savepath <- "data_analyses/env.RData"
-
-# list of objects to store for package builds
-library(rhdf5)
-library(minfi)
 library(recountmethylation)
-library(knitr)
+library(rhdf5)
+library(HDF5Array)
+library(minfi)
 library(limma)
 library(GenomicRanges)
+library(ggplot2)
+library(gridExtra)
 
-# path to full dataset
-path <- "remethdb2.h5"
-mdf <- data_mdpost(path) # all metadata
+dfp <- "data_analyses"
+env.name <- "data_analyses.RData"
+dir.create(dfp)
+savepath <- paste(dfp, env.name, sep = "/")
 
 #------------
 # global vars
 #------------
 # get local metadata
-mddir <- system.file("extdata", "metadata", package = "recountmethylation")
-mdpath <- list.files(mddir)
+path <- system.file("extdata", "metadata", package = "recountmethylation")
+mdpath <- paste(path, list.files(path)[1], sep = "/")
 md <- get(load(mdpath))
+dim(md) # [1] 35360    19
 
 # load MethylSet
 gmdn <- "remethdb-h5se_gm_0-0-1_1590090412"
@@ -272,9 +273,10 @@ barplot(xdif, las = 2, cex.names = 0.2)
 abline(h = 10, col = "red")
 dev.off()
 # scatterplot of ages among post-filtered samples
-jpeg("mainfig1b_agedif-mfilt.jpg", 3, 3)
+jpeg("mainfig1b_agedif-mfilt.jpg", 3, 3, units = "in", res = 400)
 ggplot(mdff, aes(x = chron.age, y = predage)) +
-  geom_point(size = 1.2, alpha = 0.2) + geom_smooth(method = "lm", size = 1.2) +
+  geom_point(size = 1.2, alpha = 0.2) + 
+  geom_smooth(method = "lm", size = 1.2) +
   theme_bw() + xlab("Chronological Age") + ylab("Epigenetic (DNAm) Age")
 dev.off()
 
