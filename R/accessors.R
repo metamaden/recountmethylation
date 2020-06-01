@@ -219,6 +219,7 @@ matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
 #' @param verbose Whether to post status messages.
 #' @return Returns a `RGChannelSet` object from raw signal dataset queries.
 #' @examples 
+#' h5test.name <- "remethdb-h5_rg-test_0-0-1_1590090412.h5"
 #' path <- system.file("extdata", h5test.name, package = "recountmethylation")
 #' fn <- list.files(path)
 #' dbpath = paste(path, fn, sep = "/")
@@ -298,6 +299,7 @@ rgse <- function(ldat, verbose = FALSE){
 #' @return Returns either an `RGChannelSet` or list of 
 #' `data.frame` objects from dataset query matches.
 #' @examples
+#' h5test.name <- "remethdb-h5_rg-test_0-0-1_1590090412.h5"
 #' path <- system.file("extdata", h5test.name, package = "recountmethylation")
 #' fn <- list.files(path)
 #' dbpath = paste(path, fn, sep = "/")
