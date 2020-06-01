@@ -4,27 +4,43 @@
 \alias{getdb}
 \alias{getdb_h5se_test}
 \alias{getdb_h5_test}
-\title{Functions to download and access database files.}
+\alias{getdb_h5se_gr}
+\alias{getdb_h5se_gm}
+\alias{getdb_h5se_rg}
+\alias{getdb_h5_rg}
+\title{Functions to access database files.}
 \usage{
-getdb_h5se_test(name = NULL, dfp = "downloads")
+getdb_h5se_test(name = NULL, dfp = "downloads", verbose = FALSE)
 
-getdb_h5_test(name = NULL, dfp = "downloads")
+getdb_h5_test(name = NULL, dfp = "downloads", verbose = FALSE)
+
+getdb_h5se_gr(name = NULL, dfp = "downloads", verbose = FALSE)
+
+getdb_h5se_gm(name = NULL, dfp = "downloads", verbose = FALSE)
+
+getdb_h5se_rg(name = NULL, dfp = "downloads", verbose = FALSE)
+
+getdb_h5_rg(name = NULL, dfp = "downloads", verbose = FALSE)
 }
 \arguments{
 \item{name}{Name of database file, optional (default NULL).}
 
 \item{dfp}{Folder to search for object, optional (default "downloads").}
+
+\item{verbose}{Whether to return verbose messages (default FALSE).}
 }
 \value{
 SummarizedExperiment object (for h5se) or file path for (h5).
 }
 \description{
-Combines download and load for database files. Default behavior downloads database files to 
-"downloads" directory.
+Combines download and load for database files. Latest files are downloaded to dfp directory if name not provided.
+ `HDF5-SummarizedExperiment` files (rg is `RGChannelSet`, gm is `MethylSet`, gr is `GenomicRatioSet`) 
+ can be downloaded with `h5se` functions, and `HDF5` database can be downloaded with h5 function. 
+ Files include sample metadata. See vignette for details about file types and classes.
 }
 \examples{
 getdb_h5se_test()
-getdb_h5se_test()
+getdb_h5_test()
 }
 \seealso{
 dldb, get_rmdl

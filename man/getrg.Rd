@@ -5,9 +5,9 @@
 \title{Query and store data from the signal tables}
 \usage{
 getrg(
+  dbn,
   gsmv = NULL,
   cgv = NULL,
-  dbn = "remethdb2.h5",
   data.type = c("se"),
   dsv = c("redsignal", "greensignal"),
   all.gsm = FALSE,
@@ -18,6 +18,8 @@ getrg(
 )
 }
 \arguments{
+\item{dbn}{Name of the HDF5 database file.}
+
 \item{gsmv}{Vector valid GSM IDs (rows) to query, 
 either NULL or vector of length > 2 valid GSM IDs, 
 or `all.gsm` should be TRUE.}
@@ -25,8 +27,6 @@ or `all.gsm` should be TRUE.}
 \item{cgv}{Vector of valid CpG probe addresses (columns) query,
 either NULL or a vector of valid probe addresses, or `all.cg` 
 should be TRUE.}
-
-\item{dbn}{Name of the HDF5 database file.}
 
 \item{data.type}{Format for returned query matches, either as 
 datasets 
