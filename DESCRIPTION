@@ -24,6 +24,7 @@ Imports:
     S4Vectors,
     utils,
     base,
+    methods,
     RCurl,
     methods,
     utils
