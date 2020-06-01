@@ -6,7 +6,12 @@ Authors@R: c(person(c("Sean", "K"), "Maden", role = c("cre", "aut"),
     person("Reid F", "Thompson", role = "aut", comment = c(ORCID = "0000-0003-3661-5296")),
     person("Kasper D", "Hansen", role = "aut", email = "hansen@jhsph.edu", comment = c(ORCID = "0000-0002-3303-4819")),
     person("Abhinav", "Nellore", role = "aut", email = "nellore@ohsu.edu", comment = c(ORCID = "0000-0001-8145-1484")))
-Description: Access and analyze data from the recount methylation database.
+Description: recountmethylation provides access to cross-study compilations of DNAm array data
+    as a series of database files. Database files can be downloaded and accessed using provided
+    functions. Background about database file types (HDF5 and HDF5-SummarizedExperiment), 
+    SummarizedExperiment classes, and examples for data handling, validation, and analyses, 
+    can be found in the package vignettes. Note the disclaimer on package load, and consult 
+    the main manuscript for further info.
 License: Artistic-2.0
 Encoding: UTF-8
 URL: https://github.com/metamaden/recountmethylation

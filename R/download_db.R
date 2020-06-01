@@ -7,9 +7,10 @@
 #' Get a matrix of database files from the recount server. Called by get_rmdl.
 #' @param dn Server data returned from RCurl.
 #' @param sslver Whether to use SSL certificate authentication for server connection (default FALSE).
+#' @param url Server website url.
 #' @param printmatrix Whether to print the data matrix to console (default TRUE).
 #' @param verbose Whether to show verbose messages (default FALSE).
-#' @param recursive Whether to recursively grab file sizes for h5se object (default TRUE).
+#' @param recursive Whether to recursively grab file sizes for h5se objects (default TRUE).
 #' @returns dm matrix of server files and file metadata
 #' @examples 
 #' dn <- RCurl::getURL("https://recount.bio/data/", .opts = list(ssl.verifypeer = FALSE))

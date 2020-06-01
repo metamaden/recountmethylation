@@ -18,11 +18,13 @@ servermatrix(
 
 \item{sslver}{Whether to use SSL certificate authentication for server connection (default FALSE).}
 
+\item{url}{Server website url.}
+
 \item{printmatrix}{Whether to print the data matrix to console (default TRUE).}
 
 \item{verbose}{Whether to show verbose messages (default FALSE).}
 
-\item{recursive}{Whether to recursively grab file sizes for h5se object (default TRUE).}
+\item{recursive}{Whether to recursively grab file sizes for h5se objects (default TRUE).}
 }
 \value{
 dm matrix of server files and file metadata

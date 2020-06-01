@@ -20,6 +20,7 @@ Forms an object of `RGChannelSet` class from a signal data object
 returned from a query to the red and green signal tables.
 }
 \examples{
+h5test.name <- "remethdb-h5_rg-test_0-0-1_1590090412.h5"
 path <- system.file("extdata", h5test.name, package = "recountmethylation")
 fn <- list.files(path)
 dbpath = paste(path, fn, sep = "/")

@@ -6,6 +6,14 @@ author:
 - Kasper D. Hansen
 - Abhinav Nellore
 date: "`r format(Sys.time(), '%d %B, %Y')`"
+bibliography: bibliography.bib
+package: recountmethylation
+vignette: > 
+  %\VignetteIndexEntry{recountmethylation User's Guide}
+  %\VignetteDepends{RCurl}
+  %\usepackage[UTF-8]{inputenc} 
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 output:
   pdf_document: 
     toc: yes
@@ -17,9 +25,6 @@ output:
   html_document:
     df_print: paged
     toc: yes
-bibliography: bibliography.bib
-package: recountmethylation
-vignette: "%\\VignetteDepends{RCurl} %\\VignetteIndexEntry{bioc_vignette}  %\\usepackage[UTF-8]{inputenc} %\\VignetteEngine{knitr::knitr}\n"
 ---
 
 ```{r setup, echo = FALSE}
