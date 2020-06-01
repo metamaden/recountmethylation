@@ -20,14 +20,15 @@ Forms an object of `RGChannelSet` class from a signal data object
 returned from a query to the red and green signal tables.
 }
 \examples{
-# get the list of datasets for all probe addresses, 3 samples
-path <- system.file("extdata", "testh5", package = "recountmethylation")
-dbpath <- paste0(path, "/remethdbtest.h5")
-gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
-ldat = getrg(gsmv = gsml, dbn = dbpath, data.type = "df", metadata = FALSE)
-rg = rgse(ldat) # get the rg set object
+path <- system.file("extdata", h5test.name, package = "recountmethylation")
+fn <- list.files(path)
+dbpath = paste(path, fn, sep = "/")
+rg = getrg(dbn = dbpath, all.gsm = TRUE, metadata = FALSE)
+dim(rg) # [1] 11162     2
 class(rg)
-dim(minfi::getBeta(rg))
+# [1] "RGChannelSet"
+# attr(,"package")
+# [1] "minfi"
 }
 \seealso{
 getrg()

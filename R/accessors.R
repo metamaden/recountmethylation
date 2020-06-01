@@ -110,11 +110,13 @@ gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/",
 #' @return HDF5 database connection object.
 #' @examples
 #' # Get tests data pointer
-#' path = system.file("extdata", "testh5", package = "recountmethylation")
-#' fn = list.files(path)
+#' h5test.name <- "remethdb-h5_rg-test_0-0-1_1590090412.h5"
+#' path <- system.file("extdata", h5test.name, package = "recountmethylation")
+#' fn <- list.files(path)
 #' dbpath = paste0(path, "/", fn)
 #' # red signal, first 2 assay addr, 3 samples
-#' reds <- hread(1:3, 1:2, d = "redsignal", dbn = dbpath)
+#' reds <- hread(1:2, 1:3, d = "redsignal", dbn = dbpath)
+#' dim(reds) # [1] 2 3
 #' @export
 hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
     return(rhdf5::h5read(dbn, dsn, index = list(ri, ci)))
@@ -129,10 +131,12 @@ hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
 #' the sample metadata and learned annotations.
 #' @return A `data.frame` of all the sample metadata
 #' @examples 
-#' path = system.file("extdata", "testh5", package = "recountmethylation")
+#' h5test.name <- "remethdb-h5_rg-test_0-0-1_1590090412.h5"
+#' path <- system.file("extdata", h5test.name, package = "recountmethylation")
 #' fn = list.files(path)
 #' dbpath = paste0(path, "/", fn)
 #' mdp <- data_mdpost(dbn = dbpath, dsn = "mdpost")
+#' dim(mdp) # [1]  2 19
 #' @seealso hread()
 #' @export
 data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
@@ -215,14 +219,15 @@ matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
 #' @param verbose Whether to post status messages.
 #' @return Returns a `RGChannelSet` object from raw signal dataset queries.
 #' @examples 
-#' # get the list of datasets for all probe addresses, 3 samples
-#' path <- system.file("extdata", "testh5", package = "recountmethylation")
-#' dbpath <- paste0(path, "/remethdbtest.h5")
-#' gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
-#' ldat = getrg(gsmv = gsml, dbn = dbpath, data.type = "df", metadata = FALSE)
-#' rg = rgse(ldat) # get the rg set object
+#' path <- system.file("extdata", h5test.name, package = "recountmethylation")
+#' fn <- list.files(path)
+#' dbpath = paste(path, fn, sep = "/")
+#' rg = getrg(dbn = dbpath, all.gsm = TRUE, metadata = FALSE)
+#' dim(rg) # [1] 11162     2
 #' class(rg)
-#' dim(minfi::getBeta(rg))
+#' # [1] "RGChannelSet"
+#' # attr(,"package")
+#' # [1] "minfi"
 #' @seealso getrg()
 #' @export
 rgse <- function(ldat, verbose = FALSE){
@@ -293,16 +298,15 @@ rgse <- function(ldat, verbose = FALSE){
 #' @return Returns either an `RGChannelSet` or list of 
 #' `data.frame` objects from dataset query matches.
 #' @examples
-#' # make samples list
-#' path <- system.file("extdata", "testh5", package = "recountmethylation")
-#' dbpath <- paste0(path, "/remethdbtest.h5")
-#' gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
-#' # get list of data tables for a query
-#' ldat = getrg(gsmv = gsml, dbn = dbpath, data.type = "df")
-#' names(ldat)
-#' dim(ldat[[1]])
-#' dim(ldat[[2]])
-#' dim(ldat[[3]])
+#' path <- system.file("extdata", h5test.name, package = "recountmethylation")
+#' fn <- list.files(path)
+#' dbpath = paste(path, fn, sep = "/")
+#' rg = getrg(dbn = dbpath, all.gsm = TRUE, metadata = FALSE)
+#' dim(rg) # [1] 11162     2
+#' class(rg)
+#' # [1] "RGChannelSet"
+#' # attr(,"package")
+#' # [1] "minfi"
 #' @seealso rgse()
 #' @export
 getrg <- function(dbn, gsmv = NULL, cgv = NULL, data.type = c("se"),

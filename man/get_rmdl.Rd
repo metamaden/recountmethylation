@@ -47,5 +47,6 @@ New filepath to dir with downloaded data.
 Uses RCurl to recursively download latest H5SE and HDF5 data objects the from server.
 }
 \examples{
-get_rmdl(which.class = "test", which.type = "h5se")
+path <- get_rmdl(which.class = "test", which.type = "h5se", tryload = FALSE)
+unlink("downloads", recursive = TRUE)
 }

@@ -59,16 +59,15 @@ as a list of datasets or a single `RGChannelSet`
 object, with the option of including sample metadata.
 }
 \examples{
-# make samples list
-path <- system.file("extdata", "testh5", package = "recountmethylation")
-dbpath <- paste0(path, "/remethdbtest.h5")
-gsml = c("GSM1235984", "GSM1236090", "GSM1506278")
-# get list of data tables for a query
-ldat = getrg(gsmv = gsml, dbn = dbpath, data.type = "df")
-names(ldat)
-dim(ldat[[1]])
-dim(ldat[[2]])
-dim(ldat[[3]])
+path <- system.file("extdata", h5test.name, package = "recountmethylation")
+fn <- list.files(path)
+dbpath = paste(path, fn, sep = "/")
+rg = getrg(dbn = dbpath, all.gsm = TRUE, metadata = FALSE)
+dim(rg) # [1] 11162     2
+class(rg)
+# [1] "RGChannelSet"
+# attr(,"package")
+# [1] "minfi"
 }
 \seealso{
 rgse()

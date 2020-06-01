@@ -73,7 +73,8 @@ servermatrix <- function(dn, sslver = FALSE, url = "https://recount.bio/data/",
 #' @param sslver Whether to use server certificate check (default FALSE).
 #' @return New filepath to dir with downloaded data.
 #' @examples 
-#' get_rmdl(which.class = "test", which.type = "h5se")
+#' path <- get_rmdl(which.class = "test", which.type = "h5se", tryload = FALSE)
+#' unlink("downloads", recursive = TRUE)
 #' @export
 get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"), 
                      which.type = c("h5se", "h5"), fn = NULL, dfp = "downloads", 
@@ -86,7 +87,7 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
   dn <- RCurl::getURL(url, ftp.use.epsv = ftpuseopt, dirlistonly = dirlistopt,
                       .opts = list(ssl.verifypeer = sslver))
   if(verbose){message("Getting file data from server.")}
-  sm <- servermatrix(dn, sslver)
+  sm <- servermatrix(dn = dn, sslver = sslver)
   if(show.files){prmatrix(sm)}
   if(is.null(fn)){
     # clean query results
@@ -95,9 +96,8 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
     typestr <- paste0(str1, which.type, str2)
     filt.type <- grepl(typestr, sm[,1])
     filt.all <- filt.type & grepl(paste0(".*", which.class,".*"), sm[,1])
-    filt.all <- ifelse(which.class == "test", filt.all, 
-                       filt.all[!grepl(".*test.*", filt.all)])
     dnc <- sm[filt.all, 1]
+    if(!which.class == "test"){dnc <- dnc[!grepl("test", dnc)]}
     if(length(dnc) > 1){
       tsstr <- gsub("(.*_|\\.h5)", "", dnc)
       tsv <- suppressWarnings(as.numeric(tsstr)) # timestamps
@@ -159,15 +159,17 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
 #'  `HDF5-SummarizedExperiment` files (rg is `RGChannelSet`, gm is `MethylSet`, gr is `GenomicRatioSet`) 
 #'  can be downloaded with `h5se` functions, and `HDF5` database can be downloaded with h5 function. 
 #'  Files include sample metadata. See vignette for details about file types and classes.
-#' @param name Name of database file, optional (default NULL).
-#' @param dfp Folder to search for object, optional (default "downloads").
+#' @param name Name of database file to load (optional, default NULL). If null, a new database is download.
+#' @param dfp Folder containing database to load if name not NULL, otherwise the target folder for 
+#' new database download (default "downloads").
 #' @param verbose Whether to return verbose messages (default FALSE).
 #' @seealso dldb, get_rmdl
 #' @return SummarizedExperiment object (for h5se) or file path for (h5).
 NULL
 #' @rdname getdb
 #' @examples
-#' getdb_h5se_test()
+#' path <- getdb_h5se_test()
+#' unlink("downloads", recursive = TRUE)
 #' @export
 getdb_h5se_test <- function(name = NULL, dfp = "downloads", verbose = FALSE){
   dbpath <- FALSE
@@ -198,8 +200,6 @@ getdb_h5se_test <- function(name = NULL, dfp = "downloads", verbose = FALSE){
   return(NULL)
 }
 #' @rdname getdb
-#' @examples
-#' getdb_h5_test()
 #' @export
 getdb_h5_test <- function(name = NULL, dfp = "downloads", verbose = FALSE){
   dbpath <- FALSE

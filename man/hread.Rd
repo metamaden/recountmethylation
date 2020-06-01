@@ -24,9 +24,11 @@ Get a dataset connection object from an HDF5 database
 }
 \examples{
 # Get tests data pointer
-path = system.file("extdata", "testh5", package = "recountmethylation")
-fn = list.files(path)
+h5test.name <- "remethdb-h5_rg-test_0-0-1_1590090412.h5"
+path <- system.file("extdata", h5test.name, package = "recountmethylation")
+fn <- list.files(path)
 dbpath = paste0(path, "/", fn)
 # red signal, first 2 assay addr, 3 samples
-reds <- hread(1:3, 1:2, d = "redsignal", dbn = dbpath)
+reds <- hread(1:2, 1:3, d = "redsignal", dbn = dbpath)
+dim(reds) # [1] 2 3
 }

@@ -23,9 +23,10 @@ getdb_h5se_rg(name = NULL, dfp = "downloads", verbose = FALSE)
 getdb_h5_rg(name = NULL, dfp = "downloads", verbose = FALSE)
 }
 \arguments{
-\item{name}{Name of database file, optional (default NULL).}
+\item{name}{Name of database file to load (optional, default NULL). If null, a new database is download.}
 
-\item{dfp}{Folder to search for object, optional (default "downloads").}
+\item{dfp}{Folder containing database to load if name not NULL, otherwise the target folder for 
+new database download (default "downloads").}
 
 \item{verbose}{Whether to return verbose messages (default FALSE).}
 }
@@ -39,8 +40,8 @@ Combines download and load for database files. Latest files are downloaded to df
  Files include sample metadata. See vignette for details about file types and classes.
 }
 \examples{
-getdb_h5se_test()
-getdb_h5_test()
+path <- getdb_h5se_test()
+unlink("downloads", recursive = TRUE)
 }
 \seealso{
 dldb, get_rmdl
