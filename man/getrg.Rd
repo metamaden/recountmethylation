@@ -59,8 +59,7 @@ as a list of datasets or a single `RGChannelSet`
 object, with the option of including sample metadata.
 }
 \examples{
-h5test.name <- "remethdb-h5_rg-test_0-0-1_1590090412.h5"
-path <- system.file("extdata", h5test.name, package = "recountmethylation")
+path <- system.file("extdata", "h5test", package = "recountmethylation")
 fn <- list.files(path)
 dbpath = paste(path, fn, sep = "/")
 rg = getrg(dbn = dbpath, all.gsm = TRUE, metadata = FALSE)

@@ -41,7 +41,7 @@ Combines download and load for database files. Latest files are downloaded to df
 }
 \examples{
 path <- getdb_h5se_test()
-unlink("downloads", recursive = TRUE)
+base::unlink("downloads", recursive = TRUE)
 }
 \seealso{
 dldb, get_rmdl
