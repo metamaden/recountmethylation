@@ -25,9 +25,7 @@ Imports:
     utils,
     base,
     methods,
-    RCurl,
-    methods,
-    utils
+    RCurl
 Suggests:
     HDF5Array,
     knitr,
