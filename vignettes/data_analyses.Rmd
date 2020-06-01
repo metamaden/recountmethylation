@@ -269,7 +269,7 @@ vp$col <- ifelse(grepl("ffpe", vp$group), "orange", "purple")
 ggplot(vp, aes(x = group, y = signal, color = group)) + 
   scale_color_manual(values = c("meth.ffpe" = "orange", "unmeth.ffpe" = "orange", 
                                 "meth.frozen" = "purple", "unmeth.frozen" = "purple")) +
-  geom_violin() + theme_bw() + theme(legend.position = "none")
+  geom_violin(draw_quantiles = c(0.5)) + theme_bw() + theme(legend.position = "none")
 ```
 
 # Example 3: Identifying probe sets with high and tissue-specific variances
