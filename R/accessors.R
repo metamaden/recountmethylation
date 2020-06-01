@@ -110,8 +110,7 @@ gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/",
 #' @return HDF5 database connection object.
 #' @examples
 #' # Get tests data pointer
-#' h5test.name <- "remethdb-h5_rg-test_0-0-1_1590090412.h5"
-#' path <- system.file("extdata", h5test.name, package = "recountmethylation")
+#' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn <- list.files(path)
 #' dbpath = paste0(path, "/", fn)
 #' # red signal, first 2 assay addr, 3 samples
@@ -131,8 +130,7 @@ hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
 #' the sample metadata and learned annotations.
 #' @return A `data.frame` of all the sample metadata
 #' @examples 
-#' h5test.name <- "remethdb-h5_rg-test_0-0-1_1590090412.h5"
-#' path <- system.file("extdata", h5test.name, package = "recountmethylation")
+#' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn = list.files(path)
 #' dbpath = paste0(path, "/", fn)
 #' mdp <- data_mdpost(dbn = dbpath, dsn = "mdpost")
@@ -219,8 +217,7 @@ matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
 #' @param verbose Whether to post status messages.
 #' @return Returns a `RGChannelSet` object from raw signal dataset queries.
 #' @examples 
-#' h5test.name <- "remethdb-h5_rg-test_0-0-1_1590090412.h5"
-#' path <- system.file("extdata", h5test.name, package = "recountmethylation")
+#' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn <- list.files(path)
 #' dbpath = paste(path, fn, sep = "/")
 #' rg = getrg(dbn = dbpath, all.gsm = TRUE, metadata = FALSE)
@@ -299,8 +296,7 @@ rgse <- function(ldat, verbose = FALSE){
 #' @return Returns either an `RGChannelSet` or list of 
 #' `data.frame` objects from dataset query matches.
 #' @examples
-#' h5test.name <- "remethdb-h5_rg-test_0-0-1_1590090412.h5"
-#' path <- system.file("extdata", h5test.name, package = "recountmethylation")
+#' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn <- list.files(path)
 #' dbpath = paste(path, fn, sep = "/")
 #' rg = getrg(dbn = dbpath, all.gsm = TRUE, metadata = FALSE)
