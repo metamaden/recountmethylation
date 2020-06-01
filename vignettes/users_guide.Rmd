@@ -245,6 +245,12 @@ identical(geo.bm, h5se.bm)
 
 # Conclusions
 
+```{r cleanup, echo = FALSE, eval = TRUE}
+# remove new dirs and downloaded files
+suppressMessages(unlink("idats", recursive = TRUE))
+suppressMessages(unlink("downloads", recursive = TRUE))
+```
+
 This User's Guide provided background about the database files accessed with `recountmethylation`, and provided basic handling, summarization, and validation examples for each of the principal database file types. Consult the Data Analyses vignette and the manuscript @maden_human_2020 for analysis examples and details about data compilations.
 
 # Session info

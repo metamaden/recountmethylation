@@ -47,7 +47,7 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
       for(f in fn){
         url.dlpath <- paste(url, f, sep = "")
         dest.fpath <- paste(dfp, f, sep = "")
-        download.file(url.dlpath, dest.fpath)
+        utils::download.file(url.dlpath, dest.fpath)
         fnv <- c(fnv, dest.fpath)
         if(expand){
           if(verbose){message("Expanding compressed file...")}

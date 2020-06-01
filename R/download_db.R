@@ -75,7 +75,7 @@ servermatrix <- function(dn, sslver = FALSE, url = "https://recount.bio/data/",
 #' @return New filepath to dir with downloaded data.
 #' @examples 
 #' path <- get_rmdl(which.class = "test", which.type = "h5se", tryload = FALSE)
-#' unlink("downloads", recursive = TRUE)
+#' base::unlink("downloads", recursive = TRUE)
 #' @export
 get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"), 
                      which.type = c("h5se", "h5"), fn = NULL, dfp = "downloads", 
@@ -132,7 +132,7 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
   for(i in 1:length(fl.clean)){
     fpath <- ifelse(fl.clean[[i]] == "", dn.url, paste(dn.url, fl.clean[i], sep = "/"))
     destpath <- ifelse(fl.clean[[i]] == "", dfp.dn, paste(dfp.dn, fl.clean[i], sep = "/"))
-    trydl = try(download.file(url = fpath, destfile = destpath, 
+    trydl = try(utils::download.file(url = fpath, destfile = destpath, 
                               .opts = list(ssl.verifypeer = sslver)))
   }
   if(length(dll[dll==0]) == length(dll)){
@@ -170,7 +170,7 @@ NULL
 #' @rdname getdb
 #' @examples
 #' path <- getdb_h5se_test()
-#' unlink("downloads", recursive = TRUE)
+#' base::unlink("downloads", recursive = TRUE)
 #' @export
 getdb_h5se_test <- function(name = NULL, dfp = "downloads", verbose = FALSE){
   dbpath <- FALSE
