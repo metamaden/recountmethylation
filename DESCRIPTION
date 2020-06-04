@@ -23,7 +23,6 @@ Imports:
     rhdf5,
     S4Vectors,
     utils,
-    base,
     methods,
     RCurl
 Suggests:

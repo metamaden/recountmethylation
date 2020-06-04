@@ -141,7 +141,7 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
       if(which.type == "h5se"){
         tdl <- try(HDF5Array::loadHDF5SummarizedExperiment(dfp.dn))
       } else{tdl <- try(rhdf5::h5ls(dfp.dn))}
-      if(class(tdl)=="try-error"){message("Problem loading, download may be corrupt.")}
+      if(is(tdl)=="try-error"){message("Problem loading, download may be corrupt.")}
     }
     return(dfp.dn)
   } else{
@@ -185,16 +185,16 @@ getdb_h5se_test <- function(name = NULL, dfp = "downloads", verbose = FALSE){
     message("Downloading database...")
     dbpath <- try(get_rmdl(which.class = "test", dfp = dfp, which.type = "h5se", 
                            tryload = FALSE, verbose = verbose))
-    if(!class(dbpath) == "try-errror"){
+    if(!is(dbpath) == "try-errror"){
       message("Download completed.")
     } else{stop("Problem with download.")}
   }
   # parse load
-  if(class(dbpath) == "try-error"){stop("Problem with dbpath.")} else{
+  if(is(dbpath) == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
   }
-  if(class(dbf) == "try-error"){stop("Problem loading file.")} else{
+  if(is(dbf) == "try-error"){stop("Problem loading file.")} else{
     message("Database file loaded.")
     return(dbf)
   }
@@ -215,16 +215,16 @@ getdb_h5_test <- function(name = NULL, dfp = "downloads", verbose = FALSE){
     message("Downloading database...")
     dbpath <- try(get_rmdl(which.class = "test", dfp = dfp, which.type = "h5", 
                            tryload = FALSE, verbose = verbose))
-    if(!class(dbpath) == "try-errror"){
+    if(!is(dbpath) == "try-errror"){
       message("Download completed.")
     } else{stop("Problem with download.")}
   }
   # parse load
-  if(class(dbpath) == "try-error"){stop("Problem with dbpath.")} else{
+  if(is(dbpath) == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(suppressMessages(rhdf5::h5ls(dbpath)))
   }
-  if(class(dbf) == "try-error"){stop("Problem loading file.")} else{
+  if(is(dbf) == "try-error"){stop("Problem loading file.")} else{
     message("Database file loaded.")
     return(dbpath)
   }
@@ -245,16 +245,16 @@ getdb_h5se_gr <- function(name = NULL, dfp = "downloads", verbose = FALSE){
     message("Downloading database...")
     dbpath <- try(get_rmdl(which.class = "gr", dfp = dfp, which.type = "h5se", 
                            tryload = FALSE, verbose = verbose))
-    if(!class(dbpath) == "try-errror"){
+    if(!is(dbpath) == "try-errror"){
       message("Download completed.")
     } else{stop("Problem with download.")}
   }
   # parse load
-  if(class(dbpath) == "try-error"){stop("Problem with dbpath.")} else{
+  if(is(dbpath) == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
   }
-  if(class(dbf) == "try-error"){stop("Problem loading file.")} else{
+  if(is(dbf) == "try-error"){stop("Problem loading file.")} else{
     message("Database file loaded.")
     return(dbf)
   }
@@ -275,16 +275,16 @@ getdb_h5se_gm <- function(name = NULL, dfp = "downloads", verbose = FALSE){
     message("Downloading database...")
     dbpath <- try(get_rmdl(which.class = "gm", dfp = dfp, which.type = "h5se", 
                            tryload = FALSE, verbose = verbose))
-    if(!class(dbpath) == "try-errror"){
+    if(!is(dbpath) == "try-errror"){
       message("Download completed.")
     } else{stop("Problem with download.")}
   }
   # parse load
-  if(class(dbpath) == "try-error"){stop("Problem with dbpath.")} else{
+  if(is(dbpath) == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
   }
-  if(class(dbf) == "try-error"){stop("Problem loading file.")} else{
+  if(is(dbf) == "try-error"){stop("Problem loading file.")} else{
     message("Database file loaded.")
     return(dbf)
   }
@@ -305,16 +305,16 @@ getdb_h5se_rg <- function(name = NULL, dfp = "downloads", verbose = FALSE){
     message("Downloading database...")
     dbpath <- try(get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5se", 
                            tryload = FALSE, verbose = verbose))
-    if(!class(dbpath) == "try-errror"){
+    if(!is(dbpath) == "try-errror"){
       message("Download completed.")
     } else{stop("Problem with download.")}
   }
   # parse load
-  if(class(dbpath) == "try-error"){stop("Problem with dbpath.")} else{
+  if(is(dbpath) == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
   }
-  if(class(dbf) == "try-error"){stop("Problem loading file.")} else{
+  if(is(dbf) == "try-error"){stop("Problem loading file.")} else{
     message("Database file loaded.")
     return(dbf)
   }
@@ -335,16 +335,16 @@ getdb_h5_rg <- function(name = NULL, dfp = "downloads", verbose = FALSE){
     message("Downloading database...")
     dbpath <- try(get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5", 
                            tryload = FALSE, verbose = verbose))
-    if(!class(dbpath) == "try-errror"){
+    if(!is(dbpath) == "try-errror"){
       message("Download completed.")
     } else{stop("Problem with download.")}
   }
   # parse load
-  if(class(dbpath) == "try-error"){stop("Problem with dbpath.")} else{
+  if(is(dbpath) == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(suppressMessages(rhdf5::h5ls(dbpath)))
   }
-  if(class(dbf) == "try-error"){stop("Problem loading file.")} else{
+  if(is(dbf) == "try-error"){stop("Problem loading file.")} else{
     message("Database file loaded.")
     return(dbpath)
   }
