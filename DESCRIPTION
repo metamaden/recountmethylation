@@ -30,7 +30,9 @@ Suggests:
     knitr,
     testthat,
     ggplot2,
-    gridExtra
+    gridExtra,
+    rmarkdown,
+    BiocStyle
 VignetteBuilder: 
     knitr
 biocViews: DNAMethylation, Epigenetics, Microarray, MethylationArray

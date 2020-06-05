@@ -15,16 +15,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 output:
-  pdf_document:
+  BiocStyle::pdf_document:
     toc: yes
     toc_depth: 3
   BiocStyle::html_document:
     code_folding: show
     toc: yes
     tocfloat: yes
-  html_document:
-    df_print: paged
-    toc: yes
 ---
 
 ```{r setup, echo = FALSE}
