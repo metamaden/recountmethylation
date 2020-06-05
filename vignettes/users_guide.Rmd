@@ -193,7 +193,7 @@ Rows in these signal matrices map to bead addresses rather than probe IDs. These
 
 # Validate DNAm datasets
 
-As the disclaimer notes, it is good practice to validate data against the latest available GEO files. This section shows how to use `recountmethylation` to obtain GEO DNAm data and compare with test data.
+This section demonstrates validation using the test databases. As the disclaimer notes, it is good practice to validate data against the latest available GEO files. This step may be more useful for newer samples published close to the end compilation date (end of March 2019 for current version).
 
 ## Download and read IDATs from GEO
 
