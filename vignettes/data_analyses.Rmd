@@ -7,7 +7,7 @@ author:
 - Abhinav Nellore
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 bibliography: bibliography.bib
-package: recountmethylations
+package: recountmethylation
 vignette: > 
   %\VignetteIndexEntry{Data Analyses}
   %\VignetteDepends{RCurl}

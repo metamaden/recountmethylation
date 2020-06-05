@@ -31,7 +31,9 @@ knitr::opts_chunk$set(echo = TRUE, eval = TRUE, warning = FALSE, message = FALSE
 
 # Introduction and overview
 
-This User's Guide shows how to use the `recountmethylation` package to access large databases of DNA methylation (DNAm) array assays and sample metadata compiled from the Gene Expression Omnibus (GEO). Data were compiled from over 35,000 GSM samples and over 350 GSE study records. Some background about DNAm arrays, DNAm measurement, and `SummarizedExperiment` objects is provided below. For additional info, consult the Data Analyses vignette and @maden_human_2020.
+The `recountmethylation` package provides access to databases of DNA methylation (DNAm) data from over 35,000 sample records with IDATs in the Gene Expression Omnibus (GEO, available through March 31, 2019) run using the Illumina HM450K BeadArray platform, including metadata, raw/unnormalized red and green signals, raw/unnormalized methylated and unmethylated signals, and normalized DNAm fractions or Beta-values (@maden_human_2020). Normalization was performed using the out-of-band signal correction (a.k.a. "noob") method, a type of within-sample normalization (@triche_low-level_2013).
+
+This User's Guide shows how to use the `recountmethylation` package to obtain, load, and query the DNAm databases with 2 small example files. Background about DNAm arrays, DNAm measurement, `SummarizedExperiment` objects, database file types, and samples metadata is also provided. Further analysis examples are contained in the `data_analyses` vignette.
 
 ## Disclaimer
 
@@ -77,9 +79,13 @@ Three `SummarizedExperiment` databases are provided as `HDF5-SummarizedExperimen
 
 Database files are stored as either `HDF5` or `HDF5-SummarizedExperiment`. For most R users, the latter files will be most convenient to work with. `HDF5`, or hierarchical data format 5, combines compression and chunking for convenient handling of large datasets. `HDF5-SummarizedExperiment` files combine the benefits of `HDF5` and `SummarizedExperiment` entities using a DelayedArray-powered backend. Once an `HDF5-SummarizedExperiment` file is loaded, it can be treated similarly to a `SummarizedExperiment` object in active memory. That is, summary and subset operations execute rapidly, and realization of large data chunks in active memory is delayed until called for by the script (see examples).
 
-## Sample and study metadata
+## Sample metadata
 
-Sample metadata are included with DNAm assays in database files. These include GEO record IDs for samples (GSM) and studies (GSE), record titles, learned labels for tissue and disease, sample type predictions, model-based predictions, etc (see @maden_human_2020 for details). Access sample metadata from `SummarizedExperiment` objects using the `pData` minfi function (see examples).
+Sample metadata are included with DNAm assays in the database files. Currently, metadata variables include GEO record IDs for samples (GSM) and studies (GSE), sample record titles, learned labels for tissue and disease, sample type predictions from the MetaSRA-pipeline, and DNAm model-based predictions for age, sex, and blood cell types. Access sample metadata from `SummarizedExperiment` objects using the `pData` minfi function (see examples). Examples in the `data_analyses` vignette illustrate some ways to utilize the provided sample metadata.
+
+Provided metadata derives from the GSE-specific SOFT files, which contain experiment, sample, and platform metadata. Considerable efforts were made to learn, harmonize, and predict metadata labels. Certain types of info lacking in the `recountmethylation` metadata may be available in the SOFT files, especially if it is sample non-specific (e.g. methods text, PubMed ID, etc.) or redundant with DNAm-derived metrics (e.g. DNAm summaries, predicted sex, etc.).
+
+It is good practice to validate the harmonized metadata with original metadata records, especially where labels are ambiguous or there is insufficient information for a given query. GEO GSM and GSE records can be viewed from a browser, or SOFT files may be downloaded directly. Packages like GEOmetadb and GEOquery are also useful to query and summarize GEO metadata.
 
 # HDF5-SummarizedExperiment example
 
