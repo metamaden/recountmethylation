@@ -46,7 +46,7 @@ This vignette describes analysis steps in full, but with limited evaluations to 
 
 ## Data availability
 
-This vignette makes use of the sample metadata and 2 of the available `HDF5-SummarizedExperiment` compilations. Consult the `users_guide` vignette for details about data and access. For this vignette, access the versioned metadata and load the DNAm compilation objects as follows.
+This vignette makes use of the sample metadata and 2 of the available `HDF5-SummarizedExperiment` datasets Consult the `users_guide` vignette for details about data and access. For this vignette, access the versioned metadata and load the DNAm datasets as follows.
 
 ```{r, eval = TRUE}
 # get local metadata
@@ -288,7 +288,7 @@ kable(sst.tvar, align = "c")
 
 ## Calculate log2 methylated and unmethylated signal medians
 
-Subset the `MethylSet` compilation, then append the `sgroup` variable from `mdf` and map the object to the genome using the `mapToGenome` function from the `minfi` package.
+Subset the `MethylSet` dataset, then append the `sgroup` variable from `mdf` and map the object to the genome using the `mapToGenome` function from the `minfi` package.
 
 ```{r}
 ms <- gm[,colnames(gm) %in% rownames(mdf)]
@@ -586,6 +586,13 @@ for(t in tv){
 }
 ```
 
+Use the `makevp()` helper function to make violin plots with horizontal bars at distribution medians. This function formats the data and calls `geom_violin` to make violin plots for DNAm fraction means and variances. Store plots in the `lvp` list, then display them vertically using the `grid.arrange` function from the gridExtra package.
+
+```{r, eval = TRUE, fig.width = 5, fig.height = 6}
+lvp <- makevp(lfcg, ltxcg)
+grid.arrange(lvp[[1]], lvp[[2]], ncol = 1, bottom = "Tissue")
+```
+
 Tabulate the means of probe set statistics by tissue.
 
 ```{r, eval = TRUE}
@@ -602,14 +609,9 @@ rownames(tcgss) <- tv
 kable(t(tcgss))
 ```
 
-Use the `makevp()` helper function to make violin plots with horizontal bars at distribution medians. This function formats the data and calls `geom_violin` to make violin plots for DNAm fraction means and variances. Store plots in the `lvp` list, then display them vertically using the `grid.arrange` function from the gridExtra package.
+Next, prepare genome region heatmaps with 3 helper functions. These will tabulate probe abundances by region and use the probe Beta-value means to calculate the means (left heatmap) and variances (right heatmap) by genome region type. 
 
-```{r, eval = TRUE, fig.width = 5, fig.height = 6}
-lvp <- makevp(lfcg, ltxcg)
-grid.arrange(lvp[[1]], lvp[[2]], ncol = 1, bottom = "Tissue")
-```
-
-Next, prepare genome region heatmaps with 3 helper functions as shown. First, get island and gene annotation groups using `get_cga`. Next, get region-specific DNAm summaries with `hmsets` using a minimum region coverage of 2. This means values are only calculated for regions with least 2 probes. Regions with less are assigned "NA" and would be grayed out. Make the 2 plots objects with `hmplots()`, which wraps the `geom_tile` ggplot2 function. Display plots horizontally with `grid.arrange`.
+First, define island and gene annotation groups from the manifest using `get_cga`. Next, get region-specific DNAm summaries with `hmsets` using a minimum region coverage of 2. This means values are calculated for regions with least 2 probes, and regions with less are assigned "NA" and greyed out. Make the 2 plots objects for means and variances with `hmplots()`, which wraps the `geom_tile` ggplot2 function. Finally, display plots horizontally with `grid.arrange`.
 
 ```{r, eval = TRUE, fig.width = 7, fig.height = 4}
 cga <- get_cga(anno)
@@ -620,11 +622,11 @@ grid.arrange(lhmplots$hm.mean.plot, lhmplots$hm.var.plot,
              bottom = "Tissue", left = "Annotation/Region Type")
 ```
 
-The heatmaps are colored blue, white, red for low, intermediate, and high DNAm fraction means and variances. Cell numbers show probe region quantities, which are identical for both plots.
+Colors blue, white, and red represent low, intermediate, and high means and variances of region-specific mean Beta-values. Cell numbers show probe region quantities and are identical for both plots.
 
 # Conclusions
 
-This vignette described cross-study analyses using data objects accessible with `recountmethylation` and appearing in the manuscript @maden_human_2020. See the manuscript for more information about samples, quality metric signal patterns, and extended variability analyses. For details about data objects, consult the package `users_guide` vignette. Full code and helper function definitions are contained in the `data_analyses.R` companion script. For additional utilities to analyze DNAm compilations, consult the `minfi` and `wateRmelon` packages.
+This vignette described cross-study analyses using data objects accessible with `recountmethylation` and appearing in the manuscript @maden_human_2020. See the manuscript for more information about samples, quality metric signal patterns, and extended variability analyses. For details about data objects, consult the package `users_guide` vignette. Full code and helper function definitions are contained in the `data_analyses.R` companion script. For additional utilities to analyze DNAm data, consult the `minfi` and `wateRmelon` packages.
 
 # Session info
 
