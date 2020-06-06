@@ -173,7 +173,7 @@ kable(dss, align = "c")
 
 Plot sample counts and MAD for each GSE record, with a vertical line at the 10-years MAD cutoff used for the group 2 filter.
 
-```{r, eval = TRUE, fig.width = 4, fig.height = 3.8}
+```{r, eval = TRUE, fig.width = 3.8, fig.height = 3.4}
 plot(xdif, ngsm, ylab = "Study Size (Num. GSM)", 
      xlab = "Age Difference, MAD[Chron, Pred]")
 abline(v = 10, col = "red")
@@ -181,7 +181,7 @@ abline(v = 10, col = "red")
 
 Finally, plot the chronological and predicted ages for group 2 samples.
 
-```{r, eval = TRUE, fig.width = 5, fig.height = 4.5}
+```{r, eval = TRUE, fig.width = 3.4, fig.height = 3.1}
 ggplot(mdff, aes(x = chron.age, y = predage)) +
   geom_point(size = 1.2, alpha = 0.2) + geom_smooth(method = "lm", size = 1.2) +
   theme_bw() + xlab("Chronological Age") + ylab("Epigenetic (DNAm) Age")
@@ -245,17 +245,17 @@ ds$storage <- ifelse(grepl("FFPE", gmf$storage), "ffpe", "frozen")
 
 ## Signals plotted by storage type
 
-Evaluate signal patterns across storage type using plots using the ggplot2 package. First, make a 2d scatter plot of methylated and unmethylated signals using the `geom_point` function. Color by storage type with the `scale_color_manual` function.
+Evaluate signal patterns across storage type using plots using the ggplot2 package. First, make a 2d scatter plot of methylated and unmethylated signals using the `geom_point` function. Color by storage type with the `scale_color_manual` function (FFPE samples are orange, frozen samples are purple).
 
-```{r, eval = TRUE, fig.width = 5, fig.height = 4}
+```{r, eval = TRUE, fig.width = 4.3, fig.height = 3.1}
 ggplot(ds, aes(x = meth.l2med, y = unmeth.l2med, color = storage)) + 
   geom_point(alpha = 0.35, cex = 3) + theme_bw() +
   scale_color_manual(values = c("ffpe" = "orange", "frozen" = "purple"))
 ```
 
-Next, make separate violin plots for signals and groups using the `geom_violin` function. Draw horizontal median lines by setting the `draw_quantiles` argument to 0.5.
+Next, make separate violin plots for signals and groups using the `geom_violin` function with the same colors for each storage type. Draw horizontal median lines by setting the `draw_quantiles` argument to 0.5.
 
-```{r, eval = TRUE, fig.width = 5, fig.height = 3}
+```{r, eval = TRUE, fig.width = 4.5, fig.height = 2.5}
 vp <- matrix(nrow = 0, ncol = 2)
 vp <- rbind(vp, matrix(c(ds$meth.l2med, paste0("meth.", ds$storage)), ncol = 2))
 vp <- rbind(vp, matrix(c(ds$unmeth.l2med, paste0("unmeth.", ds$storage)), ncol = 2))
@@ -332,7 +332,7 @@ ds2$tissue <- as.factor(ms$sgroup)
 
 Make a scatter plot of log2 median signals by tissue type with the `geom_point` function.
 
-```{r, eval = TRUE, fig.width = 5, fig.height = 4}
+```{r, eval = TRUE, fig.width = 4.5, fig.height = 3.1}
 ggplot(ds2, aes(x = l2med.meth, y = l2med.unmeth, color = tissue)) + 
   geom_point(alpha = 0.3, cex = 3) + theme_bw()
 ```
@@ -588,7 +588,7 @@ for(t in tv){
 
 Use the `makevp()` helper function to make violin plots with horizontal bars at distribution medians. This function formats the data and calls `geom_violin` to make violin plots for DNAm fraction means and variances. Store plots in the `lvp` list, then display them vertically using the `grid.arrange` function from the gridExtra package.
 
-```{r, eval = TRUE, fig.width = 5, fig.height = 6}
+```{r, eval = TRUE, fig.width = 3.8, fig.height = 4.5}
 lvp <- makevp(lfcg, ltxcg)
 grid.arrange(lvp[[1]], lvp[[2]], ncol = 1, bottom = "Tissue")
 ```
@@ -606,14 +606,14 @@ for(t in tv){
 }
 colnames(tcgss) <- colnames(lcgssf$adipose)
 rownames(tcgss) <- tv
-kable(t(tcgss))
+kable(t(tcgss), align = "c")
 ```
 
-Next, prepare genome region heatmaps with 3 helper functions. These will tabulate probe abundances by region and use the probe Beta-value means to calculate the means (left heatmap) and variances (right heatmap) by genome region type. 
+Next, prepare genome region heatmaps with 3 helper functions. These will tabulate probe abundances by region and use the probe Beta-value means to calculate the mean of means (left heatmap) and variance of means (right heatmap) by genome region type. 
 
 First, define island and gene annotation groups from the manifest using `get_cga`. Next, get region-specific DNAm summaries with `hmsets` using a minimum region coverage of 2. This means values are calculated for regions with least 2 probes, and regions with less are assigned "NA" and greyed out. Make the 2 plots objects for means and variances with `hmplots()`, which wraps the `geom_tile` ggplot2 function. Finally, display plots horizontally with `grid.arrange`.
 
-```{r, eval = TRUE, fig.width = 7, fig.height = 4}
+```{r, eval = TRUE, fig.width = 8.2, fig.height = 4.7}
 cga <- get_cga(anno)
 lhmset <- hmsets(ltxcg, lfcg, cga)
 lhmplots <- hmplots(lhmset$hm.mean, lhmset$hm.var, lhmset$hm.size)
