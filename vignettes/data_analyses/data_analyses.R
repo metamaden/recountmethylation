@@ -92,24 +92,24 @@ makevp <- function(lfilt, ltxcg){
     bt = as.data.frame(lfilt[[t]])
     btf <- bt[rownames(bt) %in% ltxcg[[t]],]
     dt <- data.frame(btf$mean, btf$var, rep(tname, nrow(btf)), 
-                     stringsAsFactors = F)
+                     stringsAsFactors = FALSE)
     bpdf.mean = rbind(bpdf.mean, dt[,c(1, 3)])
     bpdf.var = rbind(bpdf.var, dt[,c(2, 3)])
   }
-  bpdf.mean = as.data.frame(bpdf.mean, stringsAsFactors = F)
-  bpdf.var = as.data.frame(bpdf.var, stringsAsFactors = F)
+  bpdf.mean = as.data.frame(bpdf.mean, stringsAsFactors = FALSE)
+  bpdf.var = as.data.frame(bpdf.var, stringsAsFactors = FALSE)
   bpdf.mean[,1] = as.numeric(as.character(bpdf.mean[,1]))
   bpdf.var[,1] = as.numeric(as.character(bpdf.var[,1]))
   colnames(bpdf.mean) = c("mean", "tissue")
   colnames(bpdf.var) = c("var", "tissue")
   
   vp1 = ggplot(bpdf.mean, aes(x = tissue, y = mean, fill = tissue)) + 
-    geom_violin(trim = F, show.legend = F, draw_quantiles = c(0.5)) + 
+    geom_violin(trim = FALSE, show.legend = FALSE, draw_quantiles = c(0.5)) + 
     theme_bw() + theme(axis.text.x = element_text(angle = 90)) + 
     ggtitle("") + xlab("") + ylab("Mean")
   
   vp2 = ggplot(bpdf.var, aes(x = tissue, y = var, fill = tissue)) + 
-    geom_violin(trim = F, show.legend = F, draw_quantiles = c(0.5)) + 
+    geom_violin(trim = FALSE, show.legend = FALSE, draw_quantiles = c(0.5)) + 
     theme_bw() + theme(axis.text.x = element_text(angle = 90)) + 
     ggtitle("") + xlab("") + ylab("Variance")
   
@@ -173,8 +173,8 @@ hmplots <- function(hmma.mean, hmma.var, hmma.size){
       hdv = rbind(hdv, matrix(c(hmma.var[r, c], c, r, hmma.size[r, c]), nrow = 1))
     }
   }
-  hdx = as.data.frame(hdx, stringsAsFactors = F)
-  hdv = as.data.frame(hdv, stringsAsFactors = F)
+  hdx = as.data.frame(hdx, stringsAsFactors = FALSE)
+  hdv = as.data.frame(hdv, stringsAsFactors = FALSE)
   colnames(hdx) = c("mean", "tissue", "anno", "size")
   colnames(hdv) = c("var", "tissue", "anno", "size")
   hdx$mean <- as.numeric(hdx$mean)
@@ -514,7 +514,7 @@ cgtot <- 485512
 bpdf <- data.frame(tissue = c(rep("adipose", 2), rep("liver",2)),
                    nprobes = c(cgtot - length(lcgkeep[[1]]), length(lcgkeep[[1]]), 
                                cgtot - length(lcgkeep[[2]]), length(lcgkeep[[2]])),
-                   type = rep(c("removed", "retained"), 2), stringsAsFactors = F)
+                   type = rep(c("removed", "retained"), 2), stringsAsFactors = FALSE)
 ggplot(bpdf, aes(x = tissue, y = nprobes, fill = type)) +
   geom_bar(stat = "identity") + theme_bw() +
   theme(axis.text.x = element_text(angle = 90))
