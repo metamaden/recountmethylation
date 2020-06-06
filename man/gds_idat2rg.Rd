@@ -2,7 +2,7 @@
 % Please edit documentation in R/accessors.R
 \name{gds_idat2rg}
 \alias{gds_idat2rg}
-\title{Handles IDAT queries to GDS and returns assay data as `RGChannelSet`.}
+\title{Get IDATs as an RGChannelSet from GEO/GDS}
 \usage{
 gds_idat2rg(
   gsmvi,
@@ -15,22 +15,27 @@ gds_idat2rg(
 \arguments{
 \item{gsmvi}{A vector of GSM IDs (alphanumeric character strings).}
 
-\item{rmdl}{Whether to remove downloaded .*idat files (default TRUE).}
+\item{rmdl}{Whether to remove downloaded IDAT files when finished
+(default TRUE).}
 
-\item{ext}{Filename extension (default "gz").}
+\item{ext}{Extension for downloaded files (default "gz").}
 
-\item{dfp}{Destination file dir for idats.}
+\item{dfp}{Destination for IDAT downloads.}
 
-\item{burl}{Base URL string for idat query (default "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/").}
+\item{burl}{Base URL string for the IDAT query (default "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/").}
 }
 \value{
-object of class `RGChannelSet`
+An RGChannelSet object
 }
 \description{
-Queries and downloads GSM IDAT files in GDS, and returns
-assay data as an `RGChannelSet`.
+Queries and downloads GSM IDAT files in GEO Data Sets db, then 
+returns the assay data as an "RGChannelSet", calling gds_idatquery()
+ then minfi::read.metharray().
 }
 \examples{
 gsmvi <- c("GSM2465267", "GSM2814572")
 rg <- gds_idat2rg(gsmvi)
+}
+\seealso{
+gds_idatquery(), read.metharray()
 }

@@ -2,22 +2,22 @@
 % Please edit documentation in R/accessors.R
 \name{rgse}
 \alias{rgse}
-\title{Form an `RGChannelSet` from signal data}
+\title{Form an RGChannelSet from a list containing signal data matrices}
 \usage{
 rgse(ldat, verbose = FALSE)
 }
 \arguments{
 \item{ldat}{List of raw signal data query results. Must include 2 
-`data.frame` objects named 'redsignal' and 'greensignal'.}
+data.frame objects named "redsignal" and "greensignal."}
 
 \item{verbose}{Whether to post status messages.}
 }
 \value{
-Returns a `RGChannelSet` object from raw signal dataset queries.
+Returns a RGChannelSet object from raw signal dataset queries.
 }
 \description{
-Forms an object of `RGChannelSet` class from a signal data object 
-returned from a query to the red and green signal tables.
+Forms an RGChannelSet from signal data list. This is called by 
+certain queries to h5 files.
 }
 \examples{
 path <- system.file("extdata", "h5test", package = "recountmethylation")
@@ -31,5 +31,5 @@ class(rg)
 # [1] "minfi"
 }
 \seealso{
-getrg()
+getrg(), RGChannelSet()
 }

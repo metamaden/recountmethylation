@@ -18,17 +18,17 @@ get_rmdl(
 )
 }
 \arguments{
-\item{which.class}{Class of file to download (either "rg" for `RGChannelSet`, 
-"gm" for `MethylSet`, "gr" for `GenomicRatioSet`, or "test" for the test dataset).}
+\item{which.class}{Either "rg", "gm", "gr", or "test" for RGChannelSet, MethylSet, 
+GenomicRatioSet, or 2-sample subset (default "test").}
 
-\item{which.type}{Type of file. Either "h5se" for HDF5-SummarizedExperiment (default) or 
-`h5` for HDF5 database.}
+\item{which.type}{Either "h5se" for an HDF5-SummarizedExperiment (default) or 
+"h5" for an HDF5 database.}
 
-\item{fn}{Name of server file to download (default NULL).}
+\item{fn}{Name of file on server to download (optional, default NULL).}
 
-\item{dfp}{Target local directory for downloaded files (default "downloads").}
+\item{dfp}{Download destination directory (default "downloads").}
 
-\item{url}{Server URL containing assay data.}
+\item{url}{The server URL to locate files for download.}
 
 \item{show.files}{Whether to print server file data to console (default FALSE).}
 
@@ -45,8 +45,14 @@ New filepath to dir with downloaded data.
 }
 \description{
 Uses RCurl to recursively download latest H5SE and HDF5 data objects the from server.
+This is currently wrapped in the getdb() functions. If tryload = TRUE, successful
+download completion is tested with either HDF5Array::loadHDF5SummarizedExperiment()
+ for h5se files or rhdf5::h5ls() for h5 files.
 }
 \examples{
 path <- get_rmdl(which.class = "test", which.type = "h5se", tryload = FALSE)
 base::unlink("downloads", recursive = TRUE)
+}
+\seealso{
+servermatrix(), getURL(), loadHDF5SummarizedExperiment(), h5ls()
 }

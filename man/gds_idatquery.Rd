@@ -2,7 +2,7 @@
 % Please edit documentation in R/accessors.R
 \name{gds_idatquery}
 \alias{gds_idatquery}
-\title{IDATs query}
+\title{Query and download IDATs from GEO Data Sets}
 \usage{
 gds_idatquery(
   gsmvi,
@@ -15,25 +15,28 @@ gds_idatquery(
 )
 }
 \arguments{
-\item{gsmvi}{Vector of GSM IDs}
+\item{gsmvi}{Vector of valid GSM IDs.}
 
-\item{ext}{Filename extension}
+\item{ext}{Filename extension.}
 
 \item{expand}{Whether to expand compressed files.}
 
-\item{sys.cmd}{System command to expand compressed files (if expand TRUE).}
+\item{sys.cmd}{System command to expand compressed files if expand TRUE 
+(default "gunzip").}
 
-\item{verbose}{Whether to show verbose messages (TRUE/FALSE)}
+\item{verbose}{Whether to show verbose messages (default FALSE).}
 
-\item{dfp}{Download directory}
+\item{dfp}{Destination directory for downloads.}
 
-\item{burl}{Base URL string for RCurl query}
+\item{burl}{Base URL string for RCurl query.}
 }
 \value{
 Lists the basename paths and filenames of IDATs downloaded.
 }
 \description{
-Queries GDS IDATs and downloads, with exception handling.
+Queries GEO Data Sets for IDATs, and downloads available IDATs. This uses 
+anticipated string pattern to construct the URL path for the query. 
+IDATs are detected from the supplement for a GSE record.
 }
 \examples{
 gsmvi <- c("GSM2465267", "GSM2814572")

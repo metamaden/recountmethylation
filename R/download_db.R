@@ -4,7 +4,9 @@
 
 #' servermatrix
 #'
-#' Get a matrix of database files from the recount server. Called by get_rmdl.
+#' Called by get_rmdl() to get a matrix of database files and file info from the server. 
+#' Verifies valid versions and timestamps in filenames, and that h5se directories contain
+#'  both an assays and an se.rds file.
 #' @param dn Server data returned from RCurl.
 #' @param sslver Whether to use SSL certificate authentication for server connection (default FALSE).
 #' @param url Server website url.
@@ -59,14 +61,17 @@ servermatrix <- function(dn, sslver = FALSE, url = "https://recount.bio/data/",
 #' Get DNAm assay data.
 #'
 #' Uses RCurl to recursively download latest H5SE and HDF5 data objects the from server.
+#' This is currently wrapped in the getdb() functions. If tryload = TRUE, successful
+#' download completion is tested with either HDF5Array::loadHDF5SummarizedExperiment()
+#'  for h5se files or rhdf5::h5ls() for h5 files.
 #' 
-#' @param which.class  Class of file to download (either "rg" for `RGChannelSet`, 
-#' "gm" for `MethylSet`, "gr" for `GenomicRatioSet`, or "test" for the test dataset).
-#' @param which.type Type of file. Either "h5se" for HDF5-SummarizedExperiment (default) or 
-#' `h5` for HDF5 database.
-#' @param fn Name of server file to download (default NULL).
-#' @param dfp Target local directory for downloaded files (default "downloads").
-#' @param url Server URL containing assay data.
+#' @param which.class  Either "rg", "gm", "gr", or "test" for RGChannelSet, MethylSet, 
+#' GenomicRatioSet, or 2-sample subset (default "test").
+#' @param which.type Either "h5se" for an HDF5-SummarizedExperiment (default) or 
+#' "h5" for an HDF5 database.
+#' @param fn Name of file on server to download (optional, default NULL).
+#' @param dfp Download destination directory (default "downloads").
+#' @param url The server URL to locate files for download.
 #' @param show.files Whether to print server file data to console (default FALSE).
 #' @param download Whether to download (TRUE) or return queried filename (FALSE).
 #' @param tryload Whether to try loading downloaded data (default TRUE).
@@ -76,6 +81,7 @@ servermatrix <- function(dn, sslver = FALSE, url = "https://recount.bio/data/",
 #' @examples 
 #' path <- get_rmdl(which.class = "test", which.type = "h5se", tryload = FALSE)
 #' base::unlink("downloads", recursive = TRUE)
+#' @seealso servermatrix(), getURL(), loadHDF5SummarizedExperiment(), h5ls()
 #' @export
 get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"), 
                      which.type = c("h5se", "h5"), fn = NULL, dfp = "downloads", 
@@ -154,18 +160,26 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
 #' @name getdb
 #' @rdname getdb
 #'
-#' @title Functions to access database files.
+#' @title Access database files.
 #'
-#' @description Combines download and load for database files. Latest files are downloaded to dfp directory if name not provided.
-#'  `HDF5-SummarizedExperiment` files (rg is `RGChannelSet`, gm is `MethylSet`, gr is `GenomicRatioSet`) 
-#'  can be downloaded with `h5se` functions, and `HDF5` database can be downloaded with h5 function. 
-#'  Files include sample metadata. See vignette for details about file types and classes.
-#' @param name Name of database file to load (optional, default NULL). If null, a new database is download.
-#' @param dfp Folder containing database to load if name not NULL, otherwise the target folder for 
-#' new database download (default "downloads").
+#' @description Combines download and load functions for databases. 
+#' If "name" argument not provided, the latest available file is downloaded.
+#' All files include metadata for the available samples.
+#' 
+#' There are 6 functions. Functions with "h5se" access HDF5-SummarizedExperiment 
+#' files, and "h5" functions access HDF5 databases. The 4 h5se functions are 
+#' "rg" (RGChannelSet), "gm" (MethylSet), "gr" (GenomicRatioSet), and "test" 
+#' (data for 2 samples from "gr"). The 2 h5 functions are "rg" (red and green 
+#' signal datasets), and "test" (data for 2 samples from "rg"). See vignette 
+#' for details about file types and classes. 
+#' 
+#' @param name Database file name (optional, default NULL).
+#' @param dfp Folder to search for database file specified by "name" 
+#' (optional, default "downloads").
 #' @param verbose Whether to return verbose messages (default FALSE).
-#' @seealso dldb, get_rmdl
-#' @return SummarizedExperiment object (for h5se) or file path for (h5).
+#' @seealso dldb(), get_rmdl()
+#' @return Either a SummarizedExperiment object for h5se functions, or a file path
+#' for h5 functions.
 NULL
 #' @rdname getdb
 #' @examples

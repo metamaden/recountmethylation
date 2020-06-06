@@ -7,9 +7,9 @@
 hread(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5")
 }
 \arguments{
-\item{ri}{rows indices in dataset.}
+\item{ri}{Row indices in dataset.}
 
-\item{ci}{columns indices in dataset.}
+\item{ci}{Column indices in dataset.}
 
 \item{dsn}{Name of dataset or group of dataset to connect with.}
 
@@ -19,8 +19,8 @@ hread(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5")
 HDF5 database connection object.
 }
 \description{
-Get a dataset connection object from an HDF5 database 
-('.h5') file and return the indexed table subset.
+Connect to an HDF5 database h5 file with rhdf5::h5read(). 
+Returns the subsetted data.
 }
 \examples{
 # Get tests data pointer
@@ -30,4 +30,7 @@ dbpath = paste0(path, "/", fn)
 # red signal, first 2 assay addr, 3 samples
 reds <- hread(1:2, 1:3, d = "redsignal", dbn = dbpath)
 dim(reds) # [1] 2 3
+}
+\seealso{
+h5read()
 }

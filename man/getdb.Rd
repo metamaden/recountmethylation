@@ -8,7 +8,7 @@
 \alias{getdb_h5se_gm}
 \alias{getdb_h5se_rg}
 \alias{getdb_h5_rg}
-\title{Functions to access database files.}
+\title{Access database files.}
 \usage{
 getdb_h5se_test(name = NULL, dfp = "downloads", verbose = FALSE)
 
@@ -23,26 +23,33 @@ getdb_h5se_rg(name = NULL, dfp = "downloads", verbose = FALSE)
 getdb_h5_rg(name = NULL, dfp = "downloads", verbose = FALSE)
 }
 \arguments{
-\item{name}{Name of database file to load (optional, default NULL). If null, a new database is download.}
+\item{name}{Database file name (optional, default NULL).}
 
-\item{dfp}{Folder containing database to load if name not NULL, otherwise the target folder for 
-new database download (default "downloads").}
+\item{dfp}{Folder to search for database file specified by "name" 
+(optional, default "downloads").}
 
 \item{verbose}{Whether to return verbose messages (default FALSE).}
 }
 \value{
-SummarizedExperiment object (for h5se) or file path for (h5).
+Either a SummarizedExperiment object for h5se functions, or a file path
+for h5 functions.
 }
 \description{
-Combines download and load for database files. Latest files are downloaded to dfp directory if name not provided.
- `HDF5-SummarizedExperiment` files (rg is `RGChannelSet`, gm is `MethylSet`, gr is `GenomicRatioSet`) 
- can be downloaded with `h5se` functions, and `HDF5` database can be downloaded with h5 function. 
- Files include sample metadata. See vignette for details about file types and classes.
+Combines download and load functions for databases. 
+If "name" argument not provided, the latest available file is downloaded.
+All files include metadata for the available samples.
+
+There are 6 functions. Functions with "h5se" access HDF5-SummarizedExperiment 
+files, and "h5" functions access HDF5 databases. The 4 h5se functions are 
+"rg" (RGChannelSet), "gm" (MethylSet), "gr" (GenomicRatioSet), and "test" 
+(data for 2 samples from "gr"). The 2 h5 functions are "rg" (red and green 
+signal datasets), and "test" (data for 2 samples from "rg"). See vignette 
+for details about file types and classes.
 }
 \examples{
 path <- getdb_h5se_test()
 base::unlink("downloads", recursive = TRUE)
 }
 \seealso{
-dldb, get_rmdl
+dldb(), get_rmdl()
 }

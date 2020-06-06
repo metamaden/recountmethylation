@@ -1,16 +1,19 @@
 #!/usr/bin/env R
 
-#' IDATs query
+#' Query and download IDATs from GEO Data Sets
 #'
-#' Queries GDS IDATs and downloads, with exception handling.
+#' Queries GEO Data Sets for IDATs, and downloads available IDATs. This uses 
+#' anticipated string pattern to construct the URL path for the query. 
+#' IDATs are detected from the supplement for a GSE record.
 #' 
-#' @param gsmvi Vector of GSM IDs
-#' @param ext Filename extension
+#' @param gsmvi Vector of valid GSM IDs.
+#' @param ext Filename extension.
 #' @param expand Whether to expand compressed files.
-#' @param sys.cmd System command to expand compressed files (if expand TRUE).
-#' @param verbose Whether to show verbose messages (TRUE/FALSE)
-#' @param dfp Download directory
-#' @param burl Base URL string for RCurl query
+#' @param sys.cmd System command to expand compressed files if expand TRUE 
+#' (default "gunzip").
+#' @param verbose Whether to show verbose messages (default FALSE).
+#' @param dfp Destination directory for downloads.
+#' @param burl Base URL string for RCurl query.
 #' @return Lists the basename paths and filenames of IDATs downloaded.
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
@@ -64,20 +67,23 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
   return(list("basenames" = bnv, "filenames" = fnv))
 }
 
-#' Handles IDAT queries to GDS and returns assay data as `RGChannelSet`.
+#' Get IDATs as an RGChannelSet from GEO/GDS
 #'
-#' Queries and downloads GSM IDAT files in GDS, and returns
-#' assay data as an `RGChannelSet`.
+#' Queries and downloads GSM IDAT files in GEO Data Sets db, then 
+#' returns the assay data as an "RGChannelSet", calling gds_idatquery()
+#'  then minfi::read.metharray().
 #' 
 #' @param gsmvi A vector of GSM IDs (alphanumeric character strings).
-#' @param rmdl Whether to remove downloaded .*idat files (default TRUE).
-#' @param ext Filename extension (default "gz").
-#' @param dfp Destination file dir for idats.
-#' @param burl Base URL string for idat query (default "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/").
-#' @return object of class `RGChannelSet`
+#' @param rmdl Whether to remove downloaded IDAT files when finished
+#'  (default TRUE).
+#' @param ext Extension for downloaded files (default "gz").
+#' @param dfp Destination for IDAT downloads.
+#' @param burl Base URL string for the IDAT query (default "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/").
+#' @return An RGChannelSet object
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' rg <- gds_idat2rg(gsmvi)
+#' @seealso gds_idatquery(), read.metharray()
 #' @export
 gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/", 
                         burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
@@ -100,11 +106,11 @@ gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/",
 
 #' Query and store an HDF5 dataset on row and column indices.
 #'
-#' Get a dataset connection object from an HDF5 database 
-#' ('.h5') file and return the indexed table subset.
+#' Connect to an HDF5 database h5 file with rhdf5::h5read(). 
+#' Returns the subsetted data.
 #' 
-#' @param ri rows indices in dataset.
-#' @param ci columns indices in dataset.
+#' @param ri Row indices in dataset.
+#' @param ci Column indices in dataset.
 #' @param dsn Name of dataset or group of dataset to connect with.
 #' @param dbn Path to h5 database file.
 #' @return HDF5 database connection object.
@@ -116,19 +122,22 @@ gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/",
 #' # red signal, first 2 assay addr, 3 samples
 #' reds <- hread(1:2, 1:3, d = "redsignal", dbn = dbpath)
 #' dim(reds) # [1] 2 3
+#' @seealso h5read()
 #' @export
 hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
     return(rhdf5::h5read(dbn, dsn, index = list(ri, ci)))
 }
 
-#' Retrieve available sample metadata
+#' Retrieve all available sample metadata from an HDF5 database.
 #'
-#' Retrieves all sample metadata from an HDF5 database.
+#' Retrieve all available sample metadata in a dataset from an 
+#' HDF5 database. Returns data in metadata dataset "dsn" contained in 
+#' an h5 file located at path "dbn."
 #'
-#' @param dbn Path to HDF5 database file.
+#' @param dbn Path to h5 HDF5 database file.
 #' @param dsn Name or group path to HDF5 dataset containing 
 #' the sample metadata and learned annotations.
-#' @return A `data.frame` of all the sample metadata
+#' @return data.frame of available sample metadata.
 #' @examples 
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn = list.files(path)
@@ -145,10 +154,11 @@ data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
     return(mdp)
 }
 
-#' Match two datasets
+#' Match two datasets on rows and columns
 #'
-#' Match the character vectors of row or column names 
-#' for 2 datasets.
+#' Match 2 datasets using the character vectors of row or column 
+#' names. This is used to assemble an "RGChannelSet" from a query 
+#' to an h5 dataset.
 #' 
 #' @param ds1 First dataset to match
 #' @param ds2 Second dataset to match
@@ -207,15 +217,15 @@ matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
   return(list(ds1 = ds1m, ds2 = ds2m))
 }
 
-#' Form an `RGChannelSet` from signal data
+#' Form an RGChannelSet from a list containing signal data matrices
 #'
-#' Forms an object of `RGChannelSet` class from a signal data object 
-#' returned from a query to the red and green signal tables.
-#'
+#' Forms an RGChannelSet from signal data list. This is called by 
+#' certain queries to h5 files.
+#' 
 #' @param ldat List of raw signal data query results. Must include 2 
-#' `data.frame` objects named 'redsignal' and 'greensignal'.
+#' data.frame objects named "redsignal" and "greensignal."
 #' @param verbose Whether to post status messages.
-#' @return Returns a `RGChannelSet` object from raw signal dataset queries.
+#' @return Returns a RGChannelSet object from raw signal dataset queries.
 #' @examples 
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn <- list.files(path)
@@ -226,7 +236,7 @@ matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
 #' # [1] "RGChannelSet"
 #' # attr(,"package")
 #' # [1] "minfi"
-#' @seealso getrg()
+#' @seealso getrg(), RGChannelSet()
 #' @export
 rgse <- function(ldat, verbose = FALSE){
     if(!("greensignal" %in% names(ldat) & "redsignal" %in% names(ldat))){
@@ -266,24 +276,23 @@ rgse <- function(ldat, verbose = FALSE){
     return(rgi)
 }
 
-#' Query and store data from the signal tables
+#' Query and store data from h5 file signal tables
 #'
-#' Retrieves query matches from raw signal HDF5 datasets. 
+#' Queries signal datasets in an h5 HDF5 database file. 
 #' Handles identity queries to rows (GSM IDs) or columns 
 #' (CpG probe addresses). Returns query matches either 
-#' as a list of datasets or a single `RGChannelSet` 
-#' object, with the option of including sample metadata.
+#' as a list of datasets or a single RGChannelSet, with 
+#' option to include sample metadata.
 #'
 #' @param dbn Name of the HDF5 database file.
 #' @param gsmv Vector valid GSM IDs (rows) to query, 
 #' either NULL or vector of length > 2 valid GSM IDs, 
-#' or `all.gsm` should be TRUE.
+#' or "all.gsm" should be TRUE.
 #' @param cgv Vector of valid CpG probe addresses (columns) query,
-#' either NULL or a vector of valid probe addresses, or `all.cg` 
+#' either NULL or a vector of valid probe addresses, or "all.cg" 
 #' should be TRUE.
 #' @param data.type Format for returned query matches, either as 
-#' datasets 
-#' 'df' or `RGChannelSet` 'se' object.
+#' datasets "df" or RGChannelSet "se" object.
 #' @param dsv Vector of raw signal datasets or group paths to query, 
 #' including both the red channel 'redsignal' and green channel 
 #' 'greensignal' datasets.
@@ -293,8 +302,8 @@ rgse <- function(ldat, verbose = FALSE){
 #' metadata for queried samples.
 #' @param md.dsn Name of metadata dataset in h5 file.
 #' @param verbose Whether to post status messages.
-#' @return Returns either an `RGChannelSet` or list of 
-#' `data.frame` objects from dataset query matches.
+#' @return Returns either an RGChannelSet or list of 
+#' data.frame objects from dataset query matches.
 #' @examples
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn <- list.files(path)

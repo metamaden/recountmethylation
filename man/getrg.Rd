@@ -2,7 +2,7 @@
 % Please edit documentation in R/accessors.R
 \name{getrg}
 \alias{getrg}
-\title{Query and store data from the signal tables}
+\title{Query and store data from h5 file signal tables}
 \usage{
 getrg(
   dbn,
@@ -22,15 +22,14 @@ getrg(
 
 \item{gsmv}{Vector valid GSM IDs (rows) to query, 
 either NULL or vector of length > 2 valid GSM IDs, 
-or `all.gsm` should be TRUE.}
+or "all.gsm" should be TRUE.}
 
 \item{cgv}{Vector of valid CpG probe addresses (columns) query,
-either NULL or a vector of valid probe addresses, or `all.cg` 
+either NULL or a vector of valid probe addresses, or "all.cg" 
 should be TRUE.}
 
 \item{data.type}{Format for returned query matches, either as 
-datasets 
-'df' or `RGChannelSet` 'se' object.}
+datasets "df" or RGChannelSet "se" object.}
 
 \item{dsv}{Vector of raw signal datasets or group paths to query, 
 including both the red channel 'redsignal' and green channel 
@@ -48,15 +47,15 @@ metadata for queried samples.}
 \item{verbose}{Whether to post status messages.}
 }
 \value{
-Returns either an `RGChannelSet` or list of 
-`data.frame` objects from dataset query matches.
+Returns either an RGChannelSet or list of 
+data.frame objects from dataset query matches.
 }
 \description{
-Retrieves query matches from raw signal HDF5 datasets. 
+Queries signal datasets in an h5 HDF5 database file. 
 Handles identity queries to rows (GSM IDs) or columns 
 (CpG probe addresses). Returns query matches either 
-as a list of datasets or a single `RGChannelSet` 
-object, with the option of including sample metadata.
+as a list of datasets or a single RGChannelSet, with 
+option to include sample metadata.
 }
 \examples{
 path <- system.file("extdata", "h5test", package = "recountmethylation")

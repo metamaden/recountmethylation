@@ -2,7 +2,7 @@
 % Please edit documentation in R/accessors.R
 \name{matchds_1to2}
 \alias{matchds_1to2}
-\title{Match two datasets}
+\title{Match two datasets on rows and columns}
 \usage{
 matchds_1to2(
   ds1,
@@ -28,8 +28,9 @@ common subset instead}
 A list of the matched datasets.
 }
 \description{
-Match the character vectors of row or column names 
-for 2 datasets.
+Match 2 datasets using the character vectors of row or column 
+names. This is used to assemble an "RGChannelSet" from a query 
+to an h5 dataset.
 }
 \examples{
 # get 2 data matrices
