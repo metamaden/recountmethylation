@@ -280,7 +280,7 @@ rgse <- function(ldat, verbose = FALSE){
 #'
 #' Queries signal datasets in an h5 HDF5 database file. 
 #' Handles identity queries to rows (GSM IDs) or columns 
-#' (CpG probe addresses). Returns query matches either 
+#' (bead addresses). Returns query matches either 
 #' as a list of datasets or a single RGChannelSet, with 
 #' option to include sample metadata.
 #'
@@ -288,9 +288,8 @@ rgse <- function(ldat, verbose = FALSE){
 #' @param gsmv Vector valid GSM IDs (rows) to query, 
 #' either NULL or vector of length > 2 valid GSM IDs, 
 #' or "all.gsm" should be TRUE.
-#' @param cgv Vector of valid CpG probe addresses (columns) query,
-#' either NULL or a vector of valid probe addresses, or "all.cg" 
-#' should be TRUE.
+#' @param cgv Vector of valid bead addresses (columns) to query
+#' in the signal datasets (default NULL).
 #' @param data.type Format for returned query matches, either as 
 #' datasets "df" or RGChannelSet "se" object.
 #' @param dsv Vector of raw signal datasets or group paths to query, 
@@ -302,8 +301,8 @@ rgse <- function(ldat, verbose = FALSE){
 #' metadata for queried samples.
 #' @param md.dsn Name of metadata dataset in h5 file.
 #' @param verbose Whether to post status messages.
-#' @return Returns either an RGChannelSet or list of 
-#' data.frame objects from dataset query matches.
+#' @return Returns either an RGChannelSet or list of data.frame objects 
+#'  from dataset query matches.
 #' @examples
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn <- list.files(path)

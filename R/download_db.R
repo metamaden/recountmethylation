@@ -177,7 +177,7 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
 #' @param dfp Folder to search for database file specified by "name" 
 #' (optional, default "downloads").
 #' @param verbose Whether to return verbose messages (default FALSE).
-#' @seealso dldb(), get_rmdl()
+#' @seealso get_rmdl()
 #' @return Either a SummarizedExperiment object for h5se functions, or a file path
 #' for h5 functions.
 NULL
