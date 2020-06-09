@@ -22,7 +22,8 @@ gds_idat2rg(
 
 \item{dfp}{Destination for IDAT downloads.}
 
-\item{burl}{Base URL string for the IDAT query (default "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/").}
+\item{burl}{Base URL string for the IDAT query (default 
+"ftp://ftp.ncbi.nlm.nih.gov/geo/samples/").}
 }
 \value{
 An RGChannelSet object

@@ -20,9 +20,8 @@
 #' gds_idatquery(gsmvi)
 #' @export
 gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE, 
-                          sys.cmd = "gunzip ", verbose = FALSE, dfp = "./idats/",
-                          burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
-                                        "geo/samples/")){
+  sys.cmd = "gunzip ", verbose = FALSE, dfp = "./idats/",
+  burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/geo/samples/")){
   bnv <- fnv <- c()
   if(verbose){message("Checking dest dir dfp.")}
   if(!dir.exists(dfp)){
@@ -78,7 +77,8 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
 #'  (default TRUE).
 #' @param ext Extension for downloaded files (default "gz").
 #' @param dfp Destination for IDAT downloads.
-#' @param burl Base URL string for the IDAT query (default "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/").
+#' @param burl Base URL string for the IDAT query (default 
+#' "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/").
 #' @return An RGChannelSet object
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
@@ -176,7 +176,8 @@ data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
 #' ds2 <- ds2[rev(seq(1, 5, 1)), c(2, 1)]
 #' # match row and column names
 #' lmatched = matchds_1to2(ds1, ds2, mi1 = "rows", mi2 = "rows")
-#' lmatched = matchds_1to2(lmatched[[1]], lmatched[[2]], mi1 = "columns", mi2 = "columns")
+#' lmatched = matchds_1to2(lmatched[[1]], lmatched[[2]], mi1 = "columns", 
+#'  mi2 = "columns")
 #' # check matches
 #' ds1m <- lmatched[[1]]
 #' ds2m <- lmatched[[2]]
@@ -332,35 +333,30 @@ getrg <- function(dbn, gsmv = NULL, cgv = NULL, data.type = c("se"),
             if(all.cg){
               cgvp <- seq(1, length(cnd), 1)
               if(verbose){message("Retrieving all available CpG IDs.")}
-            } else{
-              cgvp <- which(cnd %in% cgv)
-              if(verbose){message("Found ", length(cgvp)," of ", length(cgv), " CpG addresses.")}
-            }
-            if(all.gsm){
-              gsmvp <- seq(1, length(rnd), 1)
+            } else{cgvp <- which(cnd %in% cgv)
+              if(verbose){message("Found ", length(cgvp)," of ", 
+                  length(cgv), " CpG addresses.")}}
+            if(all.gsm){gsmvp <- seq(1, length(rnd), 1)
               if(verbose){message("Retrieving all available GSM IDs.")}
             } else{
               gsmvp <- which(rnd %in% gsmv)
-              if(verbose){message("Found ", length(gsmvp)," of ", length(gsmv), " GSM IDs.")}
-            }
+              if(verbose){message("Found ", length(gsmvp)," of ", 
+                length(gsmv), " GSM IDs.")}}
             if(length(gsmvp) < 2){stop("Not enough valid GSM IDs found.")}
         }
         ddat <- hread(ri = gsmvp, ci = cgvp, d, dbn)
         rownames(ddat) <- rnd[gsmvp]; colnames(ddat) <- cnd[cgvp]
         ldat[[d]] <- t(ddat) # append transpose of data
     }
-    if(metadata){
-        mdpost <- data_mdpost(dbn = dbn, dsn = md.dsn)
+    if(metadata){mdpost <- data_mdpost(dbn = dbn, dsn = md.dsn)
         mdpost$gsm <- as.character(mdpost$gsm)
         ldat[["metadata"]] <- mdpost[mdpost$gsm %in% rownames(ddat),]
     }
-    if(data.type == "df"){
-        if(verbose){message("Returning the datasets list...")}
-        robj <- ldat
-    } else if(data.type == "se"){
-        if(verbose){message("Forming the RGChannelSet...")}
-        robj <- rgse(ldat = ldat, verbose = verbose)
-    }
+    if(data.type == "df"){if(verbose){message("Returning data list...")}
+        robj <- ldat} else if(data.type == "se"){
+          if(verbose){message("Forming the RGChannelSet...")}
+          robj <- rgse(ldat = ldat, verbose = verbose)
+          }
     rhdf5::h5closeAll() # close all open connections
     return(robj)
 }

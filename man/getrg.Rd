@@ -24,9 +24,8 @@ getrg(
 either NULL or vector of length > 2 valid GSM IDs, 
 or "all.gsm" should be TRUE.}
 
-\item{cgv}{Vector of valid CpG probe addresses (columns) query,
-either NULL or a vector of valid probe addresses, or "all.cg" 
-should be TRUE.}
+\item{cgv}{Vector of valid bead addresses (columns) to query
+in the signal datasets (default NULL).}
 
 \item{data.type}{Format for returned query matches, either as 
 datasets "df" or RGChannelSet "se" object.}
@@ -47,13 +46,13 @@ metadata for queried samples.}
 \item{verbose}{Whether to post status messages.}
 }
 \value{
-Returns either an RGChannelSet or list of 
-data.frame objects from dataset query matches.
+Returns either an RGChannelSet or list of data.frame objects 
+ from dataset query matches.
 }
 \description{
 Queries signal datasets in an h5 HDF5 database file. 
 Handles identity queries to rows (GSM IDs) or columns 
-(CpG probe addresses). Returns query matches either 
+(bead addresses). Returns query matches either 
 as a list of datasets or a single RGChannelSet, with 
 option to include sample metadata.
 }

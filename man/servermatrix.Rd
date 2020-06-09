@@ -7,35 +7,39 @@
 servermatrix(
   dn,
   sslver = FALSE,
-  url = "https://recount.bio/data/",
   printmatrix = TRUE,
   verbose = FALSE,
+  url = "https://recount.bio/data/",
   recursive = TRUE
 )
 }
 \arguments{
 \item{dn}{Server data returned from RCurl.}
 
-\item{sslver}{Whether to use SSL certificate authentication for server connection (default FALSE).}
+\item{sslver}{Whether to use SSL certificate authentication for server 
+connection (default FALSE).}
 
-\item{url}{Server website url.}
-
-\item{printmatrix}{Whether to print the data matrix to console (default TRUE).}
+\item{printmatrix}{Whether to print the data matrix to console (default 
+TRUE).}
 
 \item{verbose}{Whether to show verbose messages (default FALSE).}
 
-\item{recursive}{Whether to recursively grab file sizes for h5se objects (default TRUE).}
+\item{url}{Server website url.}
+
+\item{recursive}{Whether to recursively grab file sizes for h5se objects 
+(default TRUE).}
 }
 \value{
 dm matrix of server files and file metadata
 }
 \description{
-Called by get_rmdl() to get a matrix of database files and file info from the server. 
-Verifies valid versions and timestamps in filenames, and that h5se directories contain
- both an assays and an se.rds file.
+Called by get_rmdl() to get a matrix of database files and file info from 
+the server. Verifies valid versions and timestamps in filenames, and that 
+h5se directories contain both an assays and an se.rds file.
 }
 \examples{
-dn <- RCurl::getURL("https://recount.bio/data/", .opts = list(ssl.verifypeer = FALSE))
+dn <- RCurl::getURL("https://recount.bio/data/", 
+.opts = list(ssl.verifypeer = FALSE))
 sm <- servermatrix(dn)
 }
 \seealso{

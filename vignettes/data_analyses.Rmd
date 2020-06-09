@@ -38,15 +38,29 @@ load("data_analyses/data_analyses.RData")
 
 # Overview
 
-This vignette walks through 3 analysis examples using data accessed with the `recountmethylation` package. First, predicted and chronological ages are compared from the sample metadata. Then quality signals  (methylated and unmethylated, log2 median scale) are compared between samples stored using either formalin fixed paraffin-embedding (FFPE) or freezing. Finally, tissue-specific probe sets with high DNA methylation (DNAm) fraction variances are identifed and analyzed using liver and adipose samples. Note that versions of these analyses also appear in the manuscript @maden_human_2020.
+This vignette walks through 3 analysis examples using data accessed with the 
+`recountmethylation` package. First, predicted and chronological ages are 
+compared from the sample metadata. Then quality signals  (methylated and 
+unmethylated, log2 median scale) are compared between samples stored using 
+either formalin fixed paraffin-embedding (FFPE) or freezing. Finally, 
+tissue-specific probe sets with high DNA methylation (DNAm) fraction variances 
+are identifed and analyzed using liver and adipose samples. Note that versions 
+of these analyses also appear in the manuscript @maden_human_2020.
 
 ## Vignette code and script
 
-This vignette describes analysis steps in full, but with limited evaluations to ensure package build success. Code has been written with the intention of extensibility to new and larger comparator groups. Unabridged code and helper function definitions to reproduce these examples are contained in the `data_analyses.R` script.
+This vignette describes analysis steps in full, but with limited evaluations 
+to ensure package build success. Code has been written with the intention of 
+extensibility to new and larger comparator groups. Unabridged code and helper 
+function definitions to reproduce these examples are contained in the 
+`data_analyses.R` script.
 
 ## Data availability
 
-This vignette makes use of the sample metadata and 2 of the available `HDF5-SummarizedExperiment` datasets Consult the `users_guide` vignette for details about data and access. For this vignette, access the versioned metadata and load the DNAm datasets as follows.
+This vignette makes use of the sample metadata and 2 of the available 
+`HDF5-SummarizedExperiment` datasets Consult the `users_guide` vignette for 
+details about data and access. For this vignette, access the versioned metadata 
+and load the DNAm datasets as follows.
 
 ```{r, eval = TRUE}
 # get local metadata
@@ -65,11 +79,17 @@ gr <- loadHDF5SummarizedExperiment(grdn)
 
 # Example 1: Comparing mined and predicted age
 
-This example uses sample metadata to compare mined and predicted ages from the `age` and `predage` variables, respectively. Values in `age` were mined from GEO record metadata and are included with available age units. Values in `predage` were calculated from noob-normalized (@triche_low-level_2013) DNAm Beta-values with `agep`, a function from the `wateRmelon` package that implements the Horvath biological age clock (@horvath_dna_2013).
+This example uses sample metadata to compare mined and predicted ages from 
+the `age` and `predage` variables, respectively. Values in `age` were mined 
+from GEO record metadata and are included with available age units. Values in 
+`predage` were calculated from noob-normalized (@triche_low-level_2013) DNAm 
+Beta-values with `agep`, a function from the `wateRmelon` package that 
+implements the Horvath biological age clock (@horvath_dna_2013).
 
 ## Make new variables and filter samples
 
-Get samples for which both `age` and `predage` age are available. From `age`, make a new numeric variable `chron.age`.
+Get samples for which both `age` and `predage` age are available. From `age`, 
+make a new numeric variable `chron.age`.
 
 ```{r, eval = TRUE}
 mdf <- md[!md$age == "valm:NA",]
@@ -79,20 +99,26 @@ mdf <- mdf[!is.na(mdf$chron.age),]
 mdf <- mdf[!is.na(mdf$predage),]
 ```
 
-Next, make a new variable `stype` from `sampletype` and remove samples with missing values.
+Next, make a new variable `stype` from `sampletype` and remove samples with 
+missing values.
 
 ```{r, eval = TRUE}
-mdf$stype <- as.character(gsub(";.*", "", gsub("^msraptype:", "", mdf$sampletype)))
+mdf$stype <- as.character(gsub(";.*", "", 
+  gsub("^msraptype:", "", mdf$sampletype)))
 mdf <- mdf[!is.na(mdf$stype),]
 ```
 
-Now make a new variable `is.cx` from querying `cancer` in the `disease` term. This reflects whether a sample was likely from a cancer or a cancer patient.
+Now make a new variable `is.cx` from querying `cancer` in the `disease` term. 
+This reflects whether a sample was likely from a cancer or a cancer patient.
 
 ```{r, eval = TRUE}
 mdf$is.cx <- ifelse(grepl(".*cancer.*", mdf$disease), TRUE, FALSE)
 ```
 
-Next, store the study-wise age differences in the `xdif` variable using the mean absolute difference (a.k.a. "MAD") between `chron.age` and `predage` across samples from the same study. Also store study sizes in the `ngsm` term for plotting. 
+Next, store the study-wise age differences in the `xdif` variable using the 
+mean absolute difference (a.k.a. "MAD") between `chron.age` and `predage` 
+across samples from the same study. Also store study sizes in the `ngsm` term 
+for plotting. 
 
 ```{r, eval = TRUE}
 xdif <- ngsm <- c()
@@ -104,7 +130,9 @@ for(g in unique(mdf$gseid)){
 names(xdif) <- names(ngsm) <- unique(mdf$gseid)
 ```
 
-Make a new filtered `mdff` data frame using the new variables. Retain likely non-cancer samples from studies with MAD <= 10 years. Pre- and post-filter datasets (groups 1 and 2, respectively) are summarized below.
+Make a new filtered `mdff` data frame using the new variables. Retain likely 
+non-cancer samples from studies with MAD <= 10 years. Pre- and post-filter 
+datasets (groups 1 and 2, respectively) are summarized below.
 
 ```{r, eval = TRUE}
 filt <- mdf$stype == "tissue" & !mdf$is.cx
@@ -114,14 +142,18 @@ mdff <- mdf[filt, ]
 
 ## Analyses and summary statistics
 
-Perform statistical analyses of `mdf` (group 1) and `mdff` (group 2). First, generate multiple regressions for each. 
+Perform statistical analyses of `mdf` (group 1) and `mdff` (group 2). First, 
+generate multiple regressions for each. 
 
 ```{r, eval = TRUE}
 lm1 <- lm(mdf$predage ~ mdf$chron.age + mdf$gseid + mdf$stype + mdf$is.cx)
 lm2 <- lm(mdff$predage ~ mdff$chron.age + mdff$gseid)
 ```
 
-Now perform analyses of variances (ANOVAs) on multiple regressions. Summarize variance percentages and p-values for covariates in each model. Columns "Vperc" and "Pval" are the percent variance and unadjusted p-value for covariates in each model.
+Now perform analyses of variances (ANOVAs) on multiple regressions. Summarize 
+variance percentages and p-values for covariates in each model. Columns 
+"Vperc" and "Pval" are the percent variance and unadjusted p-value for 
+covariates in each model.
 
 ```{r, eval = TRUE}
 # anovas
@@ -142,7 +174,8 @@ rownames(dan) <- c("Chron.Age", "GSEID", "SampleType", "Cancer")
 kable(dan, align = "c")
 ```
 
-Now calcualte the R-squared, Spearman correlation coefficient (Rho), and MAD for each model.
+Now calcualte the R-squared, Spearman correlation coefficient (Rho), and MAD 
+for each model.
 
 ```{r, eval = TRUE}
 # rsquared
@@ -163,7 +196,8 @@ Finally, organize and display the results
 ```{r, eval = TRUE}
 dss <- data.frame(group = c("1", "2"),
                   ngsm = c(nrow(mdf), nrow(mdff)),
-                  ngse = c(length(unique(mdf$gseid)), length(unique(mdff$gseid))),
+                  ngse = c(length(unique(mdf$gseid)), 
+                    length(unique(mdff$gseid))),
                   r.squared = c(rsq1, rsq2), rho = as.character(c(rho1, rho2)),
                   mad = c(mad1, mad2), stringsAsFactors = FALSE)
 kable(dss, align = "c")
@@ -171,7 +205,8 @@ kable(dss, align = "c")
 
 ## Scatter plots of study errors and sample ages
 
-Plot sample counts and MAD for each GSE record, with a vertical line at the 10-years MAD cutoff used for the group 2 filter.
+Plot sample counts and MAD for each GSE record, with a vertical line at the 
+10-years MAD cutoff used for the group 2 filter.
 
 ```{r, eval = TRUE, fig.width = 3.8, fig.height = 3.4}
 plot(xdif, ngsm, ylab = "Study Size (Num. GSM)", 
@@ -189,11 +224,13 @@ ggplot(mdff, aes(x = chron.age, y = predage)) +
 
 # Example 2: Signal comparison of FFPE and frozen samples
 
-This section compares methylated and unmethylated signal (log2 sample median scale) between samples stored with either FFPE or fresh freezing (FF).
+This section compares methylated and unmethylated signal (log2 sample median 
+scale) between samples stored with either FFPE or fresh freezing (FF).
 
 ## Get samples with storage type information
 
-Identify and summarize samples with the `storage` variable available. Use values in `storage` to inform a new `sgroup` variable.
+Identify and summarize samples with the `storage` variable available. Use 
+values in `storage` to inform a new `sgroup` variable.
 
 ```{r, eval = TRUE}
 mdf <- md[!md$storage == "NA",]
@@ -204,7 +241,8 @@ kable(sst, align = "c") # table display
 
 ## Use blocking to calculate signal log2 medians
 
-Subset the `MethylSet` object and extract the full signal matrices with the `getMeth` and `getUnmeth` functions from the minfi package.
+Subset the `MethylSet` object and extract the full signal matrices with the 
+`getMeth` and `getUnmeth` functions from the minfi package.
 
 ```{r}
 gmf <- gm[, gm$gsm %in% mdf$gsm]
@@ -212,13 +250,17 @@ meth.all <- getMeth(gmf)
 unmeth.all <- getUnmeth(gmf)
 ```
 
-Next, prepare to calcualte log2 median signals. To manage data in active memory, process it in smaller units or blocks. Using the `get_blocks` helper function, assign sample indices to blocks of size 1,000 using the `bsize` argument.
+Next, prepare to calculate log2 median signals. To manage data in active 
+memory, process it in smaller units or blocks. Using the `get_blocks` helper 
+function, assign sample indices to blocks of size 1,000 using the `bsize` 
+argument.
 
 ```{r}
 blocks <- getblocks(slength = ncol(gmf), bsize = 1000)
 ```
 
-Now calculate log2 of sample median signals for each block. Vectorize calculations within blocks with `apply`. Store results in the data.frame `ds`.
+Now calculate log2 of sample median signals for each block. Vectorize 
+calculations within blocks with `apply`. Store results in the data.frame `ds`.
 
 ```{r}
 ms <- matrix(nrow = 0, ncol = 2)
@@ -245,7 +287,11 @@ ds$storage <- ifelse(grepl("FFPE", gmf$storage), "ffpe", "frozen")
 
 ## Signals plotted by storage type
 
-Evaluate signal patterns across storage type using plots using the ggplot2 package. First, make a 2d scatter plot of methylated and unmethylated signals using the `geom_point` function. Color by storage type with the `scale_color_manual` function (FFPE samples are orange, frozen samples are purple).
+Evaluate signal patterns across storage type using plots using the ggplot2 
+package. First, make a 2d scatter plot of methylated and unmethylated signals 
+using the `geom_point` function. Color by storage type with the 
+`scale_color_manual` function (FFPE samples are orange, frozen samples are 
+purple).
 
 ```{r, eval = TRUE, fig.width = 4.3, fig.height = 3.1}
 ggplot(ds, aes(x = meth.l2med, y = unmeth.l2med, color = storage)) + 
@@ -253,30 +299,43 @@ ggplot(ds, aes(x = meth.l2med, y = unmeth.l2med, color = storage)) +
   scale_color_manual(values = c("ffpe" = "orange", "frozen" = "purple"))
 ```
 
-Next, make separate violin plots for signals and groups using the `geom_violin` function with the same colors for each storage type. Draw horizontal median lines by setting the `draw_quantiles` argument to 0.5.
+Next, make separate violin plots for signals and groups using the `geom_violin` 
+function with the same colors for each storage type. Draw horizontal median 
+lines by setting the `draw_quantiles` argument to 0.5.
 
 ```{r, eval = TRUE, fig.width = 4.5, fig.height = 2.5}
 vp <- matrix(nrow = 0, ncol = 2)
-vp <- rbind(vp, matrix(c(ds$meth.l2med, paste0("meth.", ds$storage)), ncol = 2))
-vp <- rbind(vp, matrix(c(ds$unmeth.l2med, paste0("unmeth.", ds$storage)), ncol = 2))
+vp <- rbind(vp, matrix(c(ds$meth.l2med, paste0("meth.", ds$storage)), 
+  ncol = 2))
+vp <- rbind(vp, matrix(c(ds$unmeth.l2med, paste0("unmeth.", ds$storage)), 
+  ncol = 2))
 vp <- as.data.frame(vp, stringsAsFactors = FALSE)
 vp[,1] <- as.numeric(vp[,1])
 colnames(vp) <- c("signal", "group")
 vp$col <- ifelse(grepl("ffpe", vp$group), "orange", "purple")
 # make plot
 ggplot(vp, aes(x = group, y = signal, color = group)) + 
-  scale_color_manual(values = c("meth.ffpe" = "orange", "unmeth.ffpe" = "orange", 
-                                "meth.frozen" = "purple", "unmeth.frozen" = "purple")) +
-  geom_violin(draw_quantiles = c(0.5)) + theme_bw() + theme(legend.position = "none")
+  scale_color_manual(values = c("meth.ffpe" = "orange", 
+    "unmeth.ffpe" = "orange", "meth.frozen" = "purple", 
+    "unmeth.frozen" = "purple")) +
+  geom_violin(draw_quantiles = c(0.5)) + theme_bw() + 
+    theme(legend.position = "none")
 ```
 
-# Example 3: Identify and analyze tissue-specific probes with the highest variances
+# Example 3: Identify and analyze tissue-specific probes with the highest 
+variances
 
-This example describes variance analyses in liver and adipose, 2 of the 7 tissues analyzed in the manuscript @maden_human_2020. This includes a quality assessment, study ID linear adjustment of DNAm fractions, ANOVA-based and probe filtering, 2-step variance analyses, and results plots.
+This example describes variance analyses in liver and adipose, 2 of the 7 
+tissues analyzed in the manuscript @maden_human_2020. This includes a quality 
+assessment, study ID linear adjustment of DNAm fractions, ANOVA-based and 
+probe filtering, 2-step variance analyses, and results plots.
 
 ## Sample identification and summary
 
-Summarize the samples of interest. Use two vectors of GSM IDs, `adipose.gsmv` and `liver.gsmv` to filter the metadata (see vectors in the data_analyses.R script). Also define tissues in the new group variable `sgroup`. Summarize the sample groups in a table
+Summarize the samples of interest. Use two vectors of GSM IDs, `adipose.gsmv` 
+and `liver.gsmv` to filter the metadata (see vectors in the data_analyses.R 
+script). Also define tissues in the new group variable `sgroup`. Summarize the 
+sample groups in a table
 
 ```{r, eval = TRUE}
 gsmv <- c(adipose.gsmv, liver.gsmv)
@@ -288,7 +347,9 @@ kable(sst.tvar, align = "c")
 
 ## Calculate log2 methylated and unmethylated signal medians
 
-Subset the `MethylSet` dataset, then append the `sgroup` variable from `mdf` and map the object to the genome using the `mapToGenome` function from the `minfi` package.
+Subset the `MethylSet` dataset, then append the `sgroup` variable from `mdf` 
+and map the object to the genome using the `mapToGenome` function from the 
+`minfi` package.
 
 ```{r}
 ms <- gm[,colnames(gm) %in% rownames(mdf)]
@@ -301,7 +362,9 @@ dim(ms)
 # [1] 485512    252
 ```
 
-As in example 2 above, calculate the sample log2 median signals from signal matrices. Process the data in blocks using within-block vectorization with `apply`.
+As in example 2 above, calculate the sample log2 median signals from signal 
+matrices. Process the data in blocks using within-block vectorization with 
+`apply`.
 
 ```{r}
 # get log2 medians
@@ -330,7 +393,8 @@ colnames(ds2) <- c("l2med.meth", "l2med.unmeth")
 ds2$tissue <- as.factor(ms$sgroup)
 ```
 
-Make a scatter plot of log2 median signals by tissue type with the `geom_point` function.
+Make a scatter plot of log2 median signals by tissue type with the `geom_point` 
+function.
 
 ```{r, eval = TRUE, fig.width = 4.5, fig.height = 3.1}
 ggplot(ds2, aes(x = l2med.meth, y = l2med.unmeth, color = tissue)) + 
@@ -339,7 +403,11 @@ ggplot(ds2, aes(x = l2med.meth, y = l2med.unmeth, color = tissue)) +
 
 ## Perform linear correction on DNAm for study IDs
 
-Access the noob-normalized DNAm Beta-values from the `GenomicRatio` object `gr` loaded above. Extract the DNAm fractions as M-values (logit2 transformed Beta-values) with the `getM` minfi function. Perform linear correction on study ID with the `removeBatchEffect` function from the limma package by setting the `batch` argument to the "gseid" variable.
+Access the noob-normalized DNAm Beta-values from the `GenomicRatio` object `gr` 
+loaded above. Extract the DNAm fractions as M-values (logit2 transformed 
+Beta-values) with the `getM` minfi function. Perform linear correction on 
+study ID with the `removeBatchEffect` function from the limma package by 
+setting the `batch` argument to the "gseid" variable.
 
 ```{r}
 lmv <- lgr <- lmd <- lb <- lan <- list()
@@ -368,7 +436,9 @@ for(t in tv){
 
 ## Perform array-wide ANOVAs and filter probes
 
-Prepare and run ANOVAs on autosomal probes. First, identify and remove sex chromosome probes by accessing annotation with the `getAnnotation` minfi function. List the filtered data in the `lbf` object.
+Prepare and run ANOVAs on autosomal probes. First, identify and remove sex 
+chromosome probes by accessing annotation with the `getAnnotation` minfi 
+function. List the filtered data in the `lbf` object.
 
 ```{r}
 anno <- getAnnotation(gr)
@@ -382,7 +452,11 @@ for(t in tv){
 bv <- lbf[[1]]
 ```
 
-Next, select and format the 9 model covariates for the ANOVA tests. From sample metadata, select the variables for study ID ("gseid"), predicted sex ("predsex"), predicted age ("predage"), and predicted fractions of 6 cell types ("predcell..*"). Convert these to either factor or numeric type with the functions `as.factor` and `as.numeric`, respectively.
+Next, select and format the 9 model covariates for the ANOVA tests. From sample 
+metadata, select the variables for study ID ("gseid"), predicted sex 
+("predsex"), predicted age ("predage"), and predicted fractions of 6 cell types 
+("predcell..*"). Convert these to either factor or numeric type with the 
+functions `as.factor` and `as.numeric`, respectively.
 
 ```{r}
 lvar <- list()
@@ -400,7 +474,11 @@ for(t in tv){
 }
 ```
 
-Run ANOVAs on probe Beta-values. Use the blocking-with-vectorization strategy here as above, with large blocks of 100,000 sample indices each. Calculations should complete in about 1 hour. For each test, retain unadjusted p-values and variance percentages of the 9 covariates. Store the 18-column results matrices in the `lan` list object.
+Run ANOVAs on probe Beta-values. Use the blocking-with-vectorization strategy 
+here as above, with large blocks of 100,000 sample indices each. Calculations 
+should complete in about 1 hour. For each test, retain unadjusted p-values and 
+variance percentages of the 9 covariates. Store the 18-column results matrices 
+in the `lan` list object.
 
 ```{r}
 bv <- lbf[[1]]
@@ -432,7 +510,11 @@ for(bi in 1:length(blocks)){
 for(t in tv){colnames(lan[[t]]) <- rep(cnf, 2)}
 ```
 
-Next, remove probes showing evidence of residual confounding from the covariates. Adjust covariate p-values with the `p.adjust` function, and retain probes with adjusted p-values >= 0.001 and variance < 10% variance for all 9 covariates. Retain the filtered probe DNAm data as `GenomicRatioSet`s for each tissue in the list `lgr.filt`.
+Next, remove probes showing evidence of residual confounding from the 
+covariates. Adjust covariate p-values with the `p.adjust` function, and retain 
+probes with adjusted p-values >= 0.001 and variance < 10% variance for all 9 
+covariates. Retain the filtered probe DNAm data as `GenomicRatioSet`s for each 
+tissue in the list `lgr.filt`.
 
 ```{r}
 pfilt <- 1e-3
@@ -459,7 +541,9 @@ lgr.filt <- list("adipose" = lgr[[1]][lcgkeep[[1]],],
 
 ## Get probe DNAm summary statistics and analyze variances
 
-Calculate probe DNAm summary statistics. For each tissue, calculate the minima, maxima, means, medians, standard deviations, and variances of Beta-values across samples. Store results in the `lcg.ss` list.
+Calculate probe DNAm summary statistics. For each tissue, calculate the minima, 
+maxima, means, medians, standard deviations, and variances of Beta-values 
+across samples. Store results in the `lcg.ss` list.
 
 ```{r}
 cnv <- c("min", "max", "mean", "median", "sd", "var")
@@ -483,9 +567,12 @@ for(t in tv){
 }
 ```
 
-Perform the main variance analyses with 2 strategies. This selects the 2,000 probes with the highest group-specific variances.
+Perform the main variance analyses with 2 strategies. This selects the 2,000 
+probes with the highest group-specific variances.
 
-First, use a single variance cutoff, or "absolute" quantile cutoff, for each group. List probes in the top 99th quantile variances for each tissue in the `lmvp.abs` object.
+First, use a single variance cutoff, or "absolute" quantile cutoff, for each 
+group. List probes in the top 99th quantile variances for each tissue in the 
+`lmvp.abs` object.
 
 ```{r}
 qiv = seq(0, 1, 0.01)
@@ -501,7 +588,9 @@ for(t in tv){
 }
 ```
 
-Now select high-variance probes with binning for each tissue. Assign probes to 1 of 10 bins using 0.1 mean Beta-value intervals. Select probes in the top 99th variance quantiles for each bin, and store in `lmvp.bin`. 
+Now select high-variance probes with binning for each tissue. Assign probes to 
+1 of 10 bins using 0.1 mean Beta-value intervals. Select probes in the top 
+99th variance quantiles for each bin, and store in `lmvp.bin`. 
 
 ```{r}
 # binned quantiles method
@@ -524,7 +613,11 @@ for(t in tv){
 }
 ```
 
-With the variance analyses complete, filter the `lmvp.abs` and `lmvp.bin` probes by tissue specificity. Tissue-specific probes should only occur among high variance probes for a single tissue. Categorize probes as "tissue-specific" or "non-specific" using the `table` function to determine their frequency of occurrence across tissues.
+With the variance analyses complete, filter the `lmvp.abs` and `lmvp.bin` 
+probes by tissue specificity. Tissue-specific probes should only occur among 
+high variance probes for a single tissue. Categorize probes as 
+"tissue-specific" or "non-specific" using the `table` function to determine 
+their frequency of occurrence across tissues.
 
 ```{r, eval = TRUE}
 cgav <- c()
@@ -537,7 +630,10 @@ cgdf$type <- ifelse(cgdf[,2] > 1, "non-specific", "tissue-specific")
 table(cgdf$type)
 ```
 
-After filtering probes by tissue specificity, rank them by descending DNAm variance. Select 1,000 probes from `lmvp.abs`, then 1,000 non-overlapping probes from `lmvp.bin`, retain the 2,000 highest-variance probes by tissue in the `ltxcg` list.
+After filtering probes by tissue specificity, rank them by descending DNAm 
+variance. Select 1,000 probes from `lmvp.abs`, then 1,000 non-overlapping 
+probes from `lmvp.bin`, retain the 2,000 highest-variance probes by tissue 
+in the `ltxcg` list.
 
 ```{r}
 cgfilt <- cgdf$type == "non-specific"
@@ -572,10 +668,12 @@ First, get probe set DNAm summaries and annotation data.
 
 ```{r}
 # filtered cg summaries
-lfcg <- lapply(lcg.ss, function(x){x <- x[rownames(x) %in% unique(unlist(ltxcg)),]})
+lfcg <- lapply(lcg.ss, 
+  function(x){x <- x[rownames(x) %in% unique(unlist(ltxcg)),]})
 # annotation subset
 anno <- getAnnotation(gr) # save anno for cga
-anno <- anno[,c("Name", "UCSC_RefGene_Name", "UCSC_RefGene_Group", "Relation_to_Island")]
+anno <- anno[,c("Name", "UCSC_RefGene_Name", "UCSC_RefGene_Group", 
+  "Relation_to_Island")]
 anno <- anno[rownames(anno) %in% unique(unlist(ltxcg)),]
 # filtered beta values
 lcgssf <- list()
@@ -586,7 +684,11 @@ for(t in tv){
 }
 ```
 
-Use the `makevp()` helper function to make violin plots with horizontal bars at distribution medians. This function formats the data and calls `geom_violin` to make violin plots for DNAm fraction means and variances. Store plots in the `lvp` list, then display them vertically using the `grid.arrange` function from the gridExtra package.
+Use the `makevp()` helper function to make violin plots with horizontal bars at 
+distribution medians. This function formats the data and calls `geom_violin` 
+to make violin plots for DNAm fraction means and variances. Store plots in 
+the `lvp` list, then display them vertically using the `grid.arrange` function 
+from the gridExtra package.
 
 ```{r, eval = TRUE, fig.width = 3.8, fig.height = 4.5}
 lvp <- makevp(lfcg, ltxcg)
@@ -609,9 +711,18 @@ rownames(tcgss) <- tv
 kable(t(tcgss), align = "c")
 ```
 
-Next, prepare genome region heatmaps with 3 helper functions. These will tabulate probe abundances by region and use the probe Beta-value means to calculate the mean of means (left heatmap) and variance of means (right heatmap) by genome region type. 
+Next, prepare genome region heatmaps with 3 helper functions. These will 
+tabulate probe abundances by region and use the probe Beta-value means to 
+calculate the mean of means (left heatmap) and variance of means (right 
+heatmap) by genome region type. 
 
-First, define island and gene annotation groups from the manifest using `get_cga`. Next, get region-specific DNAm summaries with `hmsets` using a minimum region coverage of 2. This means values are calculated for regions with least 2 probes, and regions with less are assigned "NA" and greyed out. Make the 2 plots objects for means and variances with `hmplots()`, which wraps the `geom_tile` ggplot2 function. Finally, display plots horizontally with `grid.arrange`.
+First, define island and gene annotation groups from the manifest using 
+`get_cga`. Next, get region-specific DNAm summaries with `hmsets` using a 
+minimum region coverage of 2. This means values are calculated for regions 
+with least 2 probes, and regions with less are assigned "NA" and greyed out. 
+Make the 2 plots objects for means and variances with `hmplots()`, which wraps 
+the `geom_tile` ggplot2 function. Finally, display plots horizontally with 
+`grid.arrange`.
 
 ```{r, eval = TRUE, fig.width = 8.2, fig.height = 4.7}
 cga <- get_cga(anno)
@@ -622,11 +733,20 @@ grid.arrange(lhmplots$hm.mean.plot, lhmplots$hm.var.plot,
              bottom = "Tissue", left = "Annotation/Region Type")
 ```
 
-Colors blue, white, and red represent low, intermediate, and high means and variances of region-specific mean Beta-values. Cell numbers show probe region quantities and are identical for both plots.
+Colors blue, white, and red represent low, intermediate, and high means and 
+variances of region-specific mean Beta-values. Cell numbers show probe region 
+quantities and are identical for both plots.
 
 # Conclusions
 
-This vignette described cross-study analyses using data objects accessible with `recountmethylation` and appearing in the manuscript @maden_human_2020. See the manuscript for more information about samples, quality metric signal patterns, and extended variability analyses. For details about data objects, consult the package `users_guide` vignette. Full code and helper function definitions are contained in the `data_analyses.R` companion script. For additional utilities to analyze DNAm data, consult the `minfi` and `wateRmelon` packages.
+This vignette described cross-study analyses using data objects accessible 
+with `recountmethylation` and appearing in the manuscript @maden_human_2020. 
+See the manuscript for more information about samples, quality metric signal 
+patterns, and extended variability analyses. For details about data objects, 
+consult the package `users_guide` vignette. Full code and helper function 
+definitions are contained in the `data_analyses.R` companion script. For 
+additional utilities to analyze DNAm data, consult the `minfi` and 
+`wateRmelon` packages.
 
 # Session info
 

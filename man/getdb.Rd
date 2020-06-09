@@ -31,25 +31,25 @@ getdb_h5_rg(name = NULL, dfp = "downloads", verbose = FALSE)
 \item{verbose}{Whether to return verbose messages (default FALSE).}
 }
 \value{
-Either a SummarizedExperiment object for h5se functions, or a file path
-for h5 functions.
+Either a SummarizedExperiment object for h5se functions, or a file 
+path for h5 functions.
 }
 \description{
 Combines download and load functions for databases. 
 If "name" argument not provided, the latest available file is downloaded.
 All files include metadata for the available samples.
 
-There are 6 functions. Functions with "h5se" access HDF5-SummarizedExperiment 
-files, and "h5" functions access HDF5 databases. The 4 h5se functions are 
-"rg" (RGChannelSet), "gm" (MethylSet), "gr" (GenomicRatioSet), and "test" 
-(data for 2 samples from "gr"). The 2 h5 functions are "rg" (red and green 
-signal datasets), and "test" (data for 2 samples from "rg"). See vignette 
-for details about file types and classes.
+There are 6 functions. Functions with "h5se" access 
+HDF5-SummarizedExperiment files, and "h5" functions access HDF5 databases. 
+The 4 h5se functions are "rg" (RGChannelSet), "gm" (MethylSet), "gr" 
+(GenomicRatioSet), and "test" (data for 2 samples from "gr"). The 2 h5 
+functions are "rg" (red and green signal datasets), and "test" (data for 2 
+samples from "rg"). See vignette for details about file types and classes.
 }
 \examples{
 path <- getdb_h5se_test()
 base::unlink("downloads", recursive = TRUE)
 }
 \seealso{
-dldb(), get_rmdl()
+get_rmdl()
 }

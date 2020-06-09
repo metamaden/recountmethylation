@@ -6,7 +6,7 @@ dn <- RCurl::getURL("https://recount.bio/data/",
 sm <- servermatrix(dn)
 smfn <- sm[,1]
 tsnum <- as.numeric(gsub(".*\\_|\\..*", "", smfn), smfn)
-tsfilt <- which(tsnum == max(tsnum, na.rm = T))
+tsfilt <- which(tsnum == max(tsnum, na.rm = TRUE))
 smf <- sm[tsfilt,]
 smf1 <- smf[,1]
 

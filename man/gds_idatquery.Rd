@@ -11,7 +11,7 @@ gds_idatquery(
   sys.cmd = "gunzip ",
   verbose = FALSE,
   dfp = "./idats/",
-  burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/", "geo/samples/")
+  burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/geo/samples/")
 )
 }
 \arguments{

@@ -12,17 +12,16 @@ get_rmdl(
   url = "https://recount.bio/data/",
   show.files = FALSE,
   download = TRUE,
-  tryload = TRUE,
   verbose = TRUE,
   sslver = FALSE
 )
 }
 \arguments{
-\item{which.class}{Either "rg", "gm", "gr", or "test" for RGChannelSet, MethylSet, 
-GenomicRatioSet, or 2-sample subset (default "test").}
+\item{which.class}{Either "rg", "gm", "gr", or "test" for RGChannelSet, 
+MethylSet, GenomicRatioSet, or 2-sample subset (default "test").}
 
-\item{which.type}{Either "h5se" for an HDF5-SummarizedExperiment (default) or 
-"h5" for an HDF5 database.}
+\item{which.type}{Either "h5se" for an HDF5-SummarizedExperiment (default) 
+or "h5" for an HDF5 database.}
 
 \item{fn}{Name of file on server to download (optional, default NULL).}
 
@@ -30,11 +29,11 @@ GenomicRatioSet, or 2-sample subset (default "test").}
 
 \item{url}{The server URL to locate files for download.}
 
-\item{show.files}{Whether to print server file data to console (default FALSE).}
+\item{show.files}{Whether to print server file data to console (default 
+FALSE).}
 
-\item{download}{Whether to download (TRUE) or return queried filename (FALSE).}
-
-\item{tryload}{Whether to try loading downloaded data (default TRUE).}
+\item{download}{Whether to download (TRUE) or return queried filename 
+(FALSE).}
 
 \item{verbose}{Whether to return verbose messages.}
 
@@ -44,13 +43,11 @@ GenomicRatioSet, or 2-sample subset (default "test").}
 New filepath to dir with downloaded data.
 }
 \description{
-Uses RCurl to recursively download latest H5SE and HDF5 data objects the from server.
-This is currently wrapped in the getdb() functions. If tryload = TRUE, successful
-download completion is tested with either HDF5Array::loadHDF5SummarizedExperiment()
- for h5se files or rhdf5::h5ls() for h5 files.
+Uses RCurl to recursively download latest H5SE and HDF5 data objects from 
+the server. This is currently wrapped in the getdb() functions.
 }
 \examples{
-path <- get_rmdl(which.class = "test", which.type = "h5se", tryload = FALSE)
+path <- get_rmdl(which.class = "test", which.type = "h5se")
 base::unlink("downloads", recursive = TRUE)
 }
 \seealso{
