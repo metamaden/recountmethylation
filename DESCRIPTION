@@ -19,13 +19,13 @@ LazyData: FALSE
 Depends: R (>= 4.0.0)
 Imports:
     minfi,
+    HDF5Array,
     rhdf5,
     S4Vectors,
     utils,
     methods,
     RCurl
 Suggests:
-    HDF5Array,
     knitr,
     testthat,
     ggplot2,
