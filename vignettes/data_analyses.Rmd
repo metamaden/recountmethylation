@@ -33,7 +33,10 @@ suppressMessages(library(ggplot2))
 suppressMessages(library(gridExtra))
 opts_chunk$set(eval = FALSE, echo = TRUE, 
                warning = FALSE, message = FALSE)
-load("data_analyses/data_analyses.RData")
+# load rdata
+sf <- system.file(file.path("extdata", "data_analyses"), 
+                  package = "recountmethylation")
+load(file.path(sf, "data_analyses.RData"))
 ```
 
 # Overview
