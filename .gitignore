@@ -31,6 +31,7 @@ vignettes/*.pdf
 .Renviron
 # Bioc exclusion terms
 .Rproj.user
+.Rproj
 .renviron
 .rprofile
 .rproj
