@@ -10,7 +10,7 @@ gds_idatquery(
   expand = TRUE,
   sys.cmd = "gunzip ",
   verbose = FALSE,
-  dfp = "./idats/",
+  dfp = "idats",
   burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/geo/samples/")
 )
 }

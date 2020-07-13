@@ -20,7 +20,7 @@
 #' gds_idatquery(gsmvi)
 #' @export
 gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE, 
-  sys.cmd = "gunzip ", verbose = FALSE, dfp = "./idats/",
+  sys.cmd = "gunzip ", verbose = FALSE, dfp = "idats",
   burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/geo/samples/")){
   bnv <- fnv <- c()
   if(verbose){message("Checking dest dir dfp.")}
@@ -45,10 +45,10 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
     if(check.cond[1] & check.cond[2] & 
        check.cond[3]){
       idatl <- unique(gsub("_Red.*|_Grn.*", "", fn))
-      bnv = c(bnv, paste(dfp, idatl, sep = "")) # gsm basenames
+      bnv = c(bnv, file.path(dfp, idatl)) # gsm basenames
       for(f in fn){
         url.dlpath <- paste(url, f, sep = "")
-        dest.fpath <- paste(dfp, f, sep = "")
+        dest.fpath <- file.path(dfp, f)
         utils::download.file(url.dlpath, dest.fpath)
         fnv <- c(fnv, dest.fpath)
         if(expand){
@@ -92,22 +92,14 @@ gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/",
                                       "geo/samples/"), silent = TRUE){
   dn = "" # download idats to cwd
   bnv = c() # store the idat basenames
-  rt <- try(gds_idatquery(gsmvi = gsmvi, ext = ext, 
-                          dfp = dfp, burl = burl))
+  rt <- try(gds_idatquery(gsmvi = gsmvi, ext = ext, dfp = dfp, burl = burl))
   if(is(rt)[1] == "try-error"){stop("Process ended with message: ", rt[1])}
-  rgdl = minfi::read.metharray(basenames = rt[["basenames"]])
+  rgdl = suppressWarnings(minfi::read.metharray(basenames = rt[["basenames"]]))
   if(rmdl){
-    message("Removing downloaded files...")
-    if(silent){
-      for(f in rt[["filenames"]]){
-        suppressWarnings(file.remove(f))
-        suppressWarnings(file.remove(gsub(paste0("\\.", ext), "", f)))
-      }
-    } else{
-      for(f in rt[["filenames"]]){
-        suppressWarnings(file.remove(f))
-        suppressWarnings(file.remove(gsub(paste0("\\.", ext), "", f)))
-      }
+    message("Removing downloaded IDATs...")
+    for(f in rt[["filenames"]]){
+      fnrm <- gsub(paste0("\\.", ext), "", f)
+      if(silent){suppressWarnings(file.remove(fnrm))} else{file.remove(fnrm)}
     }
   }
   return(rgdl)
