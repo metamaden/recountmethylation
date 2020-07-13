@@ -33,10 +33,6 @@ suppressMessages(library(ggplot2))
 suppressMessages(library(gridExtra))
 opts_chunk$set(eval = FALSE, echo = TRUE, 
                warning = FALSE, message = FALSE)
-# load rdata
-sf <- system.file(file.path("extdata", "data_analyses"), 
-                  package = "recountmethylation")
-load(file.path(sf, "data_analyses.RData"))
 ```
 
 # Overview
@@ -58,12 +54,20 @@ extensibility to new and larger comparator groups. Unabridged code and helper
 function definitions to reproduce these examples are contained in the 
 `data_analyses.R` script.
 
-## Data availability
+## Datasets and data objects
 
-This vignette makes use of the sample metadata and 2 of the available 
-`HDF5-SummarizedExperiment` datasets Consult the `users_guide` vignette for 
-details about data and access. For this vignette, access the versioned metadata 
-and load the DNAm datasets as follows.
+First, load the provided data objects. These are required for evaluated code 
+chunks below. Note these objects result from running the provided script and 
+annotated code.
+
+```{r, eval = TRUE}
+sf <- system.file(file.path("extdata", "data_analyses"), 
+                  package = "recountmethylation")
+load(file.path(sf, "data_analyses.RData"))
+```
+
+Next, retrieve just the provided sample metadata from the `recountmethylation` 
+package files.
 
 ```{r, eval = TRUE}
 # get local metadata
@@ -71,6 +75,12 @@ path <- system.file("extdata", "metadata", package = "recountmethylation")
 mdpath <- paste(path, list.files(path)[1], sep = "/")
 md <- get(load(mdpath))
 ```
+
+This vignette also makes use of 2 `HDF5-SummarizedExperiment` databases. 
+Consult the `users_guide` vignette for details about the database file 
+formats and download instructions. With the datasets downloaded, load them 
+into the R session as follows.
+
 ```{r}
 # load methylset
 gmdn <- "remethdb-h5se_gm_0-0-1_1590090412"
