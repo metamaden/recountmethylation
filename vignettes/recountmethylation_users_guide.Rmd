@@ -78,7 +78,7 @@ sdf <- as.data.frame(sm)
 tsv <- as.numeric(gsub("(.*_|\\.h5)", "", sdf[,1]))
 sdff <- sdf[which(tsv == max(tsv, na.rm = TRUE)),]
 rownames(sdff) <- NULL
-kable(sdff, align = "c")
+knitr::kable(sdff, align = "c")
 ```
 
 # Background
@@ -218,7 +218,7 @@ dim(h5se.bm)
 ```
 ```{r}
 colnames(h5se.bm) <- h5se.test$gsm
-kable(head(h5se.bm), align = "c")
+knitr::kable(head(h5se.bm), align = "c")
 ```
 
 Access manifest information for probes with `getAnnotation`. This includes the 
@@ -235,7 +235,7 @@ colnames(an)
 
 ```{r}
 ant <- as.matrix(t(an[c(1:4), c(1:3, 5:6, 9, 19, 24, 26)]))
-kable(ant, align = "c")
+knitr::kable(ant, align = "c")
 ```
 
 # HDF5 database and example
@@ -280,10 +280,10 @@ h5.green <- getGreen(h5.rg)
 dim(h5.red)
 ```
 ```{r}
-kable(head(h5.red), align = "c")
+knitr::kable(head(h5.red), align = "c")
 ```
 ```{r}
-kable(head(h5.green), align = "c")
+knitr::kable(head(h5.green), align = "c")
 ```
 ```{r}
 identical(rownames(h5.red), rownames(h5.green))

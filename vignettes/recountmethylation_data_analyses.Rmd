@@ -174,7 +174,7 @@ dan <- data.frame(Vperc1 = c(sperc1),
                   Pval2 = c(pval2, "-", "-"), 
                   stringsAsFactors = FALSE)
 rownames(dan) <- c("Chron.Age", "GSEID", "SampleType", "Cancer")
-kable(dan, align = "c")
+knitr::kable(dan, align = "c")
 ```
 
 Now calcualte the R-squared, Spearman correlation coefficient (Rho), and MAD 
@@ -203,7 +203,7 @@ dss <- data.frame(group = c("1", "2"),
                     length(unique(mdff$gseid))),
                   r.squared = c(rsq1, rsq2), rho = as.character(c(rho1, rho2)),
                   mad = c(mad1, mad2), stringsAsFactors = FALSE)
-kable(dss, align = "c")
+knitr::kable(dss, align = "c")
 ```
 
 ## Scatter plots of study errors and sample ages
@@ -239,7 +239,7 @@ values in `storage` to inform a new `sgroup` variable.
 mdf <- md[!md$storage == "NA",]
 mdf$sgroup <- ifelse(grepl("FFPE", mdf$storage), "ffpe", "frozen")
 sst <- get_sst(sgroup.labs = c("ffpe", "frozen"), mdf)
-kable(sst, align = "c") # table display
+knitr::kable(sst, align = "c") # table display
 ```
 
 ## Use blocking to calculate signal log2 medians
@@ -345,7 +345,7 @@ gsmv <- c(adipose.gsmv, liver.gsmv)
 mdf <- md[md$gsm %in% gsmv,]
 mdf$sgroup <- ifelse(mdf$gsm %in% adipose.gsmv, "adipose", "liver")
 sst.tvar <- get_sst(sgroup.labs = c("liver", "adipose"), mdf)
-kable(sst.tvar, align = "c")
+knitr::kable(sst.tvar, align = "c")
 ```
 
 ## Calculate log2 methylated and unmethylated signal medians
@@ -711,7 +711,7 @@ for(t in tv){
 }
 colnames(tcgss) <- colnames(lcgssf$adipose)
 rownames(tcgss) <- tv
-kable(t(tcgss), align = "c")
+knitr::kable(t(tcgss), align = "c")
 ```
 
 Next, prepare genome region heatmaps with 3 helper functions. These will 
