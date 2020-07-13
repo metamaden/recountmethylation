@@ -1,0 +1,15 @@
+c(bibentry(bibtype = "Unpublished",
+           key = "recountmethylation manuscript",
+           title = "{Human 
+methylome variation across Infinium 450K raw data on the Gene Expression 
+Omnibus}",
+           author = c(
+               person(c("Sean", "K."), "Maden"),
+               person(c("Reid", "F."), "Thompson"),
+               person(c("Kasper", "D."), "Hansen"),
+               person("Abhinav", "Nellore")
+           ),
+           year = 2020,
+           note = "Preprint in preparation for submission",
+           header = "Please cite the research manuscript for this package:")
+)
