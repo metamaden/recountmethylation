@@ -84,8 +84,7 @@ servermatrix <- function(dn, sslver = FALSE, printmatrix = TRUE,
 #' @param sslver Whether to use server certificate check (default FALSE).
 #' @return New filepath to dir with downloaded data.
 #' @examples 
-#' path <- get_rmdl(which.class = "test", which.type = "h5se")
-#' base::unlink("downloads", recursive = TRUE)
+#' path <- get_rmdl(which.class = "test", which.type = "h5se", dfp = tempdir())
 #' @seealso servermatrix(), getURL(), loadHDF5SummarizedExperiment(), h5ls()
 #' @export
 get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"), 
@@ -160,8 +159,7 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
 NULL
 #' @rdname getdb
 #' @examples
-#' path <- getdb_h5se_test()
-#' base::unlink("downloads", recursive = TRUE)
+#' path <- getdb_h5se_test(dfp = tempdir())
 #' @export
 getdb_h5se_test <- function(name = NULL, dfp = "downloads", verbose = FALSE){
   dbpath <- FALSE

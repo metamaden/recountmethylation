@@ -22,7 +22,7 @@ certain queries to h5 files.
 \examples{
 path <- system.file("extdata", "h5test", package = "recountmethylation")
 fn <- list.files(path)
-dbpath = paste(path, fn, sep = "/")
+dbpath = file.path(path, fn)
 rg = getrg(dbn = dbpath, all.gsm = TRUE, metadata = FALSE)
 dim(rg) # [1] 11162     2
 class(rg)

@@ -23,7 +23,7 @@ an h5 file located at path "dbn."
 \examples{
 path <- system.file("extdata", "h5test", package = "recountmethylation")
 fn = list.files(path)
-dbpath = paste0(path, "/", fn)
+dbpath = file.path(path, fn)
 mdp <- data_mdpost(dbn = dbpath, dsn = "mdpost")
 dim(mdp) # [1]  2 19
 }

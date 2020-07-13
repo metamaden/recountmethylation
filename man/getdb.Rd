@@ -47,8 +47,7 @@ functions are "rg" (red and green signal datasets), and "test" (data for 2
 samples from "rg"). See vignette for details about file types and classes.
 }
 \examples{
-path <- getdb_h5se_test()
-base::unlink("downloads", recursive = TRUE)
+path <- getdb_h5se_test(dfp = tempdir())
 }
 \seealso{
 get_rmdl()

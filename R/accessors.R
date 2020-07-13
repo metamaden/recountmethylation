@@ -17,7 +17,7 @@
 #' @return Lists the basename paths and filenames of IDATs downloaded.
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
-#' gds_idatquery(gsmvi)
+#' gds_idatquery(gsmvi, dfp = tempdir())
 #' @export
 gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE, 
   sys.cmd = "gunzip ", verbose = FALSE, dfp = "idats",
@@ -84,7 +84,7 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
 #' @return An RGChannelSet object
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
-#' rg <- gds_idat2rg(gsmvi)
+#' rg <- gds_idat2rg(gsmvi, dfp = tempdir())
 #' @seealso gds_idatquery(), read.metharray()
 #' @export
 gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/", 
@@ -119,7 +119,7 @@ gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/",
 #' # Get tests data pointer
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn <- list.files(path)
-#' dbpath = paste0(path, "/", fn)
+#' dbpath = file.path(path, fn)
 #' # red signal, first 2 assay addr, 3 samples
 #' reds <- hread(1:2, 1:3, d = "redsignal", dbn = dbpath)
 #' dim(reds) # [1] 2 3
@@ -142,7 +142,7 @@ hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
 #' @examples 
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn = list.files(path)
-#' dbpath = paste0(path, "/", fn)
+#' dbpath = file.path(path, fn)
 #' mdp <- data_mdpost(dbn = dbpath, dsn = "mdpost")
 #' dim(mdp) # [1]  2 19
 #' @seealso hread()
@@ -231,7 +231,7 @@ matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
 #' @examples 
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn <- list.files(path)
-#' dbpath = paste(path, fn, sep = "/")
+#' dbpath = file.path(path, fn)
 #' rg = getrg(dbn = dbpath, all.gsm = TRUE, metadata = FALSE)
 #' dim(rg) # [1] 11162     2
 #' class(rg)
@@ -308,7 +308,7 @@ rgse <- function(ldat, verbose = FALSE){
 #' @examples
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn <- list.files(path)
-#' dbpath = paste(path, fn, sep = "/")
+#' dbpath = file.path(path, fn)
 #' rg = getrg(dbn = dbpath, all.gsm = TRUE, metadata = FALSE)
 #' dim(rg) # [1] 11162     2
 #' class(rg)

@@ -26,6 +26,9 @@ output:
 
 ```{r setup, echo = FALSE}
 suppressMessages(library(knitr))
+suppressMessages(library(GenomicRanges))
+suppressMessages(library(limma))
+suppressMessages(library(minfi))
 knitr::opts_chunk$set(echo = TRUE, eval = TRUE, warning = FALSE, 
   message = FALSE)
 ```

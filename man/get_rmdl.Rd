@@ -47,8 +47,7 @@ Uses RCurl to recursively download latest H5SE and HDF5 data objects from
 the server. This is currently wrapped in the getdb() functions.
 }
 \examples{
-path <- get_rmdl(which.class = "test", which.type = "h5se")
-base::unlink("downloads", recursive = TRUE)
+path <- get_rmdl(which.class = "test", which.type = "h5se", dfp = tempdir())
 }
 \seealso{
 servermatrix(), getURL(), loadHDF5SummarizedExperiment(), h5ls()
