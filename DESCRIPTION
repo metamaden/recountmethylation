@@ -31,7 +31,9 @@ Suggests:
     ggplot2,
     gridExtra,
     rmarkdown,
-    BiocStyle
+    BiocStyle,
+    GenomicRanges,
+    limma
 VignetteBuilder: 
     knitr
 biocViews: DNAMethylation, Epigenetics, Microarray, MethylationArray
