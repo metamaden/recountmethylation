@@ -61,7 +61,9 @@ files (see `?get_db` and examples for details). Note you will need between
 90-120 Gb of disk space to store a single database file. Files pair sample 
 metadata with assays including red and green channel signals, methylated and 
 unmethylated level signals, and DNAm fractions in 3 `HDF5-SummarizedExperiment` 
-entities, and red and green signals in an `HDF5` `h5` database. Details about 
+entities, and red and green signals in an `HDF5` `h5` database. 
+
+The database files are contained at the file server, located at the URL: [https://recount.bio/data/](https://recount.bio/data/). Details about 
 the latest files are as follows.
 
 ```{r, echo = FALSE}
