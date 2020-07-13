@@ -288,17 +288,20 @@ hmplots <- function(hmma.mean, hmma.var, hmma.size){
 #-------------------------------------------------------
 {
   # get samples with storage condition 
-  md <- pData(gm)
   mdf <- md[!md$storage == "NA",]
   gmf <- gm[, gm$gsm %in% mdf$gsm]
-  table(mdf$storage)
+  mdf <- mdf[order(match(mdf$gsm, gmf$gsm)),]
+  identical(gmf$gsm, mdf$gsm)
+  # add complete available storage info
+  gmf$storage <- mdf$storage
+  table(gmf$storage)
   
   # get signal matrices
   meth.all <- getMeth(gmf)
   unmeth.all <- getUnmeth(gmf)
   
   # get blocks for processing
-  blocks <- getblocks(slength = ncol(gmf), bsize = 100)
+  blocks <- getblocks(slength = ncol(gmf), bsize = 200)
   
   # process data in blocks
   ms <- matrix(nrow = 0, ncol = 2)
@@ -308,12 +311,12 @@ hmplots <- function(hmma.mean, hmma.var, hmma.size){
     gmff <- gmf[, b]
     methb <- as.matrix(meth.all[, b])
     unmethb <- as.matrix(unmeth.all[, b])
-    l2meth <- c(l2meth, apply(methb, 2, function(x){
+    l2meth <- apply(methb, 2, function(x){
       log2(median(as.numeric(x)))
-    }))
-    l2unmeth <- c(l2unmeth, apply(unmethb, 2, function(x){
+    })
+    l2unmeth <- apply(unmethb, 2, function(x){
       log2(median(as.numeric(x)))
-    }))
+    })
     ms <- rbind(ms, matrix(c(l2meth, l2unmeth), ncol = 2))
     message(i)
   }
@@ -321,7 +324,7 @@ hmplots <- function(hmma.mean, hmma.var, hmma.size){
   colnames(ms) <- c("meth.l2med", "unmeth.l2med")
   ds <- as.data.frame(ms)
   ds$storage <- ifelse(grepl("FFPE", gmf$storage), "ffpe", "frozen")
-  save(ds, file = "df-l2med-signals.rda")
+  save(ds, file = file.path("data_analyses", "df-l2med-signals.rda"))
   
   # signals scatterplot by storage type
   jpeg("scatterplot_storage.jpg", 7, 7, units = "in", res = 400)
@@ -333,7 +336,7 @@ hmplots <- function(hmma.mean, hmma.var, hmma.size){
   # violin plots of signals by storage type
   vp <- matrix(nrow = 0, ncol = 2)
   vp <- rbind(vp, matrix(c(ds$meth.l2med, paste0("meth.", ds$storage)), ncol = 2))
-  vp <- rbind(vp, matrix(c(ds$meth.l2med, paste0("unmeth.", ds$storage)), ncol = 2))
+  vp <- rbind(vp, matrix(c(ds$unmeth.l2med, paste0("unmeth.", ds$storage)), ncol = 2))
   vp <- as.data.frame(vp, stringsAsFactors = FALSE)
   vp[,1] <- as.numeric(vp[,1])
   colnames(vp) <- c("signal", "group")
