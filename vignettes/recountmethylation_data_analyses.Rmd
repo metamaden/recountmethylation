@@ -250,6 +250,9 @@ values in `storage` to inform a new `sgroup` variable.
 ```{r, eval = TRUE}
 mdf <- md[!md$storage == "NA",]
 mdf$sgroup <- ifelse(grepl("FFPE", mdf$storage), "ffpe", "frozen")
+```
+```{r}
+# get summary table
 sst <- get_sst(sgroup.labs = c("ffpe", "frozen"), mdf)
 knitr::kable(sst, align = "c") # table display
 ```
@@ -260,7 +263,12 @@ Subset the `MethylSet` object and extract the full signal matrices with the
 `getMeth` and `getUnmeth` functions from the minfi package.
 
 ```{r}
-gmf <- gm[, gm$gsm %in% mdf$gsm]
+gmf <- gm[, gm$gsm %in% mdf$gsm] # filt h5se object
+mdf <- mdf[order(match(mdf$gsm, gmf$gsm)),]
+identical(gmf$gsm, mdf$gsm)
+gmf$storage <- mdf$storage # append storage info
+```
+```{r}
 meth.all <- getMeth(gmf)
 unmeth.all <- getUnmeth(gmf)
 ```
