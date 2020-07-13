@@ -79,6 +79,8 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
 #' @param dfp Destination for IDAT downloads.
 #' @param burl Base URL string for the IDAT query (default 
 #' "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/").
+#' @param silent Whether to suppress warnings on download removal 
+#' (default TRUE).
 #' @return An RGChannelSet object
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
@@ -87,7 +89,7 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
 #' @export
 gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/", 
                         burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/",
-                                      "geo/samples/")){
+                                      "geo/samples/"), silent = TRUE){
   dn = "" # download idats to cwd
   bnv = c() # store the idat basenames
   rt <- try(gds_idatquery(gsmvi = gsmvi, ext = ext, 
@@ -96,9 +98,16 @@ gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/",
   rgdl = minfi::read.metharray(basenames = rt[["basenames"]])
   if(rmdl){
     message("Removing downloaded files...")
-    for(f in rt[["filenames"]]){
-      file.remove(f)
-      file.remove(gsub(paste0("\\.", ext), "", f))
+    if(silent){
+      for(f in rt[["filenames"]]){
+        suppressWarnings(file.remove(f))
+        suppressWarnings(file.remove(gsub(paste0("\\.", ext), "", f)))
+      }
+    } else{
+      for(f in rt[["filenames"]]){
+        suppressWarnings(file.remove(f))
+        suppressWarnings(file.remove(gsub(paste0("\\.", ext), "", f)))
+      }
     }
   }
   return(rgdl)

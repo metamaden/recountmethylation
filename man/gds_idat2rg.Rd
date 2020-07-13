@@ -9,7 +9,8 @@ gds_idat2rg(
   rmdl = TRUE,
   ext = "gz",
   dfp = "./idats/",
-  burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/", "geo/samples/")
+  burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/", "geo/samples/"),
+  silent = TRUE
 )
 }
 \arguments{
@@ -24,6 +25,9 @@ gds_idat2rg(
 
 \item{burl}{Base URL string for the IDAT query (default 
 "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/").}
+
+\item{silent}{Whether to suppress warnings on download removal 
+(default TRUE).}
 }
 \value{
 An RGChannelSet object
