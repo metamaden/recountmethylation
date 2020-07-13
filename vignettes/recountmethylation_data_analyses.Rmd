@@ -46,19 +46,18 @@ tissue-specific probe sets with high DNA methylation (DNAm) fraction variances
 are identifed and analyzed using liver and adipose samples. Note that versions 
 of these analyses also appear in the manuscript @maden_human_2020.
 
-## Vignette code and script
+## Analysis script and limited chunk evaluation
 
-This vignette describes analysis steps in full, but with limited evaluations 
-to ensure package build success. Code has been written with the intention of 
-extensibility to new and larger comparator groups. Unabridged code and helper 
-function definitions to reproduce these examples are contained in the 
-`data_analyses.R` script.
+This vignette accompanies the "data_analyses.R" script. Note the script was written with extensibility to new and larger comparator groups in mind. While the script should run 
+to completion without errors, it takes several hours in total to complete (excluding 
+the time to download large database files). Due to this lengthy script run time, 
+this vignette only evaluates code chunks utilizing final/resultant data objects 
+produced by the script (e.g. for tables, tests, and figures). For completeness, 
+remaining script steps and code are included but not evaluated.
 
-## Datasets and data objects
-
-First, load the provided data objects. These are required for evaluated code 
-chunks below. Note these objects result from running the provided script and 
-annotated code.
+Load the file "data_analyses.RData" from the `recountmethylation` package files. 
+This contains the resultant/final data objects produced by the script, which will 
+be used in evaluated code chunks below.
 
 ```{r, eval = TRUE}
 sf <- system.file(file.path("extdata", "data_analyses"), 
@@ -66,8 +65,9 @@ sf <- system.file(file.path("extdata", "data_analyses"),
 load(file.path(sf, "data_analyses.RData"))
 ```
 
-Next, retrieve just the provided sample metadata from the `recountmethylation` 
-package files.
+## Datasets and data objects
+
+The analysis script uses sample metadata and 2 database files. Retrieve the provided sample metadata from the `recountmethylation` package files.
 
 ```{r, eval = TRUE}
 # get local metadata
@@ -76,10 +76,10 @@ mdpath <- paste(path, list.files(path)[1], sep = "/")
 md <- get(load(mdpath))
 ```
 
-This vignette also makes use of 2 `HDF5-SummarizedExperiment` databases. 
-Consult the `users_guide` vignette for details about the database file 
-formats and download instructions. With the datasets downloaded, load them 
-into the R session as follows.
+Also obtain 2 `HDF5-SummarizedExperiment` database files, the 
+GenomicRanges and MethylSet files. Consult the `users_guide` vignette for 
+details about the database file formats and download instructions. Once the 
+datasets downloaded, they can be loaded into an R session as follows.
 
 ```{r}
 # load methylset
