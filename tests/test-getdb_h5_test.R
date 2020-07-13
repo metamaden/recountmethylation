@@ -4,7 +4,7 @@ testthat::test_that("HDF5 database properties", {
 
     # database download
     dldn <- "temp"
-    h5path <- getdb_h5_test(dfp = dldn)
+    h5path <- recountmethylation::getdb_h5_test(dfp = dldn)
     testthat::expect_true(file.exists(h5path))
     # database properties
     h5dat <- rhdf5::h5ls(h5path)

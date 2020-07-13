@@ -204,8 +204,7 @@ summary(h5se.test)
 Access the sample metadata for the 2 available samples using `pData`. 
 
 ```{r}
-suppressMessages(require(minfi))
-h5se.md <- pData(h5se.test)
+h5se.md <- minfi::pData(h5se.test)
 dim(h5se.md)
 ```
 ```{r}
@@ -216,7 +215,7 @@ Next get CpG probe-specific DNAm fractions, or "Beta-values", with `getBeta`
 (rows are probes, columns are samples).
 
 ```{r}
-h5se.bm <- getBeta(h5se.test)
+h5se.bm <- minfi::getBeta(h5se.test)
 dim(h5se.bm)
 ```
 ```{r}
@@ -228,7 +227,7 @@ Access manifest information for probes with `getAnnotation`. This includes the
 bead addresses, probe type, and genome coordinates and regions.
 
 ```{r}
-an <- getAnnotation(h5se.test)
+an <- minfi::getAnnotation(h5se.test)
 dim(an)
 ```
 
@@ -280,8 +279,8 @@ red signal matrices in the `RGChannelSet` with the `getRed` and `getGreen`
 minfi functions.
 
 ```{r}
-h5.red <- getRed(h5.rg)
-h5.green <- getGreen(h5.rg)
+h5.red <- minfi::getRed(h5.rg)
+h5.green <- minfi::getGreen(h5.rg)
 dim(h5.red)
 ```
 ```{r}
@@ -323,8 +322,8 @@ colnames(geo.rg) <- gsub("\\_.*", "", colnames(geo.rg))
 Extract the red and green signal matrices from `geo.rg`.
 
 ```{r}
-geo.red <- getRed(geo.rg)
-geo.green <- getGreen(geo.rg)
+geo.red <- minfi::getRed(geo.rg)
+geo.green <- minfi::getGreen(geo.rg)
 ```
 
 Match indices and labels between the GEO and `h5` test signal matrices.
@@ -356,13 +355,13 @@ To compare the GEO-downloaded and `h5se.test` data, first normalize the former
 using out-of-band or "noob" normalization.
 
 ```{r}
-geo.gr <- preprocessNoob(geo.rg)
+geo.gr <- minfi::preprocessNoob(geo.rg)
 ```
 
 Next, extract the Beta-values.
 
 ```{r}
-geo.bm <- as.matrix(getBeta(geo.gr))
+geo.bm <- as.matrix(minfi::getBeta(geo.gr))
 ```
 
 Now match row and column labels and indices.

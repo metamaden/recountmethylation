@@ -1,4 +1,4 @@
-context("Servermatrix properties")
+testthat::context("Servermatrix properties")
 
 testthat::test_that("Properties of server matrix returned from get_rmdl 
     and servermatrix", {
@@ -8,7 +8,7 @@ testthat::test_that("Properties of server matrix returned from get_rmdl
     ftpuseopt <- dirlistopt <- ifelse(show.files, FALSE, TRUE) # rcurl setup
     dn <- RCurl::getURL(url, ftp.use.epsv = ftpuseopt, dirlistonly = dirlistopt,
                       .opts = list(ssl.verifypeer = sslver))
-    sm <- servermatrix(dn = dn, sslver = sslver)
+    sm <- recountmethylation::servermatrix(dn = dn, sslver = sslver)
     testthat::expect_true(is.matrix(sm))
     testthat::expect_equal(ncol(sm), 4)
     testthat::expect_true(is.character(sm[,1]))

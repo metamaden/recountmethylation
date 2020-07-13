@@ -31,6 +31,8 @@ suppressMessages(library(recountmethylation))
 suppressMessages(library(knitr))
 suppressMessages(library(ggplot2))
 suppressMessages(library(gridExtra))
+suppressMessages(library(GenomicRanges))
+suppressMessages(library(limma))
 opts_chunk$set(eval = FALSE, echo = TRUE, 
                warning = FALSE, message = FALSE)
 ```
