@@ -174,8 +174,11 @@ treated as if they were fully loaded into active memory.
 Download the test dataset. This consists of sample metadata and noob-normalized 
 DNAm fractions (Beta-values) for chromosome 22 probes for 2 samples.
 
+Specify the download destination with the `dfp` argument. By default, this is a directory called "downloads." For this vignette, we will use the R temp directory called using `tempdir()` function. The current temp directory is `r tempdir()`. On exit, this will clean up downloaded files.
+
 ```{r}
-h5se.test <- getdb_h5se_test()
+newpath <- file.path(tempdir(), "data")
+h5se.test <- getdb_h5se_test(dfp = newpath)
 ```
 
 ## Inspect and summarize the database
@@ -251,8 +254,10 @@ metadata and bead-specific signals from chromosome 22 for the same 2 samples
 as in `h5se.test`. Note, `getdb` simply returns the database path for `HDF5` 
 files.
 
+As above, the download destination directory is specified with the `dfp` argument (default directory "downloads"). We'll again set `dfp` to the temprorary directory path.
+
 ```{r}
-h5.test <- getdb_h5_test()
+h5.test <- getdb_h5_test(dfp = newpath)
 ```
 
 ## Inspect and summarize the database
@@ -305,11 +310,11 @@ which may be more prone to revisions at initial publication.
 
 Download IDATs for the 2 samples used in the examples above. Obtain a new 
 `RGChannelSet` from downloaded GEO IDATs with `gds_idat2rg`, specifying the 
-test dataset GSM IDs in the `gsmv` argument.
+test dataset GSM IDs in the `gsmv` argument. Remember to set `dfp` destination directory. This defaults to "idats", but we'll set it to the temp directory path specified above.
 
 ```{r}
 gsmv <- c("GSM1038308", "GSM1038309")
-geo.rg <- gds_idat2rg(gsmv)
+geo.rg <- gds_idat2rg(gsmv, dfp = newpath)
 colnames(geo.rg) <- gsub("\\_.*", "", colnames(geo.rg))
 ```
 
@@ -377,12 +382,6 @@ identical(geo.bm, h5se.bm)
 ```
 
 # Get more help
-
-```{r cleanup, echo = FALSE, eval = TRUE}
-# remove new dirs and downloaded files
-suppressMessages(unlink("idats", recursive = TRUE))
-suppressMessages(unlink("downloads", recursive = TRUE))
-```
 
 Consult the Data Analyses [vignette](link.url) and main [manuscript](link.url) 
 for analysis examples and details about data compilations.
