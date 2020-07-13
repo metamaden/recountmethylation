@@ -11,7 +11,16 @@ Omnibus." 2019 (preprint in preparation for submission).
 
 # Installation and data access
 
-Install this library from an R session using 
+From an active R session, install this package from Bioconductor using:
+
+```
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("recountmethylation")
+```
+
+You may alternatively install this package from GitHub using: 
+ 
 `require(devtools); install_github("metamaden/recountmethylation")`.
 
 # Package disclaimer
