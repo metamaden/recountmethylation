@@ -17,7 +17,7 @@
 #' @return Lists the basename paths and filenames of IDATs downloaded.
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
-#' gds_idatquery(gsmvi, dfp = tempdir())
+#' gds_idatquery(gsmvi, dfp = file.path(tempdir(), "gds_idatquery_example"))
 #' @export
 gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE, 
   sys.cmd = "gunzip ", verbose = FALSE, dfp = "idats",
@@ -84,7 +84,8 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
 #' @return An RGChannelSet object
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
-#' rg <- gds_idat2rg(gsmvi, dfp = tempdir())
+#' fpath <- file.path(tempdir(), "gds_idat2rg_example")
+#' rg <- gds_idat2rg(gsmvi, dfp = fpath)
 #' @seealso gds_idatquery(), read.metharray()
 #' @export
 gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/", 

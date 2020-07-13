@@ -39,7 +39,8 @@ returns the assay data as an "RGChannelSet", calling gds_idatquery()
 }
 \examples{
 gsmvi <- c("GSM2465267", "GSM2814572")
-rg <- gds_idat2rg(gsmvi, dfp = tempdir())
+fpath <- file.path(tempdir(), "gds_idat2rg_example")
+rg <- gds_idat2rg(gsmvi, dfp = fpath)
 }
 \seealso{
 gds_idatquery(), read.metharray()

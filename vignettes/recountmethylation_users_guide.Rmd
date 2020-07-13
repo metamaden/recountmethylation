@@ -177,7 +177,8 @@ treated as if they were fully loaded into active memory.
 Download the test dataset. This consists of sample metadata and noob-normalized 
 DNAm fractions (Beta-values) for chromosome 22 probes for 2 samples.
 
-Specify the download destination with the `dfp` argument. By default, this is a directory called "downloads." For this vignette, we will use the R temp directory called using `tempdir()` function. The current temp directory is `r tempdir()`. On exit, this will clean up downloaded files.
+Specify the download destination with the `dfp` argument. By default, this is a directory called "downloads." For this vignette, we will use the R temp directory called using `tempdir()` function. The downloaded example files will be removed from this directory 
+on exit.
 
 ```{r}
 newpath <- file.path(tempdir(), "data")

@@ -40,5 +40,5 @@ IDATs are detected from the supplement for a GSE record.
 }
 \examples{
 gsmvi <- c("GSM2465267", "GSM2814572")
-gds_idatquery(gsmvi, dfp = tempdir())
+gds_idatquery(gsmvi, dfp = file.path(tempdir(), "gds_idatquery_example"))
 }
