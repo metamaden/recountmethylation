@@ -1,2 +1,3 @@
 # Main testthat script for `recountmethylation` unit tests.
-#test_check("recountmethylation")
+library(testthat)
+test_check("recountmethylation")
