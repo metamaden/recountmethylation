@@ -15,13 +15,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 output:
-  BiocStyle::pdf_document: 
-    toc: yes
-    toc_depth: 2
   BiocStyle::html_document:
     code_folding: show
     toc: yes
     tocfloat: yes
+  BiocStyle::pdf_document: 
+    toc: yes
+    toc_depth: 2
 ---
 
 ```{r setup, echo = FALSE}
@@ -174,15 +174,17 @@ treated as if they were fully loaded into active memory.
 
 ## Obtain the test database
 
-Download the test dataset. This consists of sample metadata and noob-normalized 
-DNAm fractions (Beta-values) for chromosome 22 probes for 2 samples.
-
-Specify the download destination with the `dfp` argument. By default, this is a directory called "downloads." For this vignette, we will use the R temp directory called using `tempdir()` function. The downloaded example files will be removed from this directory 
-on exit.
+The test h5se dataset includes sample metadata and noob-normalized 
+DNAm fractions (Beta-values) for chromosome 22 probes for 2 samples. 
+Datasets can be downloaded using the `getdb` series of functions 
+(see `?getdb` for details), where the `dfp` argument specifies the 
+download destination. The test h5se file is included in the package 
+"inst" directory, and can be loaded as follows.
 
 ```{r}
-newpath <- file.path(tempdir(), "data")
-h5se.test <- getdb_h5se_test(dfp = newpath)
+dn <- "remethdb-h5se_gr-test_0-0-1_1590090412"
+path <- system.file("extdata", dn, package = "recountmethylation")
+h5se.test <- HDF5Array::loadHDF5SummarizedExperiment(path)
 ```
 
 ## Inspect and summarize the database
@@ -228,7 +230,8 @@ knitr::kable(head(h5se.bm), align = "c")
 ```
 
 Access manifest information for probes with `getAnnotation`. This includes the 
-bead addresses, probe type, and genome coordinates and regions.
+bead addresses, probe type, and genome coordinates and regions. For full details 
+about the probe annotations, consult the minfi and Illumina platform documentation.
 
 ```{r}
 an <- minfi::getAnnotation(h5se.test)
@@ -247,27 +250,30 @@ knitr::kable(ant, align = "c")
 # HDF5 database and example
 
 To provide more workflow options, bead-specific red and green signal data have 
-been provided with sample metadata in an `HDF5` `h5` file. This example shows 
+been provided with sample metadata in an `HDF5`/h5 file. This example shows 
 how to handle objects of this type with `recountmethylation`.
 
 ## Obtain the test database
 
-Download the test `h5` file with `getdb_h5_test`. The test data includes sample 
-metadata and bead-specific signals from chromosome 22 for the same 2 samples 
-as in `h5se.test`. Note, `getdb` simply returns the database path for `HDF5` 
-files.
-
-As above, the download destination directory is specified with the `dfp` argument (default directory "downloads"). We'll again set `dfp` to the temprorary directory path.
+The test h5 file includes metadata and bead-specific signals from 
+chromosome 22 for the same 2 samples as in the h5se test file. 
+Note `getdb` functions for h5 files simply return the database path.
+Since the test h5 file has also been included in the package "inst" folder,
+get the path to load the file as follows.
 
 ```{r}
-h5.test <- getdb_h5_test(dfp = newpath)
+dn <- "remethdb-h5_rg-test_0-0-1_1590090412.h5"
+h5.test <- system.file("extdata", "h5test", dn, 
+                    package = "recountmethylation")
 ```
 
 ## Inspect and summarize the database
 
 Use the file path to read data into an `RGChannelSet` with the `getrg` 
-function. Set `all.gsm = TRUE` to retrieve signals for all available GSM IDs 
-(columns).
+function. Setting `all.gsm = TRUE` obtains data for all samples in the
+database files, while passing a vector of GSM IDs to `gsmv` argument 
+will query a subset of available samples. Signals from all available probes are retrieved by default, and probe subsets can be obtained by passing a vector of 
+valid bead addresses to the `cgv` argument.
 
 ```{r}
 h5.rg <- getrg(dbn = h5.test, all.gsm = TRUE)
@@ -298,7 +304,7 @@ identical(rownames(h5.red), rownames(h5.green))
 ```
 
 Rows in these signal matrices map to bead addresses rather than probe IDs. 
-These matrices have more rows than the `h5se` test Beta-value matrix because 
+These matrices have more rows than the h5se test Beta-value matrix because 
 any type I probes use data from 2 beads each.
 
 # Validate DNAm datasets
@@ -309,15 +315,17 @@ available GEO files. This step may be most useful for newer samples published
 close to the end compilation date (end of March 2019 for current version), 
 which may be more prone to revisions at initial publication.
 
-## Download and read IDATs from GEO
+## Download and read IDATs from the GEO database server
 
-Download IDATs for the 2 samples used in the examples above. Obtain a new 
-`RGChannelSet` from downloaded GEO IDATs with `gds_idat2rg`, specifying the 
-test dataset GSM IDs in the `gsmv` argument. Remember to set `dfp` destination directory. This defaults to "idats", but we'll set it to the temp directory path specified above.
+Use the `gds_idat2rg` function to download IDATs for the 2 test samples 
+and load these into a new `RGChannelSet` object. Do this by passing a vector
+of GSM IDs to `gsmv` and the download
+destination to `dfp`.
 
 ```{r}
+dlpath <- tempdir()
 gsmv <- c("GSM1038308", "GSM1038309")
-geo.rg <- gds_idat2rg(gsmv, dfp = newpath)
+geo.rg <- gds_idat2rg(gsmv, dfp = dlpath)
 colnames(geo.rg) <- gsub("\\_.*", "", colnames(geo.rg))
 ```
 
@@ -355,8 +363,8 @@ identical(geo.green, h5.green)
 
 ## Compare DNAm Beta-values
 
-To compare the GEO-downloaded and `h5se.test` data, first normalize the former 
-using out-of-band or "noob" normalization.
+Before comparing the GEO-downloaded data to data from the `h5se.test` database, normalize the data using the same out-of-band or "noob" normalization technique 
+that was used to generate data in the h5se database.
 
 ```{r}
 geo.gr <- minfi::preprocessNoob(geo.rg)
@@ -381,7 +389,7 @@ identical(rownames(geo.bm), rownames(h5se.bm))
 Finally, compare the two datasets.
 
 ```{r}
-identical(geo.bm, h5se.bm)
+identical(summary(geo.bm), summary(h5se.bm))
 ```
 
 # Get more help
