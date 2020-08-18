@@ -9,8 +9,6 @@
 #' @param gsmvi Vector of valid GSM IDs.
 #' @param ext Filename extension.
 #' @param expand Whether to expand compressed files.
-#' @param sys.cmd System command to expand compressed files if expand TRUE 
-#' (default "gunzip").
 #' @param verbose Whether to show verbose messages (default FALSE).
 #' @param dfp Destination directory for downloads.
 #' @param burl Base URL string for RCurl query.
@@ -19,8 +17,8 @@
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' gds_idatquery(gsmvi, dfp = file.path(tempdir(), "gds_idatquery_example"))
 #' @export
-gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE, 
-  sys.cmd = "gunzip ", verbose = FALSE, dfp = "idats",
+gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
+  verbose = FALSE, dfp = "idats",
   burl = paste0("ftp://ftp.ncbi.nlm.nih.gov/geo/samples/")){
   bnv <- fnv <- c()
   if(verbose){message("Checking dest dir dfp.")}
@@ -53,7 +51,11 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
         fnv <- c(fnv, dest.fpath)
         if(expand){
           if(verbose){message("Expanding compressed file...")}
-          system(paste0(sys.cmd, dest.fpath))
+          tcond <- try(R.utils::gunzip(dest.fpath))
+          #tcond <- try(system(paste0(sys.cmd, dest.fpath)))
+          if(is(tcond, "try-error")){
+            message("Error expanding file ", dest.fpath)
+          }
         }
         message(f)
       }
@@ -120,7 +122,7 @@ gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/",
 #' # Get tests data pointer
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn <- list.files(path)
-#' dbpath = file.path(path, fn)
+#' dbpath <- file.path(path, fn)
 #' # red signal, first 2 assay addr, 3 samples
 #' reds <- hread(1:2, 1:3, d = "redsignal", dbn = dbpath)
 #' dim(reds) # [1] 2 3
@@ -142,8 +144,8 @@ hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
 #' @return data.frame of available sample metadata.
 #' @examples 
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
-#' fn = list.files(path)
-#' dbpath = file.path(path, fn)
+#' fn <- list.files(path)
+#' dbpath <- file.path(path, fn)
 #' mdp <- data_mdpost(dbn = dbpath, dsn = "mdpost")
 #' dim(mdp) # [1]  2 19
 #' @seealso hread()
@@ -177,9 +179,9 @@ data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
 #' colnames(ds1) <- colnames(ds2) <- paste0("col", c(1, 2))
 #' ds2 <- ds2[rev(seq(1, 5, 1)), c(2, 1)]
 #' # match row and column names
-#' lmatched = matchds_1to2(ds1, ds2, mi1 = "rows", mi2 = "rows")
-#' lmatched = matchds_1to2(lmatched[[1]], lmatched[[2]], mi1 = "columns", 
-#'  mi2 = "columns")
+#' lmatched <- matchds_1to2(ds1, ds2, mi1 = "rows", mi2 = "rows")
+#' lmatched <- matchds_1to2(lmatched[[1]], lmatched[[2]], mi1 = "columns", 
+#'  mi2 <- "columns")
 #' # check matches
 #' ds1m <- lmatched[[1]]
 #' ds2m <- lmatched[[2]]
@@ -232,8 +234,8 @@ matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
 #' @examples 
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn <- list.files(path)
-#' dbpath = file.path(path, fn)
-#' rg = getrg(dbn = dbpath, all.gsm = TRUE, metadata = FALSE)
+#' dbpath <- file.path(path, fn)
+#' rg <- getrg(dbn = dbpath, all.gsm = TRUE, metadata = FALSE)
 #' dim(rg) # [1] 11162     2
 #' class(rg)
 #' # [1] "RGChannelSet"
@@ -309,8 +311,8 @@ rgse <- function(ldat, verbose = FALSE){
 #' @examples
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn <- list.files(path)
-#' dbpath = file.path(path, fn)
-#' rg = getrg(dbn = dbpath, all.gsm = TRUE, metadata = FALSE)
+#' dbpath <- file.path(path, fn)
+#' rg <- getrg(dbn = dbpath, all.gsm = TRUE, metadata = FALSE)
 #' dim(rg) # [1] 11162     2
 #' class(rg)
 #' # [1] "RGChannelSet"

@@ -3,7 +3,7 @@ testthat::context("Test HDF5 dataset download")
 testthat::test_that("HDF5 database properties", {
 
     # database download
-    dldn <- "temp"
+    dldn <- tempdir()
     h5path <- recountmethylation::getdb_h5_test(dfp = dldn)
     testthat::expect_true(file.exists(h5path))
     # database properties

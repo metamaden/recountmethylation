@@ -46,10 +46,6 @@ New filepath to dir with downloaded data.
 Uses RCurl to recursively download latest H5SE and HDF5 data objects from 
 the server. This is currently wrapped in the getdb() functions.
 }
-\examples{
-dlpath <- file.path(tempdir(), "get_rmdl_example")
-path <- get_rmdl(which.class = "test", which.type = "h5se", dfp = dlpath)
-}
 \seealso{
 servermatrix(), getURL(), loadHDF5SummarizedExperiment(), h5ls()
 }

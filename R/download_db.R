@@ -85,6 +85,8 @@ servermatrix <- function(dn, sslver = FALSE, printmatrix = TRUE,
 #' @return New filepath to dir with downloaded data.
 #' @examples 
 #' dlpath <- file.path(tempdir(), "get_rmdl_example")
+#' # ensure path separator symbol consistency (namely for windows)
+#' dlpath <- gsub("\\\", "/", dlpath)
 #' path <- get_rmdl(which.class = "test", which.type = "h5se", dfp = dlpath)
 #' @seealso servermatrix(), getURL(), loadHDF5SummarizedExperiment(), h5ls()
 #' @export
@@ -160,7 +162,8 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
 NULL
 #' @rdname getdb
 #' @examples
-#' path <- getdb_h5se_test(dfp = file.path(tempdir(), "getdb_example"))
+#' # download test file to temp directory
+#' h5 <- getdb_h5_test(dfp = tempdir())
 #' @export
 getdb_h5se_test <- function(name = NULL, dfp = "downloads", verbose = FALSE){
   dbpath <- FALSE

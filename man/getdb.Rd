@@ -47,7 +47,8 @@ functions are "rg" (red and green signal datasets), and "test" (data for 2
 samples from "rg"). See vignette for details about file types and classes.
 }
 \examples{
-path <- getdb_h5se_test(dfp = file.path(tempdir(), "getdb_example"))
+# download test file to temp directory
+h5 <- getdb_h5_test(dfp = tempdir())
 }
 \seealso{
 get_rmdl()

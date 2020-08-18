@@ -33,6 +33,7 @@ suppressMessages(library(ggplot2))
 suppressMessages(library(gridExtra))
 suppressMessages(library(GenomicRanges))
 suppressMessages(library(limma))
+suppressMessages(library(HDF5Array))
 opts_chunk$set(eval = FALSE, echo = TRUE, 
                warning = FALSE, message = FALSE)
 ```
