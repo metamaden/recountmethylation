@@ -1,7 +1,6 @@
 testthat::context("Test HDF5 dataset download")
 
 testthat::test_that("HDF5 database properties", {
-
     # database download
     dldn <- tempdir()
     h5path <- recountmethylation::getdb_h5_test(dfp = dldn)
@@ -18,8 +17,5 @@ testthat::test_that("HDF5 database properties", {
     testthat::expect_equal(nrow(h5dat[h5dat$name == "redsignal.colnames",]), 1)
     testthat::expect_equal(nrow(h5dat[h5dat$name == "redsignal.rownames",]), 1)
     testthat::expect_equal(nrow(h5dat[h5dat$name == "mdpost.colnames",]), 1)
-    # remove temp dir
-    unlink(dldn, recursive = TRUE)
-
 })
 

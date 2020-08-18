@@ -127,7 +127,8 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
   for(fi in fl.clean){
     fpath <- ifelse(fi == "", dn.url, paste(dn.url, fi, sep = "/"))
     destpath <- ifelse(fi == "", dfp.dn, paste(dfp.dn, fi, sep="/"))
-    trydl <- try(utils::download.file(url = fpath, destfile = destpath, 
+    trydl <- try(utils::download.file(url = fpath, destfile = destpath,
+                              method = "curl", 
                               .opts = list(ssl.verifypeer = sslver)))
   }
   if(is(trydl)[1] == "try-error" | length(dll[dll==0]) < length(dll)){

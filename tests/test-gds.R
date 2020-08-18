@@ -1,8 +1,7 @@
 testthat::context("GEO validate SummarizedExperiment")
 
 testthat::test_that("Download and object properties", {
-
-    dldn <- "./temp/"
+    dldn <- tempdir()
     gsmv <- c("GSM2465267", "GSM2814572")
     gdq <- recountmethylation::gds_idatquery(gsmv, dfp = dldn)
     # ids in query
@@ -11,6 +10,4 @@ testthat::test_that("Download and object properties", {
     # idat downloads
     gds.se <- recountmethylation::gds_idat2rg(gsmv, dfp = dldn)
     testthat::expect_that(gds.se, testthat::is_a("RGChannelSet"))
-    unlink(dldn, recursive = TRUE)
-    
 })
