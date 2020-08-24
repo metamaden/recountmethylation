@@ -133,7 +133,10 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
   }
   if(is(trydl)[1] == "try-error" | length(dll[dll==0]) < length(dll)){
     message("Download incomplete for ", fl.clean[which(dll!=0)])
-  } else{return(dfp.dn)}
+  } else{
+    dfp.dn <- gsub("\\\\", "/", dfp.dn) # fixes windows path
+    return(dfp.dn)
+  }
   return(NULL)
 }
 
