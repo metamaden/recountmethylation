@@ -281,7 +281,7 @@ h5.rg <- getrg(dbn = h5.test, all.gsm = TRUE)
 
 To avoid exhausting active memory with the full-sized `h5` dataset, provide 
 either `gsmv` or `cgv` to `getrg`, and set either `all.cg` or `all.gsm` to 
-`FLASE` (see `?getrg` for details).
+FALSE (see `?getrg` for details).
 
 As in the previous example, use `pData` and `getAnnotation` to get sample 
 metadata and array manifest information, respectively. Access the green and 
