@@ -119,7 +119,7 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
   dct1 <- ifelse(!dir.exists(dfp) & !dfp == "", try(dir.create(dfp)), TRUE)
   dfp.dn <- paste(dfp, dnc, sep = "/") # download loc
   if(which.type == "h5"){dct2 <- try(file.create(dfp.dn))} else{
-    dct2 <- ifelse(!dir.exists(dfp.dn), try(dir.create(dfp.dn), TRUE))}
+    dct2 <- ifelse(!dir.exists(dfp.dn), try(dir.create(dfp.dn)), TRUE)}
   if(!(dct1 & dct2)){stop("Problem handling download destination.")}
   dn.url <- paste0(url, dnc)
   if(which.type=="h5"){fl.clean<-""} else{fl.clean<-c("assays.h5","se.rds")}
