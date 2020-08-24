@@ -10,23 +10,32 @@
 \alias{getdb_h5_rg}
 \title{Access database files.}
 \usage{
-getdb_h5se_test(name = NULL, dfp = "downloads", verbose = FALSE)
+getdb_h5se_test(
+  namematch = "remethdb-h5se_gr-test.*",
+  dfp = NULL,
+  verbose = FALSE
+)
 
-getdb_h5_test(name = NULL, dfp = "downloads", verbose = FALSE)
+getdb_h5_test(
+  namematch = "remethdb-h5_rg-test_.*",
+  dfp = NULL,
+  verbose = FALSE
+)
 
-getdb_h5se_gr(name = NULL, dfp = "downloads", verbose = FALSE)
+getdb_h5se_gr(namematch = "remethdb-h5se_gr_.*", dfp = NULL, verbose = FALSE)
 
-getdb_h5se_gm(name = NULL, dfp = "downloads", verbose = FALSE)
+getdb_h5se_gm(namematch = "remethdb-h5se_gm_.*", dfp = NULL, verbose = FALSE)
 
-getdb_h5se_rg(name = NULL, dfp = "downloads", verbose = FALSE)
+getdb_h5se_rg(namematch = "remethdb-h5se_rg_.*", dfp = NULL, verbose = FALSE)
 
-getdb_h5_rg(name = NULL, dfp = "downloads", verbose = FALSE)
+getdb_h5_rg(namematch = "remethdb-h5_rg_.*", dfp = NULL, verbose = FALSE)
 }
 \arguments{
-\item{name}{Database file name (optional, default NULL).}
+\item{namematch}{Filename pattern to match when searching for database 
+(see defaults).}
 
-\item{dfp}{Folder to search for database file specified by "name" 
-(optional, default "downloads").}
+\item{dfp}{Folder to search for database file 
+(optional, if NULL then searches cache dir specified by BiocFileCache).}
 
 \item{verbose}{Whether to return verbose messages (default FALSE).}
 }
@@ -36,7 +45,7 @@ path for h5 functions.
 }
 \description{
 Combines download and load functions for databases. 
-If "name" argument not provided, the latest available file is downloaded.
+If the "namematch" argument isn't provided, the latest available file is downloaded.
 All files include metadata for the available samples.
 
 There are 6 functions. Functions with "h5se" access 

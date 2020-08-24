@@ -119,7 +119,7 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
   dct1 <- ifelse(!dir.exists(dfp) & !dfp == "", try(dir.create(dfp)), TRUE)
   dfp.dn <- paste(dfp, dnc, sep = "/") # download loc
   if(which.type == "h5"){dct2 <- try(file.create(dfp.dn))} else{
-    dct2 <- try(dir.create(dfp.dn))}
+    dct2 <- ifelse(!dir.exists(dfp.dn), try(dir.create(dfp.dn)), TRUE)}
   if(!(dct1 & dct2)){stop("Problem handling download destination.")}
   dn.url <- paste0(url, dnc)
   if(which.type=="h5"){fl.clean<-""} else{fl.clean<-c("assays.h5","se.rds")}
@@ -133,7 +133,10 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
   }
   if(is(trydl)[1] == "try-error" | length(dll[dll==0]) < length(dll)){
     message("Download incomplete for ", fl.clean[which(dll!=0)])
-  } else{return(dfp.dn)}
+  } else{
+    dfp.dn <- gsub("\\\\", "/", dfp.dn) # fixes windows path
+    return(dfp.dn)
+  }
   return(NULL)
 }
 
@@ -143,7 +146,7 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
 #' @title Access database files.
 #'
 #' @description Combines download and load functions for databases. 
-#' If "name" argument not provided, the latest available file is downloaded.
+#' If the "namematch" argument isn't provided, the latest available file is downloaded.
 #' All files include metadata for the available samples.
 #' 
 #' There are 6 functions. Functions with "h5se" access 
@@ -153,9 +156,10 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
 #' functions are "rg" (red and green signal datasets), and "test" (data for 2 
 #' samples from "rg"). See vignette for details about file types and classes. 
 #' 
-#' @param name Database file name (optional, default NULL).
-#' @param dfp Folder to search for database file specified by "name" 
-#' (optional, default "downloads").
+#' @param namematch Filename pattern to match when searching for database 
+#' (see defaults).
+#' @param dfp Folder to search for database file 
+#' (optional, if NULL then searches cache dir specified by BiocFileCache).
 #' @param verbose Whether to return verbose messages (default FALSE).
 #' @seealso get_rmdl()
 #' @return Either a SummarizedExperiment object for h5se functions, or a file 
@@ -166,181 +170,217 @@ NULL
 #' # download test file to temp directory
 #' h5 <- getdb_h5_test(dfp = tempdir())
 #' @export
-getdb_h5se_test <- function(name = NULL, dfp = "downloads", verbose = FALSE){
-  dbpath <- FALSE
-  if(!is.null(name)){
-    dbpath <- paste(dfp, name, sep = "/")
-    if(!file.exists(dbpath)){
-      message("Dataset file not found at dfp.")
-    } else{
-      message("Dataset file found at dfp.")
-    }
-  } else{
+getdb_h5se_test <- function(namematch = "remethdb-h5se_gr-test.*", 
+  dfp = NULL, verbose = FALSE){
+  download <- FALSE
+  if(is.null(dfp)){dfp <- BiocFileCache::BiocFileCache()@cache}
+  clf <- list.files(dfp)
+  fmatch <- clf[grepl(namematch, clf)]
+  if(!is.null(namematch) & length(fmatch) > 0){
+    fn1 <- fmatch[1]
+    fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
+    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
+    opt <- readline(ostr)
+    if(!opt %in% c("Y", "N")){stop("Unsupported input")}
+    if(opt == "N"){download <- TRUE}
+  } else{download <- TRUE}
+  if(download){
     message("Downloading database...")
-    dbpath <- try(get_rmdl(which.class = "test", dfp = dfp, 
-      which.type = "h5se", verbose = verbose))
+    dbpath <- try(
+      get_rmdl(which.class = "test", dfp = dfp, which.type = "h5se", 
+        verbose = verbose)
+    )
     if(!is(dbpath)[1] == "try-errror"){
       message("Download completed.")
-    } else{stop("Problem with download.")}
+      } else{stop("Problem with download.")}
   }
-  # parse load
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
-  }
-  if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
-    message("Database file loaded.")
-    return(dbf)
+    if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
+      message("Database file loaded.")
+      return(dbf)
+    }
   }
   return(NULL)
 }
 #' @rdname getdb
 #' @export
-getdb_h5_test <- function(name = NULL, dfp = "downloads", verbose = FALSE){
-  dbpath <- FALSE
-  if(!is.null(name)){
-    dbpath <- paste(dfp, name, sep = "/")
-    if(!file.exists(dbpath)){
-      message("Dataset file not found at dfp.")
-    } else{
-      message("Dataset file found at dfp.")
-    }
-  } else{
+getdb_h5_test <- function(namematch = "remethdb-h5_rg-test_.*", 
+  dfp = NULL, verbose = FALSE){
+  download <- FALSE
+  if(is.null(dfp)){dfp <- BiocFileCache::BiocFileCache()@cache}
+  clf <- list.files(dfp)
+  fmatch <- clf[grepl(namematch, clf)]
+  if(!is.null(namematch) & length(fmatch) > 0){
+    fn1 <- fmatch[1]
+    fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
+    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
+    opt <- readline(ostr)
+    if(!opt %in% c("Y", "N")){stop("Unsupported input")}
+    if(opt == "N"){download <- TRUE}
+  } else{download <- TRUE}
+  if(download){
     message("Downloading database...")
-    dbpath <- try(get_rmdl(which.class = "test", dfp = dfp, 
-      which.type = "h5", verbose = verbose))
+    dbpath <- try(
+      get_rmdl(which.class = "test", dfp = dfp, which.type = "h5", 
+        verbose = verbose)
+    )
     if(!is(dbpath)[1] == "try-errror"){
       message("Download completed.")
-    } else{stop("Problem with download.")}
+      } else{stop("Problem with download.")}
   }
-  # parse load
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(suppressMessages(rhdf5::h5ls(dbpath)))
-  }
-  if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
-    message("Database file loaded.")
-    return(dbpath)
+    if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
+      message("Database file loaded.")
+      return(dbpath)
+    }
   }
   return(NULL)
 }
 #' @rdname getdb
 #' @export
-getdb_h5se_gr <- function(name = NULL, dfp = "downloads", verbose = FALSE){
-  dbpath <- FALSE
-  if(!is.null(name)){
-    dbpath <- paste(dfp, name, sep = "/")
-    if(!file.exists(dbpath)){
-      message("Dataset file not found at dfp.")
-    } else{
-      message("Dataset file found at dfp.")
-    }
-  } else{
+getdb_h5se_gr <- function(namematch = "remethdb-h5se_gr_.*", 
+  dfp = NULL, verbose = FALSE){
+  download <- FALSE
+  if(is.null(dfp)){dfp <- BiocFileCache::BiocFileCache()@cache}
+  clf <- list.files(dfp)
+  fmatch <- clf[grepl(namematch, clf)]
+  if(!is.null(namematch) & length(fmatch) > 0){
+    fn1 <- fmatch[1]
+    fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
+    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
+    opt <- readline(ostr)
+    if(!opt %in% c("Y", "N")){stop("Unsupported input")}
+    if(opt == "N"){download <- TRUE}
+  } else{download <- TRUE}
+  if(download){
     message("Downloading database...")
-    dbpath <- try(get_rmdl(which.class = "gr", dfp = dfp, 
-      which.type = "h5se", verbose = verbose))
+    dbpath <- try(
+      get_rmdl(which.class = "gr", dfp = dfp, which.type = "h5se", 
+        verbose = verbose)
+    )
     if(!is(dbpath)[1] == "try-errror"){
       message("Download completed.")
-    } else{stop("Problem with download.")}
+      } else{stop("Problem with download.")}
   }
-  # parse load
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
-  }
-  if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
-    message("Database file loaded.")
-    return(dbf)
+    if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
+      message("Database file loaded.")
+      return(dbf)
+    }
   }
   return(NULL)
 }
 #' @rdname getdb
 #' @export
-getdb_h5se_gm <- function(name = NULL, dfp = "downloads", verbose = FALSE){
-  dbpath <- FALSE
-  if(!is.null(name)){
-    dbpath <- paste(dfp, name, sep = "/")
-    if(!file.exists(dbpath)){
-      message("Dataset file not found at dfp.")
-    } else{
-      message("Dataset file found at dfp.")
-    }
-  } else{
+getdb_h5se_gm <- function(namematch = "remethdb-h5se_gm_.*", 
+  dfp = NULL, verbose = FALSE){
+  download <- FALSE
+  if(is.null(dfp)){dfp <- BiocFileCache::BiocFileCache()@cache}
+  clf <- list.files(dfp)
+  fmatch <- clf[grepl(namematch, clf)]
+  if(!is.null(namematch) & length(fmatch) > 0){
+    fn1 <- fmatch[1]
+    fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
+    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
+    opt <- readline(ostr)
+    if(!opt %in% c("Y", "N")){stop("Unsupported input")}
+    if(opt == "N"){download <- TRUE}
+  } else{download <- TRUE}
+  if(download){
     message("Downloading database...")
-    dbpath <- try(get_rmdl(which.class = "gm", dfp = dfp, 
-      which.type = "h5se", verbose = verbose))
+    dbpath <- try(
+      get_rmdl(which.class = "gm", dfp = dfp, which.type = "h5se", 
+        verbose = verbose)
+    )
     if(!is(dbpath)[1] == "try-errror"){
       message("Download completed.")
-    } else{stop("Problem with download.")}
+      } else{stop("Problem with download.")}
   }
-  # parse load
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
-  }
-  if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
-    message("Database file loaded.")
-    return(dbf)
+    if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
+      message("Database file loaded.")
+      return(dbf)
+    }
   }
   return(NULL)
 }
 #' @rdname getdb
 #' @export
-getdb_h5se_rg <- function(name = NULL, dfp = "downloads", verbose = FALSE){
-  dbpath <- FALSE
-  if(!is.null(name)){
-    dbpath <- paste(dfp, name, sep = "/")
-    if(!file.exists(dbpath)){
-      message("Dataset file not found at dfp.")
-    } else{
-      message("Dataset file found at dfp.")
-    }
-  } else{
+getdb_h5se_rg <- function(namematch = "remethdb-h5se_rg_.*", 
+  dfp = NULL, verbose = FALSE){
+  download <- FALSE
+  if(is.null(dfp)){dfp <- BiocFileCache::BiocFileCache()@cache}
+  clf <- list.files(dfp)
+  fmatch <- clf[grepl(namematch, clf)]
+  if(!is.null(namematch) & length(fmatch) > 0){
+    fn1 <- fmatch[1]
+    fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
+    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
+    opt <- readline(ostr)
+    if(!opt %in% c("Y", "N")){stop("Unsupported input")}
+    if(opt == "N"){download <- TRUE}
+  } else{download <- TRUE}
+  if(download){
     message("Downloading database...")
-    dbpath <- try(get_rmdl(which.class = "rg", dfp = dfp, 
-      which.type = "h5se", verbose = verbose))
+    dbpath <- try(
+      get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5se", 
+        verbose = verbose)
+    )
     if(!is(dbpath)[1] == "try-errror"){
       message("Download completed.")
-    } else{stop("Problem with download.")}
+      } else{stop("Problem with download.")}
   }
-  # parse load
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
-  }
-  if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
-    message("Database file loaded.")
-    return(dbf)
+    if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
+      message("Database file loaded.")
+      return(dbf)
+    }
   }
   return(NULL)
 }
 #' @rdname getdb
 #' @export
-getdb_h5_rg <- function(name = NULL, dfp = "downloads", verbose = FALSE){
-  dbpath <- FALSE
-  if(!is.null(name)){
-    dbpath <- paste(dfp, name, sep = "/")
-    if(!file.exists(dbpath)){
-      message("Dataset file not found at dfp.")
-    } else{
-      message("Dataset file found at dfp.")
-    }
-  } else{
+getdb_h5_rg <- function(namematch = "remethdb-h5_rg_.*", 
+  dfp = NULL, verbose = FALSE){
+  download <- FALSE
+  if(is.null(dfp)){dfp <- BiocFileCache::BiocFileCache()@cache}
+  clf <- list.files(dfp)
+  fmatch <- clf[grepl(namematch, clf)]
+  if(!is.null(namematch) & length(fmatch) > 0){
+    fn1 <- fmatch[1]
+    fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
+    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
+    opt <- readline(ostr)
+    if(!opt %in% c("Y", "N")){stop("Unsupported input")}
+    if(opt == "N"){download <- TRUE}
+  } else{download <- TRUE}
+  if(download){
     message("Downloading database...")
-    dbpath <- try(get_rmdl(which.class = "rg", dfp = dfp, 
-      which.type = "h5", verbose = verbose))
+    dbpath <- try(
+      get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5", 
+        verbose = verbose)
+    )
     if(!is(dbpath)[1] == "try-errror"){
       message("Download completed.")
-    } else{stop("Problem with download.")}
+      } else{stop("Problem with download.")}
   }
-  # parse load
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(suppressMessages(rhdf5::h5ls(dbpath)))
-  }
-  if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
-    message("Database file loaded.")
-    return(dbpath)
+    if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
+      message("Database file loaded.")
+      return(dbpath)
+    }
   }
   return(NULL)
 }
