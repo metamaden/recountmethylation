@@ -239,7 +239,7 @@ getdb_h5_test <- function(namematch = "remethdb-h5_rg-test_.*",
 }
 #' @rdname getdb
 #' @export
-getdb_h5se_gr <- function(name = "remethdb-h5se_gr_.*", 
+getdb_h5se_gr <- function(namematch = "remethdb-h5se_gr_.*", 
   dfp = NULL, verbose = FALSE){
   download <- FALSE
   if(is.null(dfp)){dfp <- BiocFileCache::BiocFileCache()@cache}
