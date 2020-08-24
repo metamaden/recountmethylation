@@ -22,7 +22,7 @@ getdb_h5_test(
   verbose = FALSE
 )
 
-getdb_h5se_gr(name = "remethdb-h5se_gr_.*", dfp = NULL, verbose = FALSE)
+getdb_h5se_gr(namematch = "remethdb-h5se_gr_.*", dfp = NULL, verbose = FALSE)
 
 getdb_h5se_gm(namematch = "remethdb-h5se_gm_.*", dfp = NULL, verbose = FALSE)
 
