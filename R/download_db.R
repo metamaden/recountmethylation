@@ -179,7 +179,7 @@ getdb_h5se_test <- function(namematch = "remethdb-h5se_gr-test.*",
   if(!is.null(namematch) & length(fmatch) > 0){
     fn1 <- fmatch[1]
     fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file ", fpath, "? (enter 'Y' or 'N')")
+    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
     opt <- readline(ostr)
     if(!opt %in% c("Y", "N")){stop("Unsupported input")}
     if(opt == "N"){download <- TRUE}
@@ -215,7 +215,7 @@ getdb_h5_test <- function(namematch = "remethdb-h5_rg-test_.*",
   if(!is.null(namematch) & length(fmatch) > 0){
     fn1 <- fmatch[1]
     fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file ", fpath, "? (enter 'Y' or 'N')")
+    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
     opt <- readline(ostr)
     if(!opt %in% c("Y", "N")){stop("Unsupported input")}
     if(opt == "N"){download <- TRUE}
@@ -251,7 +251,7 @@ getdb_h5se_gr <- function(namematch = "remethdb-h5se_gr_.*",
   if(!is.null(namematch) & length(fmatch) > 0){
     fn1 <- fmatch[1]
     fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file ", fpath, "? (enter 'Y' or 'N')")
+    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
     opt <- readline(ostr)
     if(!opt %in% c("Y", "N")){stop("Unsupported input")}
     if(opt == "N"){download <- TRUE}
@@ -287,7 +287,7 @@ getdb_h5se_gm <- function(namematch = "remethdb-h5se_gm_.*",
   if(!is.null(namematch) & length(fmatch) > 0){
     fn1 <- fmatch[1]
     fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file ", fpath, "? (enter 'Y' or 'N')")
+    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
     opt <- readline(ostr)
     if(!opt %in% c("Y", "N")){stop("Unsupported input")}
     if(opt == "N"){download <- TRUE}
@@ -323,7 +323,7 @@ getdb_h5se_rg <- function(namematch = "remethdb-h5se_rg_.*",
   if(!is.null(namematch) & length(fmatch) > 0){
     fn1 <- fmatch[1]
     fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file ", fpath, "? (enter 'Y' or 'N')")
+    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
     opt <- readline(ostr)
     if(!opt %in% c("Y", "N")){stop("Unsupported input")}
     if(opt == "N"){download <- TRUE}
@@ -359,7 +359,7 @@ getdb_h5_rg <- function(namematch = "remethdb-h5_rg_.*",
   if(!is.null(namematch) & length(fmatch) > 0){
     fn1 <- fmatch[1]
     fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file ", fpath, "? (enter 'Y' or 'N')")
+    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
     opt <- readline(ostr)
     if(!opt %in% c("Y", "N")){stop("Unsupported input")}
     if(opt == "N"){download <- TRUE}
