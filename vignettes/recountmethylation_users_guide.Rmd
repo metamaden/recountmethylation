@@ -383,13 +383,15 @@ h5se.bm <- as.matrix(h5se.bm)
 int.cg <- intersect(rownames(geo.bm), rownames(h5se.bm))
 geo.bm <- geo.bm[int.cg,]
 geo.bm <- geo.bm[order(match(rownames(geo.bm), rownames(h5se.bm))),]
-identical(rownames(geo.bm), rownames(h5se.bm))
 ```
 
 Finally, compare the two datasets.
 
 ```{r}
 identical(summary(geo.bm), summary(h5se.bm))
+```
+```{r}
+identical(rownames(geo.bm), rownames(h5se.bm))
 ```
 
 # Get more help
