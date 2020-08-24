@@ -25,7 +25,8 @@ Imports:
     utils,
     methods,
     RCurl,
-    R.utils
+    R.utils,
+    BiocFileCache
 Suggests:
     knitr,
     testthat,
