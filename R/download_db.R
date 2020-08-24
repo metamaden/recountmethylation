@@ -235,7 +235,7 @@ getdb_h5_test <- function(namematch = "remethdb-h5_rg-test_.*",
     dbf <- try(suppressMessages(rhdf5::h5ls(dbpath)))
     if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
       message("Database file loaded.")
-      return(dbf)
+      return(dbpath)
     }
   }
   return(NULL)
@@ -379,7 +379,7 @@ getdb_h5_rg <- function(namematch = "remethdb-h5_rg_.*",
     dbf <- try(suppressMessages(rhdf5::h5ls(dbpath)))
     if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
       message("Database file loaded.")
-      return(dbf)
+      return(dbpath)
     }
   }
   return(NULL)
