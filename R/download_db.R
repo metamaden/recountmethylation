@@ -118,6 +118,12 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
   if(!download){return(dnc)}
   dct1 <- ifelse(!dir.exists(dfp) & !dfp == "", try(dir.create(dfp)), TRUE)
   dfp.dn <- paste(dfp, dnc, sep = "/") # download loc
+  # check overwrite
+  if(file.exists(dfp.dn)){
+    ostr <- paste0("Ok to overwrite existing file:\n", dfp.dn, 
+      "?\n(yes/no)"); opt <- readline(ostr)
+    if(!opt %in% c("yes", "no")){stop("Unsupported input")}
+    if(opt == "no"){stop("Stopping download")}}
   if(which.type == "h5"){dct2 <- try(file.create(dfp.dn))} else{
     dct2 <- ifelse(!dir.exists(dfp.dn), try(dir.create(dfp.dn)), TRUE)}
   if(!(dct1 & dct2)){stop("Problem handling download destination.")}
@@ -179,10 +185,10 @@ getdb_h5se_test <- function(namematch = "remethdb-h5se_gr-test.*",
   if(!is.null(namematch) & length(fmatch) > 0){
     fn1 <- fmatch[1]
     fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
+    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)")
     opt <- readline(ostr)
-    if(!opt %in% c("Y", "N")){stop("Unsupported input")}
-    if(opt == "N"){download <- TRUE}
+    if(!opt %in% c("yes", "no")){stop("Unsupported input")}
+    if(opt == "no"){download <- TRUE}
   } else{download <- TRUE}
   if(download){
     message("Downloading database...")
@@ -193,7 +199,7 @@ getdb_h5se_test <- function(namematch = "remethdb-h5se_gr-test.*",
     if(!is(dbpath)[1] == "try-errror"){
       message("Download completed.")
       } else{stop("Problem with download.")}
-  }
+  } else{dbpath <- fpath}
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
@@ -215,10 +221,10 @@ getdb_h5_test <- function(namematch = "remethdb-h5_rg-test_.*",
   if(!is.null(namematch) & length(fmatch) > 0){
     fn1 <- fmatch[1]
     fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
+    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)")
     opt <- readline(ostr)
-    if(!opt %in% c("Y", "N")){stop("Unsupported input")}
-    if(opt == "N"){download <- TRUE}
+    if(!opt %in% c("yes", "no")){stop("Unsupported input")}
+    if(opt == "no"){download <- TRUE}
   } else{download <- TRUE}
   if(download){
     message("Downloading database...")
@@ -229,7 +235,7 @@ getdb_h5_test <- function(namematch = "remethdb-h5_rg-test_.*",
     if(!is(dbpath)[1] == "try-errror"){
       message("Download completed.")
       } else{stop("Problem with download.")}
-  }
+  } else{dbpath <- fpath}
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(suppressMessages(rhdf5::h5ls(dbpath)))
@@ -251,10 +257,10 @@ getdb_h5se_gr <- function(namematch = "remethdb-h5se_gr_.*",
   if(!is.null(namematch) & length(fmatch) > 0){
     fn1 <- fmatch[1]
     fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
+    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)")
     opt <- readline(ostr)
-    if(!opt %in% c("Y", "N")){stop("Unsupported input")}
-    if(opt == "N"){download <- TRUE}
+    if(!opt %in% c("yes", "no")){stop("Unsupported input")}
+    if(opt == "no"){download <- TRUE}
   } else{download <- TRUE}
   if(download){
     message("Downloading database...")
@@ -265,7 +271,7 @@ getdb_h5se_gr <- function(namematch = "remethdb-h5se_gr_.*",
     if(!is(dbpath)[1] == "try-errror"){
       message("Download completed.")
       } else{stop("Problem with download.")}
-  }
+  } else{dbpath <- fpath}
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
@@ -287,10 +293,10 @@ getdb_h5se_gm <- function(namematch = "remethdb-h5se_gm_.*",
   if(!is.null(namematch) & length(fmatch) > 0){
     fn1 <- fmatch[1]
     fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
+    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)")
     opt <- readline(ostr)
-    if(!opt %in% c("Y", "N")){stop("Unsupported input")}
-    if(opt == "N"){download <- TRUE}
+    if(!opt %in% c("yes", "no")){stop("Unsupported input")}
+    if(opt == "no"){download <- TRUE}
   } else{download <- TRUE}
   if(download){
     message("Downloading database...")
@@ -301,7 +307,7 @@ getdb_h5se_gm <- function(namematch = "remethdb-h5se_gm_.*",
     if(!is(dbpath)[1] == "try-errror"){
       message("Download completed.")
       } else{stop("Problem with download.")}
-  }
+  } else{dbpath <- fpath}
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
@@ -323,10 +329,10 @@ getdb_h5se_rg <- function(namematch = "remethdb-h5se_rg_.*",
   if(!is.null(namematch) & length(fmatch) > 0){
     fn1 <- fmatch[1]
     fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
+    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)")
     opt <- readline(ostr)
-    if(!opt %in% c("Y", "N")){stop("Unsupported input")}
-    if(opt == "N"){download <- TRUE}
+    if(!opt %in% c("yes", "no")){stop("Unsupported input")}
+    if(opt == "no"){download <- TRUE}
   } else{download <- TRUE}
   if(download){
     message("Downloading database...")
@@ -337,7 +343,7 @@ getdb_h5se_rg <- function(namematch = "remethdb-h5se_rg_.*",
     if(!is(dbpath)[1] == "try-errror"){
       message("Download completed.")
       } else{stop("Problem with download.")}
-  }
+  } else{dbpath <- fpath}
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
@@ -359,10 +365,10 @@ getdb_h5_rg <- function(namematch = "remethdb-h5_rg_.*",
   if(!is.null(namematch) & length(fmatch) > 0){
     fn1 <- fmatch[1]
     fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file ", fpath, "?\n(enter 'Y' or 'N')")
+    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)")
     opt <- readline(ostr)
-    if(!opt %in% c("Y", "N")){stop("Unsupported input")}
-    if(opt == "N"){download <- TRUE}
+    if(!opt %in% c("yes", "no")){stop("Unsupported input")}
+    if(opt == "no"){download <- TRUE}
   } else{download <- TRUE}
   if(download){
     message("Downloading database...")
@@ -373,7 +379,7 @@ getdb_h5_rg <- function(namematch = "remethdb-h5_rg_.*",
     if(!is(dbpath)[1] == "try-errror"){
       message("Download completed.")
       } else{stop("Problem with download.")}
-  }
+  } else{dbpath <- fpath}
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(suppressMessages(rhdf5::h5ls(dbpath)))
