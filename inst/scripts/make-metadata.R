@@ -12,7 +12,7 @@ smf1 <- smf[,1]
 
 # get field info
 linfo <- list()
-linfo[["h5se_gr"]] <- list(fn = "remethdb-h5se_gr-test_0-0-1_1590090412",
+linfo[["h5se_gr"]] <- list(fn = "remethdb-h5se_gr_0-0-1_1590090412",
                            info = "h5se, GenomicRatioSet, noob-normalized, version 0.0.1")
 linfo[["h5se_gm"]] <- list(fn = "remethdb-h5se_gm_0-0-1_1590090412",
                            info = "h5se, MethylSet, raw/unnormalized, version 0.0.1")
@@ -28,7 +28,7 @@ ndb <- 6
 version <- "0.0.1"
 biocv <- BiocManager::version()
 gbld <- "hg19"
-stype <- "tar.gz"
+stype <- "HDF5"
 surl <- "http://www.ncbi.nlm.nih.gov/geo/query/"
 svers <- "Mar 31 2019"
 spp <- "Homo sapiens"
@@ -37,10 +37,13 @@ coordb <- "NA"
 dprov <- "GEO/GDS"
 maint <- maintainer("recountmethylation")
 rdclass <- c(rep("HDF5-SummarizedExperiment", 4), rep("HDF5Database", 2))
-dsclass <- c(rep("HDF5-SummarizedExperiment", 4), rep("H5File", 2))
-rdpath <- paste("https://recount.bio", "data", 
-                as.character(unlist(lapply(linfo, function(x){x$fn}))), 
-                sep = "/")
+# dsclass <- c(rep("HDF5-SummarizedExperiment", 4), rep("H5File", 2))
+dsclass <- rep("FilePath", 6)
+#rdpath <- paste("https://recount.bio", "data", 
+#                as.character(unlist(lapply(linfo, function(x){x$fn}))), 
+#                sep = "/")
+rdpath <- as.character(unlist(lapply(linfo, function(x){x$fn})))
+locprefix <- rep("https://recount.bio/data/", 6)
 tagsv <- rep("", ndb)
 
 meta <- data.frame(Title = as.character(unlist(lapply(linfo, function(x){x$fn}))),
@@ -48,7 +51,7 @@ meta <- data.frame(Title = as.character(unlist(lapply(linfo, function(x){x$fn}))
                    BiocVersion = rep(biocv, ndb),
                    Genome = rep(gbld, ndb),
                    SourceType = rep(stype, ndb),
-                   SourceURL = rep(surl, ndb),
+                   SourceUrl = rep(surl, ndb),
                    SourceVersion = rep(svers, ndb),
                    Species = rep(spp, ndb),
                    TaxonomyId = rep(taxid, ndb),
@@ -57,6 +60,7 @@ meta <- data.frame(Title = as.character(unlist(lapply(linfo, function(x){x$fn}))
                    Maintainer = rep(maint, ndb), 
                    RDataClass = rdclass,
                    DispatchClass = dsclass,
+                   Location_Prefix = locprefix,
                    RDataPath = rdpath,
                    Tags = tagsv,
                    Version = rep(version, ndb),
