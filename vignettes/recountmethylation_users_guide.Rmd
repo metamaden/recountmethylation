@@ -61,7 +61,7 @@ library(recountmethylation)
 
 Database access, including downloads and file loads, are managed by the 
 `get_db` functions. These download and access the latest available database 
-files (see `?get_db` and examples for details). Note you will need between 
+files (see `?get_db` and below examples for details). Note you will need between 
 90-120 Gb of disk space to store a single database file. Files pair sample 
 metadata with assays including red and green channel signals, methylated and 
 unmethylated level signals, and DNAm fractions in 3 `HDF5-SummarizedExperiment` 
@@ -85,9 +85,9 @@ rownames(sdff) <- NULL
 knitr::kable(sdff, align = "c")
 ```
 
-## `ExperimentHub` integration
+## ExperimentHub integration
 
-DNAm database files available through `recountmethylation` are also indexed on `ExperimentHub`. You may view the files on the hubs as follows.
+The DNAm array database files are indexed on `ExperimentHub`, and are viewable as follows.
 
 ```{r}
 hub = ExperimentHub::ExperimentHub() # connect to the hubs
@@ -95,13 +95,15 @@ rmdat <- AnnotationHub::query(hub, "recountmethylation") # query the hubs
 rmdat
 ```
 
-The `getdb` functions implement caching and are sufficient for both database file types (described below). The `.h5` (HDF5) files may alternatively be downloaded directly from the hubs with caching as follows.
+In addition to using the `getdb` functions, the `HDF5` (`.h5` extension) files may alternatively be downloaded from the hubs, as follows.
 
 ```{r}
 eid <- "EH3778" # h5 test file id
 fpath <- rmdat[[eid]] # download with default caching
 rhdf5::h5ls(fpath)
 ```
+
+Note that whether downloads use the hubs or `getdb` functions, caching is implemented to check for previously downloaded database files.
 
 # Background
 
