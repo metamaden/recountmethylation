@@ -29,6 +29,7 @@ suppressMessages(library(knitr))
 suppressMessages(library(GenomicRanges))
 suppressMessages(library(limma))
 suppressMessages(library(minfi))
+suppressMessages(library(ExperimentHub))
 knitr::opts_chunk$set(echo = TRUE, eval = TRUE, warning = FALSE, 
   message = FALSE)
 ```
@@ -82,6 +83,23 @@ tsv <- as.numeric(gsub("(.*_|\\.h5)", "", sdf[,1]))
 sdff <- sdf[which(tsv == max(tsv, na.rm = TRUE)),]
 rownames(sdff) <- NULL
 knitr::kable(sdff, align = "c")
+```
+
+## `ExperimentHub` integration
+
+DNAm database files available through `recountmethylation` are also indexed on `ExperimentHub`. You may view the files on the hubs as follows.
+
+```{r}
+hub = ExperimentHub::ExperimentHub() # connect to the hubs
+rmdat <- AnnotationHub::query(hub, "recountmethylation") # query the hubs
+rmdat
+```
+
+The `getdb` functions implement caching and are sufficient for both database file types. You may alternatively download the `.h5` files from the hubs, with caching, as follows.
+
+```{r}
+eid <- "EH3776" # h5 test file id
+rmdat[[eid]] # download with default caching
 ```
 
 # Background
