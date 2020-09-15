@@ -95,11 +95,12 @@ rmdat <- AnnotationHub::query(hub, "recountmethylation") # query the hubs
 rmdat
 ```
 
-The `getdb` functions implement caching and are sufficient for both database file types. You may alternatively download the `.h5` files from the hubs, with caching, as follows.
+The `getdb` functions implement caching and are sufficient for both database file types (described below). The `.h5` (HDF5) files may alternatively be downloaded directly from the hubs with caching as follows.
 
 ```{r}
-eid <- "EH3776" # h5 test file id
-rmdat[[eid]] # download with default caching
+eid <- "EH3778" # h5 test file id
+fpath <- rmdat[[eid]] # download with default caching
+rhdf5::h5ls(fpath)
 ```
 
 # Background
