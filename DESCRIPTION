@@ -1,5 +1,5 @@
 Package: recountmethylation
-Version: 0.99.15
+Version: 1.1.1
 Title: Access and Analyze DNA Methylation Array Databases
 Authors@R: c(person(c("Sean", "K"), "Maden", role = c("cre", "aut"),
         email = "maden@ohsu.edu", comment = c(ORCID = "0000-0002-2212-4894")),
@@ -7,9 +7,9 @@ Authors@R: c(person(c("Sean", "K"), "Maden", role = c("cre", "aut"),
     person("Kasper D", "Hansen", role = "aut", email = "hansen@jhsph.edu", comment = c(ORCID = "0000-0003-0086-0687")),
     person("Abhinav", "Nellore", role = "aut", email = "nellore@ohsu.edu", comment = c(ORCID = "0000-0001-8145-1484")))
 Description: Access cross-study compilations of DNA methylation array databases. Database files can be downloaded and accessed using provided
-    functions. Background about database file types (HDF5 and HDF5-SummarizedExperiment), 
-    SummarizedExperiment classes, and examples for data handling, validation, and analyses, 
-    can be found in the package vignettes. Note the disclaimer on package load, and consult 
+    functions. Background about database file types (HDF5 and HDF5-SummarizedExperiment),
+    SummarizedExperiment classes, and examples for data handling, validation, and analyses,
+    can be found in the package vignettes. Note the disclaimer on package load, and consult
     the main manuscript for further info.
 License: Artistic-2.0
 Encoding: UTF-8
@@ -38,7 +38,7 @@ Suggests:
     limma,
     ExperimentHub,
     AnnotationHub
-VignetteBuilder: 
+VignetteBuilder:
     knitr
 biocViews: DNAMethylation, Epigenetics, Microarray, MethylationArray, ExperimentHub
 RoxygenNote: 7.1.0
