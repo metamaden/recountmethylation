@@ -53,7 +53,7 @@ contained in the `data_analyses` vignette.
 
 ## Disclaimer
 
-```{r disclaimer, echo = FALSE, message = TRUE}
+```{r disclaimer, echo = TRUE, message = TRUE}
 library(recountmethylation)
 ```
 
@@ -70,7 +70,7 @@ entities, and red and green signals in an `HDF5` `h5` database.
 The database files are contained at the file server, located at the URL: [https://recount.bio/data/](https://recount.bio/data/). Details about 
 the latest files are as follows.
 
-```{r, echo = FALSE}
+```{r, echo = TRUE, message = TRUE}
 url = "https://recount.bio/data/"
 sslver <- FALSE
 ftpuseopt <- FALSE
