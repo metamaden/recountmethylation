@@ -196,7 +196,7 @@ getdb_h5se_test <- function(namematch = "remethdb-h5se_gr-test.*",
       get_rmdl(which.class = "test", dfp = dfp, which.type = "h5se", 
         verbose = verbose)
     )
-    if(!is(dbpath)[1] == "try-errror"){
+    if(!is(dbpath)[1] == "try-error"){
       message("Download completed.")
       } else{stop("Problem with download.")}
   } else{dbpath <- fpath}
@@ -232,7 +232,7 @@ getdb_h5_test <- function(namematch = "remethdb-h5_rg-test_.*",
       get_rmdl(which.class = "test", dfp = dfp, which.type = "h5", 
         verbose = verbose)
     )
-    if(!is(dbpath)[1] == "try-errror"){
+    if(!is(dbpath)[1] == "try-error"){
       message("Download completed.")
       } else{stop("Problem with download.")}
   } else{dbpath <- fpath}
@@ -268,7 +268,7 @@ getdb_h5se_gr <- function(namematch = "remethdb-h5se_gr_.*",
       get_rmdl(which.class = "gr", dfp = dfp, which.type = "h5se", 
         verbose = verbose)
     )
-    if(!is(dbpath)[1] == "try-errror"){
+    if(!is(dbpath)[1] == "try-error"){
       message("Download completed.")
       } else{stop("Problem with download.")}
   } else{dbpath <- fpath}
@@ -304,7 +304,7 @@ getdb_h5se_gm <- function(namematch = "remethdb-h5se_gm_.*",
       get_rmdl(which.class = "gm", dfp = dfp, which.type = "h5se", 
         verbose = verbose)
     )
-    if(!is(dbpath)[1] == "try-errror"){
+    if(!is(dbpath)[1] == "try-error"){
       message("Download completed.")
       } else{stop("Problem with download.")}
   } else{dbpath <- fpath}
@@ -340,7 +340,7 @@ getdb_h5se_rg <- function(namematch = "remethdb-h5se_rg_.*",
       get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5se", 
         verbose = verbose)
     )
-    if(!is(dbpath)[1] == "try-errror"){
+    if(!is(dbpath)[1] == "try-error"){
       message("Download completed.")
       } else{stop("Problem with download.")}
   } else{dbpath <- fpath}
@@ -376,7 +376,7 @@ getdb_h5_rg <- function(namematch = "remethdb-h5_rg_.*",
       get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5", 
         verbose = verbose)
     )
-    if(!is(dbpath)[1] == "try-errror"){
+    if(!is(dbpath)[1] == "try-error"){
       message("Download completed.")
       } else{stop("Problem with download.")}
   } else{dbpath <- fpath}
