@@ -24,8 +24,8 @@ MethylSet, GenomicRatioSet, or 2-sample subset.}
 \item{which.type}{Either "h5se" for an HDF5-SummarizedExperiment or 
 "h5" for an HDF5 database.}
 
-\item{which.platform}{Supported DNAm array platform type. Currently supports
-either "epic" for EPIC/HM850K, or "hm450k" for HM450K.}
+\item{which.platform}{Supported DNAm array platform type. Currently 
+supports either "epic" for EPIC/HM850K, or "hm450k" for HM450K.}
 
 \item{fn}{Name of file on server to download (optional, default NULL).}
 

@@ -12,8 +12,8 @@
 \usage{
 getdb_h5se_test(
   platform = NULL,
-  namematch = "remethdb-h5se_gr-test.*",
   dfp = NULL,
+  namematch = "remethdb-h5se_gr-test.*",
   verbose = FALSE
 )
 
@@ -56,11 +56,11 @@ getdb_h5_rg(
 \item{platform}{Valid supported DNAm array platform type. Currently either
 "epic" for EPIC/HM850K, or "hm450k" for HM450K.}
 
-\item{namematch}{Filename pattern to match when searching for database 
-(see defaults).}
-
 \item{dfp}{Folder to search for database file 
 (optional, if NULL then searches cache dir specified by BiocFileCache).}
+
+\item{namematch}{Filename pattern to match when searching for database 
+(see defaults).}
 
 \item{verbose}{Whether to return verbose messages (default FALSE).}
 }

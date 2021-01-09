@@ -56,7 +56,7 @@ servermatrix <- function(dn = NULL, sslver = FALSE, printmatrix = TRUE,
 #' @examples 
 #' dm <- matrix(c("remethdb_h5-rg_epic_0-0-2_1589820348.h5","08-Jan-2021",
 #' "09:46","66751358297"), nrow = 1)
-#' dmfilt(dm)
+#' smfilt(dm)
 #' @seealso get_rmdl, servermatrix
 #' @export
 smfilt <- function(sm, typesdf = NULL){
@@ -91,8 +91,8 @@ smfilt <- function(sm, typesdf = NULL){
 #' MethylSet, GenomicRatioSet, or 2-sample subset.
 #' @param which.type Either "h5se" for an HDF5-SummarizedExperiment or 
 #' "h5" for an HDF5 database.
-#' @param which.platform Supported DNAm array platform type. Currently supports
-#' either "epic" for EPIC/HM850K, or "hm450k" for HM450K.
+#' @param which.platform Supported DNAm array platform type. Currently 
+#' supports either "epic" for EPIC/HM850K, or "hm450k" for HM450K.
 #' @param fn Name of file on server to download (optional, default NULL).
 #' @param dfp Download destination directory (default "downloads").
 #' @param url The server URL to locate files for download.
@@ -118,15 +118,15 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
                      verbose = TRUE){
   if(verbose){message("Retrieving data dirnames from server...")}
   sm <- servermatrix(dn = NULL);smf <- smfilt(sm)
-  if(show.files){message("Printing server matrix: ");print(smff)}
+  if(show.files){message("Printing server matrix: ");print(smf)}
   if(is.null(fn)){ # clean query results
     str1 <- ifelse(which.type == "h5", "\\.", ".*")
     str2 <- ifelse(which.type == "h5", "$", ".*")
     filt.type <- grepl(paste0(str1, which.type, str2), smf[,1])
-    filt.platform <- grepl(which.platform, smf[,1])
     filt.class <- grepl(paste0(".*", which.class,".*"), smf[,1])
-    which.fn<-which(filt.type&filt.platform&filt.class);dnc<-smf[which.fn, 1]
-    if(!which.class == "test"){dnc <- dnc[!grepl("test", dnc)]}
+    which.fn<-which(filt.type&filt.class);dnc<-smf[which.fn, 1]
+    if(!which.class == "test"){
+      dnc <- dnc[grepl(which.platform, smf[,1]) & !grepl("test", dnc)]}
     if(length(dnc) > 1){
       tsv <- suppressWarnings(as.numeric(gsub("(.*_|\\.h5)", "", dnc)))
       tsv <- tsv[!is.na(tsv)];dnc <- dnc[which(tsv == max(tsv))[1]]
@@ -189,8 +189,9 @@ NULL
 #' # download test file containing HM450k sample data
 #' h5 <- getdb_h5_test(dfp = tempdir())
 #' @export
-getdb_h5se_test <- function(platform = NULL, namematch = "remethdb-h5se_gr-test.*", 
-                            dfp = NULL, verbose = FALSE){
+getdb_h5se_test <- function(platform = NULL, dfp = NULL,
+                            namematch = "remethdb-h5se_gr-test.*",
+                            verbose = FALSE){
   download<-FALSE;if(is.null(dfp)){dfp<-BiocFileCache::BiocFileCache()@cache}
   clf <- list.files(dfp);fmatch <- clf[grepl(namematch, clf)]
   if(!is.null(namematch) & length(fmatch) > 0){

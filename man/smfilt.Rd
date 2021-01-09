@@ -20,7 +20,7 @@ Filters the data matrix returned from servermatrix().
 \examples{
 dm <- matrix(c("remethdb_h5-rg_epic_0-0-2_1589820348.h5","08-Jan-2021",
 "09:46","66751358297"), nrow = 1)
-dmfilt(dm)
+smfilt(dm)
 }
 \seealso{
 get_rmdl, servermatrix
