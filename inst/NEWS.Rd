@@ -15,6 +15,9 @@
     add a download troubleshoot section. Revised citations format, and removed 
     evaluation of validation section due to periodic build failures from 
     connectivity issues.
+    \item Updated ExperimentHub file metadata script and table to add new 
+    v.0.0.2 compilation files. Renamed included sample metadata directory to 
+    "gsm_metadata" to avoid confusion with "metadata.csv" file table for hubs.
   }
 }
 
