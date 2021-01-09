@@ -15,8 +15,6 @@
 #' TRUE).
 #' @param verbose Whether to show verbose messages (default FALSE).
 #' @param url Server website url.
-#' @param recursive Whether to recursively grab file sizes for h5se objects 
-#' (default TRUE).
 #' @returns dm matrix of server files and file metadata
 #' @examples 
 #' dn <- RCurl::getURL("https://recount.bio/data/", 
@@ -25,43 +23,25 @@
 #' @seealso get_rmdl
 #' @export
 servermatrix <- function(dn, sslver = FALSE, printmatrix = TRUE, 
-  verbose = FALSE, url = "https://recount.bio/data/", recursive = TRUE){
-  if(verbose){message("Getting file data from server.")}
-  dt <- unlist(strsplit(dn, "\r\n"))
-  dt <- gsub('(.*\">|/</a>|</a>)', "", dt)
+  url = "https://recount.bio/data/", verbose = FALSE){
+  if(verbose){message("Getting server data...")}
+  dt<-unlist(strsplit(dn,"\r\n"));dt <- gsub('(.*\">|/</a>|</a>)', "", dt)
   dt <- dt[grepl("remethdb", dt)]
-  drows <- lapply(as.list(dt), function(x){
-    return(unlist(strsplit(gsub("[ ]+", ";", x), ";")))
-  })
-  dm <- do.call(rbind, drows)
-  colnames(dm) <- c("filename", "date", "time", "size (bytes)")
-  if(recursive){
-    sv <- c() # file sizes vector
-    fnv <- dm[grepl("h5se", dm[,1]), 1]
-    fnexclude <- c()
-    for(f in fnv){
-      fv <- RCurl::getURL(paste0(url, f, "/"), dirlistonly = TRUE, 
-                          .opts = list(ssl.verifypeer = sslver))
-      fvv <- unlist(strsplit(fv, "\r\n"))
-      which.start <- which(grepl("Index", fvv))[2] + 1
-      which.end <- which(grepl("/pre", fvv)) - 1
-      fvf <- fvv[which.start:which.end]
-      fniv <- c()
-      for(fni in fvf){
-        name <- gsub('.*\">', '', gsub("</a>.*", "", fni))
-        size <- gsub(".* ", "", fni)
-        fniv <- c(fniv, paste0("`", name, "`", " = ", size))
-      }
-      # check for h5se completeness
-      cond.assays <- length(fniv[grepl("assays", fniv)]) == 1
-      cond.se <- length(fniv[grepl("se", fniv)]) == 1
-      sv <- c(sv, paste(fniv, collapse = ";"))
-      if(!(cond.assays & cond.se)){fnexclude <- c(fnexclude, f)}
-    }
-  }
-  dm[grepl("h5se", dm[,1]), 4] <- sv
-  dm <- dm[!dm[,1] %in% fnexclude,] # filter incomplete h5se files
-  return(dm)
+  drows <- do.call(rbind, lapply(as.list(dt), function(x){
+    return(unlist(strsplit(gsub("[ ]+",";",x),";")))
+  }));colnames(dm) <- c("filename", "date", "time", "size (bytes)")
+  sv <- c(); fnv <- dm[grepl("h5se", dm[,1]), 1];fnexclude <- c()
+  for(f in fnv){fniv <- c()
+  fv <- RCurl::getURL(paste0(url, f, "/"), dirlistonly = TRUE, 
+                      .opts = list(ssl.verifypeer = sslver))
+  fvv<-unlist(strsplit(fv,"\r\n"));which.start<-which(grepl("Index",fvv))[2]+1
+  which.end <- which(grepl("/pre", fvv)) - 1;fvf <- fvv[which.start:which.end]
+  for(fni in fvf){name <- gsub('.*\">', '', gsub("</a>.*", "", fni))
+  size<-gsub(".* ","",fni);fniv<-c(fniv,paste0("`",name,"`"," = ",size))}
+  cond.assays <- length(fniv[grepl("assays", fniv)]) == 1
+  cond.se<-length(fniv[grepl("se",fniv)])==1;sv<-c(sv,paste(fniv,collapse=";"))
+  if(!(cond.assays & cond.se)){fnexclude <- c(fnexclude, f)}}
+  dm[grepl("h5se",dm[,1]),4]<-sv;dm<-dm[!dm[,1] %in% fnexclude,];return(dm)
 }
 
 #' Get DNAm assay data.
