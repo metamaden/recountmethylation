@@ -8,29 +8,31 @@
 #' Called by get_rmdl() to get a matrix of database files and file info from 
 #' the server. Verifies valid versions and timestamps in filenames, and that 
 #' h5se directories contain both an assays and an se.rds file.
-#' @param dn Server data returned from RCurl.
+#' 
+#' @param dn Server data returned from RCurl (default NULL).
 #' @param sslver Whether to use SSL certificate authentication for server 
 #' connection (default FALSE).
 #' @param printmatrix Whether to print the data matrix to console (default 
 #' TRUE).
+#' @param url Server website url (default "https://recount.bio/data/").
 #' @param verbose Whether to show verbose messages (default FALSE).
-#' @param url Server website url.
-#' @returns dm matrix of server files and file metadata
+#' @returns Matrix of server files and file metadata
 #' @examples 
-#' dn <- RCurl::getURL("https://recount.bio/data/", 
-#' .opts = list(ssl.verifypeer = FALSE))
+#' dn <- "remethdb-h5se_gr-test_0-0-1_1590090412 29-May-2020 07:28 -"
 #' sm <- servermatrix(dn)
-#' @seealso get_rmdl
+#' @seealso get_rmdl, smfilt
 #' @export
-servermatrix <- function(dn, sslver = FALSE, printmatrix = TRUE, 
-  url = "https://recount.bio/data/", verbose = FALSE){
+servermatrix <- function(dn = NULL, sslver = FALSE, printmatrix = TRUE, 
+                         url = "https://recount.bio/data/", verbose = FALSE){
   if(verbose){message("Getting server data...")}
+  if(is.null(dn)){dn <- RCurl::getURL(url,ftp.use.epsv=TRUE,dirlistonly=TRUE,
+                                      .opts = list(ssl.verifypeer = sslver))}
   dt<-unlist(strsplit(dn,"\r\n"));dt <- gsub('(.*\">|/</a>|</a>)', "", dt)
   dt <- dt[grepl("remethdb", dt)]
-  drows <- do.call(rbind, lapply(as.list(dt), function(x){
+  sm <- do.call(rbind, lapply(as.list(dt), function(x){
     return(unlist(strsplit(gsub("[ ]+",";",x),";")))
-  }));colnames(dm) <- c("filename", "date", "time", "size (bytes)")
-  sv <- c(); fnv <- dm[grepl("h5se", dm[,1]), 1];fnexclude <- c()
+  }));colnames(sm) <- c("filename", "date", "time", "size (bytes)")
+  sv <- c(); fnv <- sm[grepl("h5se", sm[,1]), 1];fnexclude <- c()
   for(f in fnv){fniv <- c()
   fv <- RCurl::getURL(paste0(url, f, "/"), dirlistonly = TRUE, 
                       .opts = list(ssl.verifypeer = sslver))
@@ -41,18 +43,54 @@ servermatrix <- function(dn, sslver = FALSE, printmatrix = TRUE,
   cond.assays <- length(fniv[grepl("assays", fniv)]) == 1
   cond.se<-length(fniv[grepl("se",fniv)])==1;sv<-c(sv,paste(fniv,collapse=";"))
   if(!(cond.assays & cond.se)){fnexclude <- c(fnexclude, f)}}
-  dm[grepl("h5se",dm[,1]),4]<-sv;dm<-dm[!dm[,1] %in% fnexclude,];return(dm)
+  sm[grepl("h5se",sm[,1]),4]<-sv;sm<-sm[!sm[,1] %in% fnexclude,];return(sm)
+}
+
+#' smfilt
+#' 
+#' Filters the data matrix returned from servermatrix().
+#' 
+#' @param sm Data matrix returned from servermatrix().
+#' @param typesdf Data.frame containing database file info for dm filters.
+#' @returns Filtered data matrix of server file info.
+#' @examples 
+#' dm <- matrix(c("remethdb_h5-rg_epic_0-0-2_1589820348.h5","08-Jan-2021",
+#' "09:46","66751358297"), nrow = 1)
+#' dmfilt(dm)
+#' @seealso get_rmdl, servermatrix
+#' @export
+smfilt <- function(sm, typesdf = NULL){
+  if(is.null(typesdf)){typesdf <- data.frame(platform = c(rep("hm450k", 4), 
+                                                          rep("epic", 4)),
+                                             dbtype=rep(c(paste0("h5se-",c("rg","gr","gm")), 
+                                                          "h5-rg"), 2), 
+                                             stringsAsFactors = FALSE)};
+  smf <- sm;smff <- matrix(nrow = 0, ncol = ncol(smf))
+  for(r in seq(nrow(typesdf))){
+    tr <- typesdf[r,,drop = FALSE]
+    which.db <- which(grepl(tr$platform, sm[,1]) & grepl(tr$dbtype, sm[,1]))
+    db.select <- as.character(sm[which.db, 1])
+    if(length(db.select) > 1){
+      tsv <- as.numeric(gsub(".*_|\\.h5", "", db.select))
+      max.ts <- which(tsv == max(tsv));db.select <- db.select[max.ts][1]}
+    smff <- rbind(smf[smf[,1] == db.select,], smff)}
+  colnames(smff) <- colnames(smf);return(smff)
 }
 
 #' Get DNAm assay data.
 #'
-#' Uses RCurl to recursively download latest H5SE and HDF5 data objects from 
-#' the server. This is currently wrapped in the getdb() functions.
+#' Uses RCurl to download the latest HDF5-SummarizedExperiment or HDF5 
+#' database compilation files objects from the server. Calls servermatrix 
+#' and performs various quality checks to validate files and downloads. 
+#' This function is wrapped in the getdb() set of functions (type `?getdb` for 
+#' details).
 #' 
 #' @param which.class  Either "rg", "gm", "gr", or "test" for RGChannelSet, 
-#' MethylSet, GenomicRatioSet, or 2-sample subset (default "test").
-#' @param which.type Either "h5se" for an HDF5-SummarizedExperiment (default) 
-#' or "h5" for an HDF5 database.
+#' MethylSet, GenomicRatioSet, or 2-sample subset.
+#' @param which.type Either "h5se" for an HDF5-SummarizedExperiment or 
+#' "h5" for an HDF5 database.
+#' @param which.platform Supported DNAm array platform type. Currently supports
+#' either "epic" for EPIC/HM850K, or "hm450k" for HM450K.
 #' @param fn Name of file on server to download (optional, default NULL).
 #' @param dfp Download destination directory (default "downloads").
 #' @param url The server URL to locate files for download.
@@ -60,9 +98,9 @@ servermatrix <- function(dn, sslver = FALSE, printmatrix = TRUE,
 #' FALSE).
 #' @param download Whether to download (TRUE) or return queried filename 
 #' (FALSE).
-#' @param verbose Whether to return verbose messages.
 #' @param sslver Whether to use server certificate check (default FALSE).
-#' @return New filepath to dir with downloaded data.
+#' @param verbose Whether to return verbose messages (default TRUE).
+#' @return New filepath to dir containing the downloaded data.
 #' @examples 
 #' dlpath <- file.path(tempdir(), "get_rmdl_example")
 #' # ensure path separator symbol consistency (namely for windows)
@@ -70,60 +108,51 @@ servermatrix <- function(dn, sslver = FALSE, printmatrix = TRUE,
 #' path <- get_rmdl(which.class = "test", which.type = "h5se", dfp = dlpath)
 #' @seealso servermatrix(), getURL(), loadHDF5SummarizedExperiment(), h5ls()
 #' @export
-get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"), 
-                     which.type = c("h5se", "h5"), fn = NULL, 
-                     dfp = "downloads", url = "https://recount.bio/data/", 
-                     show.files = FALSE, download = TRUE, verbose = TRUE, 
-                     sslver = FALSE){
+get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
+                     which.type = c("h5se", "h5"),
+                     which.platform = c("hm450k", "epic"), fn = NULL, 
+                     dfp="downloads", url = "https://recount.bio/data/", 
+                     show.files = FALSE, download = TRUE, sslver = FALSE, 
+                     verbose = TRUE){
   if(verbose){message("Retrieving data dirnames from server...")}
-  ftpuseopt <- dirlistopt <- ifelse(show.files, FALSE, TRUE) # rcurl setup
-  dn <- RCurl::getURL(url, ftp.use.epsv = ftpuseopt, dirlistonly = dirlistopt,
-                      .opts = list(ssl.verifypeer = sslver))
-  sm <- servermatrix(dn = dn, sslver = sslver)
-  if(show.files){prmatrix(sm)}
+  sm <- servermatrix(dn = NULL);smf <- smfilt(sm)
+  if(show.files){message("Printing server matrix: ");print(smff)}
   if(is.null(fn)){ # clean query results
     str1 <- ifelse(which.type == "h5", "\\.", ".*")
     str2 <- ifelse(which.type == "h5", "$", ".*")
-    filt.type <- grepl(paste0(str1, which.type, str2), sm[,1])
-    dnc <- sm[filt.type & grepl(paste0(".*", which.class,".*"), sm[,1]), 1]
+    filt.type <- grepl(paste0(str1, which.type, str2), smf[,1])
+    filt.platform <- grepl(which.platform, smf[,1])
+    filt.class <- grepl(paste0(".*", which.class,".*"), smf[,1])
+    which.fn<-which(filt.type&filt.platform&filt.class);dnc<-smf[which.fn, 1]
     if(!which.class == "test"){dnc <- dnc[!grepl("test", dnc)]}
     if(length(dnc) > 1){
       tsv <- suppressWarnings(as.numeric(gsub("(.*_|\\.h5)", "", dnc)))
-      tsv <- tsv[!is.na(tsv)] # rm files without timestamp
-      dnc <- dnc[which(tsv == max(tsv))[1]] # first instance
-    }
-    if(length(dnc) == 0){stop("No files of class and type found.")}
-  } else{condpass <- grepl("(\\.h5$|.*h5se.*)", fn) & fn %in% sm[,1]
-    if(!condpass){stop("Provided fn not found on server.")}}
+      tsv <- tsv[!is.na(tsv)];dnc <- dnc[which(tsv == max(tsv))[1]]
+    };if(length(dnc) == 0){stop("No files of class and type found.")}
+  } else{condpass <- grepl("(\\.h5$|.*h5se.*)", fn) & fn %in% smf[,1]
+  if(!condpass){stop("Provided fn not found on server.")}}
   if(!download){return(dnc)}
   dct1 <- ifelse(!dir.exists(dfp) & !dfp == "", try(dir.create(dfp)), TRUE)
   dfp.dn <- paste(dfp, dnc, sep = "/") # download loc
-  # check overwrite
   if(file.exists(dfp.dn)){
-    ostr <- paste0("Ok to overwrite existing file:\n", dfp.dn, 
-      "?\n(yes/no)"); opt <- readline(ostr)
-    if(!opt %in% c("yes", "no")){stop("Unsupported input")}
-    if(opt == "no"){stop("Stopping download")}}
+    ostr<-paste0("Ok to overwrite existing file:\n",dfp.dn,"?\n(yes/no)")
+    opt<-readline(ostr);if(!opt%in%c("yes","no")){stop("Unsupported input")}
+    if(opt == "no"){stop("Stopping download...")}}
   if(which.type == "h5"){dct2 <- try(file.create(dfp.dn))} else{
     dct2 <- ifelse(!dir.exists(dfp.dn), try(dir.create(dfp.dn)), TRUE)}
   if(!(dct1 & dct2)){stop("Problem handling download destination.")}
-  dn.url <- paste0(url, dnc)
-  if(which.type=="h5"){fl.clean<-""} else{fl.clean<-c("assays.h5","se.rds")}
-  dll <- list() # download statuses list
+  dn.url <- paste0(url, dnc);if(which.type=="h5"){fl.clean<-""} else{
+    fl.clean<-c("assays.h5","se.rds")};dll <- list()
   for(fi in fl.clean){
     fpath <- ifelse(fi == "", dn.url, paste(dn.url, fi, sep = "/"))
     destpath <- ifelse(fi == "", dfp.dn, paste(dfp.dn, fi, sep="/"))
     trydl <- try(utils::download.file(url = fpath, destfile = destpath,
-                              method = "curl", 
-                              .opts = list(ssl.verifypeer = sslver)))
-  }
+                                      method = "curl", 
+                                      .opts = list(ssl.verifypeer = sslver)))}
   if(is(trydl)[1] == "try-error" | length(dll[dll==0]) < length(dll)){
-    message("Download incomplete for ", fl.clean[which(dll!=0)])
-  } else{
-    dfp.dn <- gsub("\\\\", "/", dfp.dn) # fixes windows path
-    return(dfp.dn)
-  }
-  return(NULL)
+    message("Download incomplete for ", fl.clean[which(dll!=0)])} else{
+      dfp.dn <- gsub("\\\\", "/", dfp.dn)
+      return(dfp.dn)};return(NULL)
 }
 
 #' @name getdb
@@ -142,6 +171,8 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
 #' functions are "rg" (red and green signal datasets), and "test" (data for 2 
 #' samples from "rg"). See vignette for details about file types and classes. 
 #' 
+#' @param platform Valid supported DNAm array platform type. Currently either
+#' "epic" for EPIC/HM850K, or "hm450k" for HM450K.
 #' @param namematch Filename pattern to match when searching for database 
 #' (see defaults).
 #' @param dfp Folder to search for database file 
@@ -153,222 +184,152 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
 NULL
 #' @rdname getdb
 #' @examples
-#' # download test file to temp directory
+#' # download test file containing HM450k sample data
 #' h5 <- getdb_h5_test(dfp = tempdir())
 #' @export
-getdb_h5se_test <- function(namematch = "remethdb-h5se_gr-test.*", 
-  dfp = NULL, verbose = FALSE){
-  download <- FALSE
-  if(is.null(dfp)){dfp <- BiocFileCache::BiocFileCache()@cache}
-  clf <- list.files(dfp)
-  fmatch <- clf[grepl(namematch, clf)]
+getdb_h5se_test <- function(platform = NULL, namematch = "remethdb-h5se_gr-test.*", 
+                            dfp = NULL, verbose = FALSE){
+  download<-FALSE;if(is.null(dfp)){dfp<-BiocFileCache::BiocFileCache()@cache}
+  clf <- list.files(dfp);fmatch <- clf[grepl(namematch, clf)]
   if(!is.null(namematch) & length(fmatch) > 0){
-    fn1 <- fmatch[1]
-    fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)")
-    opt <- readline(ostr)
+    fn1 <- fmatch[1];fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
+    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)");opt <- readline(ostr)
     if(!opt %in% c("yes", "no")){stop("Unsupported input")}
-    if(opt == "no"){download <- TRUE}
-  } else{download <- TRUE}
+    if(opt == "no"){download <- TRUE}} else{download <- TRUE}
   if(download){
     message("Downloading database...")
-    dbpath <- try(
-      get_rmdl(which.class = "test", dfp = dfp, which.type = "h5se", 
-        verbose = verbose)
-    )
-    if(!is(dbpath)[1] == "try-error"){
-      message("Download completed.")
-      } else{stop("Problem with download.")}
+    dbpath <- try(get_rmdl(which.class = "test", dfp = dfp, 
+                           which.type = "h5se", verbose = verbose))
+    if(!is(dbpath)[1] == "try-error"){message("Download completed.")} else{
+      stop("Problem with download.")}
   } else{dbpath <- fpath}
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
-    message("Loading database file.")
-    dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
+    message("Loading database...");dbf <- try(
+      HDF5Array::loadHDF5SummarizedExperiment(dbpath))
     if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
-      message("Database file loaded.")
-      return(dbf)
-    }
-  }
-  return(NULL)
+      message("Database file loaded.");return(dbf)}};return(NULL)
 }
 #' @rdname getdb
 #' @export
-getdb_h5_test <- function(namematch = "remethdb-h5_rg-test_.*", 
-  dfp = NULL, verbose = FALSE){
-  download <- FALSE
-  if(is.null(dfp)){dfp <- BiocFileCache::BiocFileCache()@cache}
-  clf <- list.files(dfp)
-  fmatch <- clf[grepl(namematch, clf)]
+getdb_h5_test <- function(platform = NULL, namematch = "remethdb-h5_rg-test_.*", 
+                          dfp = NULL, verbose = FALSE){
+  download<-FALSE;if(is.null(dfp)){dfp<-BiocFileCache::BiocFileCache()@cache}
+  clf <- list.files(dfp);fmatch <- clf[grepl(namematch, clf)]
   if(!is.null(namematch) & length(fmatch) > 0){
-    fn1 <- fmatch[1]
-    fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)")
-    opt <- readline(ostr)
+    fn1 <- fmatch[1];fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
+    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)");opt <- readline(ostr)
     if(!opt %in% c("yes", "no")){stop("Unsupported input")}
     if(opt == "no"){download <- TRUE}
   } else{download <- TRUE}
   if(download){
     message("Downloading database...")
-    dbpath <- try(
-      get_rmdl(which.class = "test", dfp = dfp, which.type = "h5", 
-        verbose = verbose)
-    )
-    if(!is(dbpath)[1] == "try-error"){
-      message("Download completed.")
-      } else{stop("Problem with download.")}
+    dbpath <- try(get_rmdl(which.class = "test", dfp = dfp, which.type = "h5", 
+                           verbose = verbose));if(!is(dbpath)[1] == "try-error"){
+                             message("Download completed.")} else{stop("Problem with download.")}
   } else{dbpath <- fpath}
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(suppressMessages(rhdf5::h5ls(dbpath)))
     if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
-      message("Database file loaded.")
-      return(dbpath)
-    }
-  }
-  return(NULL)
+      message("Database file loaded.");return(dbpath)}};return(NULL)
 }
 #' @rdname getdb
 #' @export
-getdb_h5se_gr <- function(namematch = "remethdb-h5se_gr_.*", 
-  dfp = NULL, verbose = FALSE){
-  download <- FALSE
-  if(is.null(dfp)){dfp <- BiocFileCache::BiocFileCache()@cache}
-  clf <- list.files(dfp)
-  fmatch <- clf[grepl(namematch, clf)]
+getdb_h5se_gr <- function(platform = c("hm450k", "epic"), dfp = NULL,
+                          namematch="remethdb_h5se-gr_.*", verbose=FALSE){
+  download<-FALSE;if(is.null(dfp)){dfp<-BiocFileCache::BiocFileCache()@cache}
+  clf <- list.files(dfp);fmatch <- clf[grepl(namematch, clf)]
   if(!is.null(namematch) & length(fmatch) > 0){
-    fn1 <- fmatch[1]
-    fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)")
-    opt <- readline(ostr)
+    fn1 <- fmatch[1];fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
+    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)");opt <- readline(ostr)
     if(!opt %in% c("yes", "no")){stop("Unsupported input")}
-    if(opt == "no"){download <- TRUE}
-  } else{download <- TRUE}
+    if(opt == "no"){download <- TRUE}} else{download <- TRUE}
   if(download){
-    message("Downloading database...")
-    dbpath <- try(
-      get_rmdl(which.class = "gr", dfp = dfp, which.type = "h5se", 
-        verbose = verbose)
-    )
+    message(paste0("Downloading ",platform," database..."))
+    dbpath <- try(get_rmdl(which.class = "gr", dfp = dfp, which.type = "h5se",
+                           which.platform = platform, verbose = verbose))
     if(!is(dbpath)[1] == "try-error"){
-      message("Download completed.")
-      } else{stop("Problem with download.")}
+      message("Download completed.")} else{stop("Problem with download.")}
   } else{dbpath <- fpath}
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
     if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
-      message("Database file loaded.")
-      return(dbf)
-    }
-  }
-  return(NULL)
+      message("Database file loaded.");return(dbf)}};return(NULL)
 }
 #' @rdname getdb
 #' @export
-getdb_h5se_gm <- function(namematch = "remethdb-h5se_gm_.*", 
-  dfp = NULL, verbose = FALSE){
-  download <- FALSE
-  if(is.null(dfp)){dfp <- BiocFileCache::BiocFileCache()@cache}
-  clf <- list.files(dfp)
-  fmatch <- clf[grepl(namematch, clf)]
+getdb_h5se_gm <- function(platform = c("hm450k", "epic"), dfp = NULL, 
+                          namematch = "remethdb_h5se-gm_.*", verbose = FALSE){
+  download<-FALSE;if(is.null(dfp)){dfp<-BiocFileCache::BiocFileCache()@cache}
+  clf <- list.files(dfp);fmatch <- clf[grepl(namematch, clf)]
   if(!is.null(namematch) & length(fmatch) > 0){
-    fn1 <- fmatch[1]
-    fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)")
-    opt <- readline(ostr)
+    fn1 <- fmatch[1];fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
+    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)");opt<-readline(ostr)
     if(!opt %in% c("yes", "no")){stop("Unsupported input")}
     if(opt == "no"){download <- TRUE}
   } else{download <- TRUE}
   if(download){
     message("Downloading database...")
-    dbpath <- try(
-      get_rmdl(which.class = "gm", dfp = dfp, which.type = "h5se", 
-        verbose = verbose)
-    )
+    dbpath <- try(get_rmdl(which.class = "gm", dfp = dfp, which.type = "h5se",
+                           which.platform = platform, verbose = verbose))
     if(!is(dbpath)[1] == "try-error"){
-      message("Download completed.")
-      } else{stop("Problem with download.")}
+      message("Download completed.")} else{stop("Problem with download.")}
   } else{dbpath <- fpath}
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
     if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
-      message("Database file loaded.")
-      return(dbf)
-    }
-  }
-  return(NULL)
+      message("Database file loaded.");return(dbf)}};return(NULL)
 }
 #' @rdname getdb
 #' @export
-getdb_h5se_rg <- function(namematch = "remethdb-h5se_rg_.*", 
-  dfp = NULL, verbose = FALSE){
-  download <- FALSE
-  if(is.null(dfp)){dfp <- BiocFileCache::BiocFileCache()@cache}
-  clf <- list.files(dfp)
-  fmatch <- clf[grepl(namematch, clf)]
+getdb_h5se_rg <- function(platform = c("hm450k", "epic"), dfp = NULL, 
+                          namematch = "remethdb-h5se_rg_.*", verbose = FALSE){
+  download<-FALSE;if(is.null(dfp)){dfp<-BiocFileCache::BiocFileCache()@cache}
+  clf <- list.files(dfp);fmatch <- clf[grepl(namematch, clf)]
   if(!is.null(namematch) & length(fmatch) > 0){
-    fn1 <- fmatch[1]
-    fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)")
-    opt <- readline(ostr)
+    fn1 <- fmatch[1];fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
+    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)");opt <- readline(ostr)
     if(!opt %in% c("yes", "no")){stop("Unsupported input")}
     if(opt == "no"){download <- TRUE}
   } else{download <- TRUE}
   if(download){
     message("Downloading database...")
-    dbpath <- try(
-      get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5se", 
-        verbose = verbose)
-    )
-    if(!is(dbpath)[1] == "try-error"){
-      message("Download completed.")
-      } else{stop("Problem with download.")}
+    dbpath <- try(get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5se",
+                           which.platform = platform, verbose = verbose))
+    if(!is(dbpath)[1] == "try-error"){message("Download completed.")} else{
+      stop("Problem with download.")}
   } else{dbpath <- fpath}
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(HDF5Array::loadHDF5SummarizedExperiment(dbpath))
     if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
-      message("Database file loaded.")
-      return(dbf)
-    }
-  }
-  return(NULL)
+      message("Database file loaded.");return(dbf)}};return(NULL)
 }
 #' @rdname getdb
 #' @export
-getdb_h5_rg <- function(namematch = "remethdb-h5_rg_.*", 
-  dfp = NULL, verbose = FALSE){
-  download <- FALSE
-  if(is.null(dfp)){dfp <- BiocFileCache::BiocFileCache()@cache}
-  clf <- list.files(dfp)
-  fmatch <- clf[grepl(namematch, clf)]
+getdb_h5_rg <- function(platform = c("hm450k", "epic"), dfp = NULL, 
+                        namematch = "remethdb-h5_rg_.*", verbose = FALSE){
+  download<-FALSE;if(is.null(dfp)){dfp<-BiocFileCache::BiocFileCache()@cache}
+  clf <- list.files(dfp);fmatch <- clf[grepl(namematch, clf)]
   if(!is.null(namematch) & length(fmatch) > 0){
-    fn1 <- fmatch[1]
-    fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
-    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)")
-    opt <- readline(ostr)
+    fn1 <- fmatch[1];fpath <- gsub("\\\\", "/", file.path(dfp, fn1))
+    ostr <- paste0("Use file:\n", fpath, "?\n(yes/no)");opt <- readline(ostr)
     if(!opt %in% c("yes", "no")){stop("Unsupported input")}
-    if(opt == "no"){download <- TRUE}
-  } else{download <- TRUE}
+    if(opt == "no"){download <- TRUE}} else{download <- TRUE}
   if(download){
     message("Downloading database...")
-    dbpath <- try(
-      get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5", 
-        verbose = verbose)
-    )
-    if(!is(dbpath)[1] == "try-error"){
-      message("Download completed.")
-      } else{stop("Problem with download.")}
+    dbpath <- try(get_rmdl(which.class = "rg", dfp = dfp, which.type = "h5", 
+               which.platform = platform, verbose = verbose))
+    if(!is(dbpath)[1] == "try-error"){message("Download completed.")} else{
+      stop("Problem with download.")}
   } else{dbpath <- fpath}
   if(is(dbpath)[1] == "try-error"){stop("Problem with dbpath.")} else{
     message("Loading database file.")
     dbf <- try(suppressMessages(rhdf5::h5ls(dbpath)))
     if(is(dbf)[1] == "try-error"){stop("Problem loading file.")} else{
-      message("Database file loaded.")
-      return(dbpath)
-    }
-  }
-  return(NULL)
+      message("Database file loaded.");return(dbpath)}};return(NULL)
 }
 
 

@@ -61,11 +61,12 @@ library(recountmethylation)
 
 Database access, including downloads and file loads, are managed by the 
 `get_db` functions. These download and access the latest available database 
-files (see `?get_db` and below examples for details). Note you will need between 
-90-120 Gb of disk space to store a single database file. Files pair sample 
-metadata with assays including red and green channel signals, methylated and 
-unmethylated level signals, and DNAm fractions in 3 `HDF5-SummarizedExperiment` 
-entities, and red and green signals in an `HDF5` `h5` database. 
+files (see `?get_db` and below examples for details). Note you will 
+need between 50-180 Gb of disk space to store a single database file. Files 
+pair sample metadata with assays including red and green channel signals, 
+methylated and unmethylated level signals, and DNAm fractions in 3 
+`HDF5-SummarizedExperiment` entities, and red and green signals in an 
+`HDF5` `h5` database. 
 
 The database files are contained at the file server, located at the URL: [https://recount.bio/data/](https://recount.bio/data/). Details about 
 the latest files are as follows.
@@ -87,7 +88,8 @@ knitr::kable(sdff, align = "c")
 
 ## ExperimentHub integration
 
-The DNAm array database files are indexed on `ExperimentHub`, and are viewable as follows.
+The DNAm array database files are indexed on `ExperimentHub`, and are 
+viewable as follows.
 
 ```{r}
 hub = ExperimentHub::ExperimentHub() # connect to the hubs
@@ -95,7 +97,8 @@ rmdat <- AnnotationHub::query(hub, "recountmethylation") # query the hubs
 rmdat
 ```
 
-In addition to using the `getdb` functions, the `HDF5` (`.h5` extension) files may alternatively be downloaded from the hubs, as follows.
+In addition to using the `getdb` functions, the `HDF5` (".h5"" extension) 
+files may alternatively be downloaded from the hubs, as follows.
 
 ```{r}
 eid <- "EH3778" # h5 test file id
@@ -103,7 +106,26 @@ fpath <- rmdat[[eid]] # download with default caching
 rhdf5::h5ls(fpath)
 ```
 
-Note that whether downloads use the hubs or `getdb` functions, caching is implemented to check for previously downloaded database files.
+Note that whether downloads use the hubs or `getdb` functions, caching 
+is implemented to check for previously downloaded database files.
+
+## Troubleshooting tips for large file downloads
+
+If repeated attempts to download the database compilation files fail, there
+ are several options worth trying. First, ensure your internet connection 
+ is stable and there is sufficient space at the download destination for 
+ the database file. 
+
+Second, try increasing your timeout duration beyond the default before 
+repeating the download attempt with `getdb`. Check the current timeout 
+for an R session with `getOptions('timeout')`, then manually increase 
+the timeout duration with `options(timeout = new.time)`.
+
+Finally, you may attempt to download a server file using command line 
+calls to your system terminal or console. For instance, on a Mac you 
+might try `wget -r <file_name>`. If this doesn't work, you can again 
+attempt to increase the timeout duration and repeat the download attempt.
+
 
 # Background
 
@@ -128,7 +150,7 @@ objects are larger than the probe-specific matrices found in derived object
 types (e.g. 622,399 assays for red/green signal matrices versus 485,512 assays 
 for methylated/unmethylated signal, DNAm fractions matrices, see below).
 
-## SummarizedExperiment object classes
+## `SummarizedExperiment` object classes
 
 DNAm array sample IDATs can be read into an R session as an object of class 
 `RGChannelSet`, a type of `SummarizedExperiment`. These objects support 
@@ -186,7 +208,7 @@ information for a given query. GEO GSM and GSE records can be viewed from a
 browser, or SOFT files may be downloaded directly. Packages like GEOmetadb and 
 GEOquery are also useful to query and summarize GEO metadata.
 
-# HDF5-SummarizedExperiment example
+# `HDF5-SummarizedExperiment` example
 
 This example shows basic handling for `HDF5-SummarizedExperiment` (a.k.a. 
 "h5se") files. For these files, the `getdb` function returns the loaded file. 
@@ -195,11 +217,11 @@ treated as if they were fully loaded into active memory.
 
 ## Obtain the test database
 
-The test h5se dataset includes sample metadata and noob-normalized 
+The test `h5se` dataset includes sample metadata and noob-normalized 
 DNAm fractions (Beta-values) for chromosome 22 probes for 2 samples. 
 Datasets can be downloaded using the `getdb` series of functions 
 (see `?getdb` for details), where the `dfp` argument specifies the 
-download destination. The test h5se file is included in the package 
+download destination. The test `h5se` file is included in the package 
 "inst" directory, and can be loaded as follows.
 
 ```{r}
@@ -271,15 +293,15 @@ knitr::kable(ant, align = "c")
 # HDF5 database and example
 
 To provide more workflow options, bead-specific red and green signal data have 
-been provided with sample metadata in an `HDF5`/h5 file. This example shows 
+been provided with sample metadata in an `HDF5`/`h5` file. This example shows 
 how to handle objects of this type with `recountmethylation`.
 
 ## Obtain the test database
 
-The test h5 file includes metadata and bead-specific signals from 
-chromosome 22 for the same 2 samples as in the h5se test file. 
-Note `getdb` functions for h5 files simply return the database path.
-Since the test h5 file has also been included in the package "inst" folder,
+The test `h5` file includes metadata and bead-specific signals from 
+chromosome 22 for the same 2 samples as in the `h5se` test file. 
+Note `getdb` functions for `h5` files simply return the database path.
+Since the test `h5` file has also been included in the package "inst" folder,
 get the path to load the file as follows.
 
 ```{r}
@@ -325,7 +347,7 @@ identical(rownames(h5.red), rownames(h5.green))
 ```
 
 Rows in these signal matrices map to bead addresses rather than probe IDs. 
-These matrices have more rows than the h5se test Beta-value matrix because 
+These matrices have more rows than the `h5se` test Beta-value matrix because 
 any type I probes use data from 2 beads each.
 
 # Validate DNAm datasets
@@ -385,7 +407,7 @@ identical(geo.green, h5.green)
 ## Compare DNAm Beta-values
 
 Before comparing the GEO-downloaded data to data from the `h5se.test` database, normalize the data using the same out-of-band or "noob" normalization technique 
-that was used to generate data in the h5se database.
+that was used to generate data in the `h5se` database.
 
 ```{r}
 geo.gr <- minfi::preprocessNoob(geo.rg)

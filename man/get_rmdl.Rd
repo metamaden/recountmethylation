@@ -7,21 +7,25 @@
 get_rmdl(
   which.class = c("rg", "gm", "gr", "test"),
   which.type = c("h5se", "h5"),
+  which.platform = c("hm450k", "epic"),
   fn = NULL,
   dfp = "downloads",
   url = "https://recount.bio/data/",
   show.files = FALSE,
   download = TRUE,
-  verbose = TRUE,
-  sslver = FALSE
+  sslver = FALSE,
+  verbose = TRUE
 )
 }
 \arguments{
 \item{which.class}{Either "rg", "gm", "gr", or "test" for RGChannelSet, 
-MethylSet, GenomicRatioSet, or 2-sample subset (default "test").}
+MethylSet, GenomicRatioSet, or 2-sample subset.}
 
-\item{which.type}{Either "h5se" for an HDF5-SummarizedExperiment (default) 
-or "h5" for an HDF5 database.}
+\item{which.type}{Either "h5se" for an HDF5-SummarizedExperiment or 
+"h5" for an HDF5 database.}
+
+\item{which.platform}{Supported DNAm array platform type. Currently supports
+either "epic" for EPIC/HM850K, or "hm450k" for HM450K.}
 
 \item{fn}{Name of file on server to download (optional, default NULL).}
 
@@ -35,16 +39,19 @@ FALSE).}
 \item{download}{Whether to download (TRUE) or return queried filename 
 (FALSE).}
 
-\item{verbose}{Whether to return verbose messages.}
-
 \item{sslver}{Whether to use server certificate check (default FALSE).}
+
+\item{verbose}{Whether to return verbose messages (default TRUE).}
 }
 \value{
-New filepath to dir with downloaded data.
+New filepath to dir containing the downloaded data.
 }
 \description{
-Uses RCurl to recursively download latest H5SE and HDF5 data objects from 
-the server. This is currently wrapped in the getdb() functions.
+Uses RCurl to download the latest HDF5-SummarizedExperiment or HDF5 
+database compilation files objects from the server. Calls servermatrix 
+and performs various quality checks to validate files and downloads. 
+This function is wrapped in the getdb() set of functions (type `?getdb` for 
+details).
 }
 \seealso{
 servermatrix(), getURL(), loadHDF5SummarizedExperiment(), h5ls()
