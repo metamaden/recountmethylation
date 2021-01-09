@@ -66,6 +66,8 @@ smfilt <- function(sm, typesdf = NULL){
                                                           "h5-rg"), 2), 
                                              stringsAsFactors = FALSE)};
   smf <- sm;smff <- matrix(nrow = 0, ncol = ncol(smf))
+  test.files <- which(grepl("test", smf[,1]))
+  if(length(test.files) > 0){smff<-smf[test.files,]}
   for(r in seq(nrow(typesdf))){
     tr <- typesdf[r,,drop = FALSE]
     which.db <- which(grepl(tr$platform, sm[,1]) & grepl(tr$dbtype, sm[,1]))
