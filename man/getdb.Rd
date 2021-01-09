@@ -11,31 +11,56 @@
 \title{Access database files.}
 \usage{
 getdb_h5se_test(
-  namematch = "remethdb-h5se_gr-test.*",
+  platform = NULL,
   dfp = NULL,
+  namematch = "remethdb-h5se_gr-test.*",
   verbose = FALSE
 )
 
 getdb_h5_test(
+  platform = NULL,
   namematch = "remethdb-h5_rg-test_.*",
   dfp = NULL,
   verbose = FALSE
 )
 
-getdb_h5se_gr(namematch = "remethdb-h5se_gr_.*", dfp = NULL, verbose = FALSE)
+getdb_h5se_gr(
+  platform = c("hm450k", "epic"),
+  dfp = NULL,
+  namematch = "remethdb_h5se-gr_.*",
+  verbose = FALSE
+)
 
-getdb_h5se_gm(namematch = "remethdb-h5se_gm_.*", dfp = NULL, verbose = FALSE)
+getdb_h5se_gm(
+  platform = c("hm450k", "epic"),
+  dfp = NULL,
+  namematch = "remethdb_h5se-gm_.*",
+  verbose = FALSE
+)
 
-getdb_h5se_rg(namematch = "remethdb-h5se_rg_.*", dfp = NULL, verbose = FALSE)
+getdb_h5se_rg(
+  platform = c("hm450k", "epic"),
+  dfp = NULL,
+  namematch = "remethdb-h5se_rg_.*",
+  verbose = FALSE
+)
 
-getdb_h5_rg(namematch = "remethdb-h5_rg_.*", dfp = NULL, verbose = FALSE)
+getdb_h5_rg(
+  platform = c("hm450k", "epic"),
+  dfp = NULL,
+  namematch = "remethdb-h5_rg_.*",
+  verbose = FALSE
+)
 }
 \arguments{
-\item{namematch}{Filename pattern to match when searching for database 
-(see defaults).}
+\item{platform}{Valid supported DNAm array platform type. Currently either
+"epic" for EPIC/HM850K, or "hm450k" for HM450K.}
 
 \item{dfp}{Folder to search for database file 
 (optional, if NULL then searches cache dir specified by BiocFileCache).}
+
+\item{namematch}{Filename pattern to match when searching for database 
+(see defaults).}
 
 \item{verbose}{Whether to return verbose messages (default FALSE).}
 }
@@ -56,7 +81,7 @@ functions are "rg" (red and green signal datasets), and "test" (data for 2
 samples from "rg"). See vignette for details about file types and classes.
 }
 \examples{
-# download test file to temp directory
+# download test file containing HM450k sample data
 h5 <- getdb_h5_test(dfp = tempdir())
 }
 \seealso{

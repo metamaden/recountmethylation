@@ -4,14 +4,22 @@
 
 Sean K. Maden, Reid F. Thompson, Kasper D. Hansen, Abhinav Nellore
 
-# Manuscript
-Sean K. Maden, Reid F. Thompson, Kasper D. Hansen, Abhinav Nellore. "Human 
-methylome variation across Infinium 450K raw data on the Gene Expression 
-Omnibus." 2019 (preprint in preparation for submission).
+# Overview
+
+The `recountmethylation` package provides access to databases of DNA 
+methylation (DNAm) data from over 62,000 cumulative sample records with 
+IDATs in the Gene Expression Omnibus (GEO, available by November, 2020). 
+Samples were run using either of 2 Illumina BeadArray platform types, 
+either the older HM450K platform or the newer EPIC/HM850K platform. The
+database compilation files include mined, mapped, and model-based sample 
+metadata, and DNAm data in the form of either raw/unnormalized red and 
+green signals, raw/unnormalized methylated and unmethylated signals, or 
+normalized DNAm fractions (a.k.a. "Beta-values").
 
 # Installation and data access
 
-From an active R session, install this package from Bioconductor using:
+From an active R session, install the latest available package version from 
+Bioconductor with:
 
 ```
 if (!requireNamespace("BiocManager", quietly = TRUE))
@@ -19,12 +27,28 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("recountmethylation")
 ```
 
-You may alternatively install this package from GitHub using: 
+You may also install the package from GitHub using: 
  
 `require(devtools); install_github("metamaden/recountmethylation")`.
 
+See the package User's Guide vignette for more details and background about the 
+datasets.
+
+# Manuscript
+
+If you use `recountmethylation` in published work, please cite the following 
+paper:
+
+Sean K. Maden, Reid F. Thompson, Kasper D. Hansen, Abhinav Nellore. 'Human 
+methylome variation across Infinium 450K data on the Gene Expression Omnibus.' 
+2020. bioRxiv 2020.11.17.387548; doi: https://doi.org/10.1101/2020.11.17.387548
+
 # Package disclaimer
 
+Please note the following disclaimer regarding the data contained in the 
+compilation files.
+
+```
 Databases accessed with recountmethylation 
 contain data from GEO (ncbi.nlm.nih.gov/geo/), 
 a live public database where alterations to 
@@ -33,3 +57,4 @@ stored data over time. We cannot guarantee
 the accuracy of stored data, and advise users 
 cross-check their findings with latest available 
 records.
+```

@@ -5,16 +5,15 @@
 \title{servermatrix}
 \usage{
 servermatrix(
-  dn,
+  dn = NULL,
   sslver = FALSE,
   printmatrix = TRUE,
-  verbose = FALSE,
   url = "https://recount.bio/data/",
-  recursive = TRUE
+  verbose = FALSE
 )
 }
 \arguments{
-\item{dn}{Server data returned from RCurl.}
+\item{dn}{Server data returned from RCurl (default NULL).}
 
 \item{sslver}{Whether to use SSL certificate authentication for server 
 connection (default FALSE).}
@@ -22,15 +21,12 @@ connection (default FALSE).}
 \item{printmatrix}{Whether to print the data matrix to console (default 
 TRUE).}
 
+\item{url}{Server website url (default "https://recount.bio/data/").}
+
 \item{verbose}{Whether to show verbose messages (default FALSE).}
-
-\item{url}{Server website url.}
-
-\item{recursive}{Whether to recursively grab file sizes for h5se objects 
-(default TRUE).}
 }
 \value{
-dm matrix of server files and file metadata
+Matrix of server files and file metadata
 }
 \description{
 Called by get_rmdl() to get a matrix of database files and file info from 
@@ -38,10 +34,9 @@ the server. Verifies valid versions and timestamps in filenames, and that
 h5se directories contain both an assays and an se.rds file.
 }
 \examples{
-dn <- RCurl::getURL("https://recount.bio/data/", 
-.opts = list(ssl.verifypeer = FALSE))
+dn <- "remethdb-h5se_gr-test_0-0-1_1590090412 29-May-2020 07:28 -"
 sm <- servermatrix(dn)
 }
 \seealso{
-get_rmdl
+get_rmdl, smfilt
 }

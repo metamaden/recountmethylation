@@ -51,12 +51,14 @@ of these analyses also appear in the manuscript @maden_human_2020.
 
 ## Analysis script and limited chunk evaluation
 
-This vignette accompanies the "data_analyses.R" script. Note the script was written with extensibility to new and larger comparator groups in mind. While the script should run 
-to completion without errors, it takes several hours in total to complete (excluding 
-the time to download large database files). Due to this lengthy script run time, 
-this vignette only evaluates code chunks utilizing final/resultant data objects 
-produced by the script (e.g. for tables, tests, and figures). For completeness, 
-remaining script steps and code are included but not evaluated.
+This vignette accompanies the "data_analyses.R" script. Note the script was 
+written with extensibility to new and larger comparator groups in mind. While 
+the script should run to completion without errors, it takes several hours in 
+total to complete (excluding the time to download large database files). Due 
+to this lengthy script run time, this vignette only evaluates code chunks 
+utilizing final/resultant data objects produced by the script (e.g. for tables, 
+tests, and figures). For completeness, remaining script steps and code are 
+included but not evaluated.
 
 Load the file "data_analyses.RData" from the `recountmethylation` package files. 
 This contains the resultant/final data objects produced by the script, which will 
@@ -70,11 +72,12 @@ load(file.path(sf, "data_analyses.RData"))
 
 ## Datasets and data objects
 
-The analysis script uses sample metadata and 2 database files. Retrieve the provided sample metadata from the `recountmethylation` package files.
+The analysis script uses sample metadata and 2 database files. Retrieve the 
+provided sample metadata from the `recountmethylation` package files.
 
 ```{r, eval = TRUE}
 # get local metadata
-path <- system.file("extdata", "metadata", package = "recountmethylation")
+path <- system.file("extdata", "gsm_metadata", package = "recountmethylation")
 mdpath <- paste(path, list.files(path)[1], sep = "/")
 md <- get(load(mdpath))
 ```

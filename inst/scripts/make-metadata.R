@@ -12,6 +12,8 @@ smf1 <- smf[,1]
 
 # get field info
 linfo <- list()
+
+# version 0.0.1
 linfo[["h5se_gr"]] <- list(fn = "remethdb-h5se_gr_0-0-1_1590090412",
                            info = "h5se, GenomicRatioSet, noob-normalized, version 0.0.1")
 linfo[["h5se_gm"]] <- list(fn = "remethdb-h5se_gm_0-0-1_1590090412",
@@ -24,27 +26,42 @@ linfo[["h5_rg"]] <- list(fn = "remethdb-h5_rg_0-0-1_1590090412.h5",
                          info = "h5, red and green signal, raw/unnormalized, version 0.0.1")
 linfo[["h5_rg-test"]] <- list(fn = "remethdb-h5_rg-test_0-0-1_1590090412.h5",
                          info = "h5, red and green signal, raw/unnormalized, version 0.0.1")
-ndb <- 6
-version <- "0.0.1"
-biocv <- BiocManager::version()
-gbld <- "hg19"
-stype <- "HDF5"
-surl <- "http://www.ncbi.nlm.nih.gov/geo/query/"
-svers <- "Mar 31 2019"
-spp <- "Homo sapiens"
-taxid <- "9606"
-coordb <- "NA"
-dprov <- "GEO/GDS"
-maint <- maintainer("recountmethylation")
-rdclass <- c(rep("HDF5-SummarizedExperiment", 4), rep("HDF5Database", 2))
-# dsclass <- c(rep("HDF5-SummarizedExperiment", 4), rep("H5File", 2))
-dsclass <- rep("FilePath", 6)
-#rdpath <- paste("https://recount.bio", "data", 
-#                as.character(unlist(lapply(linfo, function(x){x$fn}))), 
-#                sep = "/")
+
+# version 0.0.2
+linfo[["h5se-gr_hm450k"]] <- list(fn = "remethdb_h5se-gr_hm450k_0-0-2_1607018051",
+                           info = "h5se, HM450K platform samples, GenomicRatioSet, 
+                           noob-normalized, version 0.0.2")
+linfo[["h5se-gm_hm450k"]] <- list(fn = "remethdb_h5se-gm_hm450k_0-0-2_1607018051",
+                           info = "h5se, HM450K platform samples, MethylSet, 
+                           raw/unnormalized, version 0.0.2")
+linfo[["h5se-rg_hm450k"]] <- list(fn = "remethdb_h5se-rg_hm450k_0-0-2_1607018051",
+                           info = "h5se, HM450K platform samples, RGChannelSet, 
+                           raw/unnormalized, version 0.0.2")
+linfo[["h5-rg_hm450k"]] <- list(fn = "remethdb_h5-rg_hm450k_0-0-2_1607018051.h5",
+                         info = "h5, HM450K platform samples, red and green signal, 
+                         raw/unnormalized, version 0.0.2")
+linfo[["h5se-gr_epic"]] <- list(fn = "remethdb_h5se-gr_epic_0-0-2_1607018051",
+                           info = "h5se, EPIC/HM850K platform samples, 
+                           GenomicRatioSet, noob-normalized, version 0.0.2")
+linfo[["h5se-gm_epic"]] <- list(fn = "remethdb_h5se-gm_epic_0-0-2_1589820348",
+                           info = "h5se, EPIC/HM850K platform samples, 
+                           MethylSet, raw/unnormalized, version 0.0.2")
+linfo[["h5se-rg_epic"]] <- list(fn = "remethdb_h5se-rg_epic_0-0-2_1589820348",
+                           info = "h5se, EPIC/HM850K platform samples, 
+                           RGChannelSet, raw/unnormalized, version 0.0.2")
+linfo[["h5-rg_epic"]] <- list(fn = "remethdb_h5-rg_epic_0-0-2_1589820348.h5 ",
+                         info = "h5, EPIC/HM850K platform samples, 
+                         red and green signal, raw/unnormalized, version 0.0.2")
+
+
+ndb <- length(linfo);tagsv <- rep("", ndb);biocv <- BiocManager::version()
+dsclass<-rep("FilePath",ndb);locprefix<-rep("https://recount.bio/data/",ndb)
+version<-"0.0.2";gbld<-"hg19";stype<-"HDF5";coordb<-"NA";dprov<-"GEO/GDS"
+surl<-"http://www.ncbi.nlm.nih.gov/geo/query/";spp<-"Homo sapiens"
+taxid<-"9606";svers <- "Nov 7 2020";maint <- maintainer("recountmethylation")
+rdclass <- ifelse(grepl("h5se", names(linfo)), "HDF5-SummarizedExperiment",
+                  "HDF5Database")
 rdpath <- as.character(unlist(lapply(linfo, function(x){x$fn})))
-locprefix <- rep("https://recount.bio/data/", 6)
-tagsv <- rep("", ndb)
 
 meta <- data.frame(Title = as.character(unlist(lapply(linfo, function(x){x$fn}))),
                    Description = as.character(unlist(lapply(linfo, function(x){x$info}))),
@@ -67,3 +84,5 @@ meta <- data.frame(Title = as.character(unlist(lapply(linfo, function(x){x$fn}))
                    stringsAsFactors = FALSE)
 
 write.csv(meta, file="inst/extdata/metadata.csv", row.names=FALSE)
+
+write.csv(meta, file="metadata.csv", row.names=FALSE)
