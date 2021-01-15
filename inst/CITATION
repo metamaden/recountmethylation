@@ -1,15 +1,14 @@
-c(bibentry(bibtype = "Unpublished",
-           key = "recountmethylation manuscript",
-           title = "{Human 
-methylome variation across Infinium 450K raw data on the Gene Expression 
-Omnibus}",
+c(bibentry(bibtype = "article",
+           title = "Human methylome variation across Infinium 450K on 
+           the Gene Expression Omnibus",
            author = c(
                person(c("Sean", "K."), "Maden"),
                person(c("Reid", "F."), "Thompson"),
                person(c("Kasper", "D."), "Hansen"),
                person("Abhinav", "Nellore")
            ),
-           year = 2020,
-           note = "Preprint in preparation for submission",
-           header = "Please cite the research manuscript for this package:")
+           year = 2021,
+           journal = "bioRxiv",
+           doi = "10.1101/2020.11.17.387548",
+           url = "https://www.biorxiv.org/content/10.1101/2020.11.17.387548v3")
 )

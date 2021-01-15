@@ -70,8 +70,8 @@ path for h5 functions.
 }
 \description{
 Combines download and load functions for databases. 
-If the "namematch" argument isn't provided, the latest available file is downloaded.
-All files include metadata for the available samples.
+If the "namematch" argument isn't provided, the latest available 
+file is downloaded. All files include metadata for the available samples.
 
 There are 6 functions. Functions with "h5se" access 
 HDF5-SummarizedExperiment files, and "h5" functions access HDF5 databases. 
@@ -81,8 +81,9 @@ functions are "rg" (red and green signal datasets), and "test" (data for 2
 samples from "rg"). See vignette for details about file types and classes.
 }
 \examples{
-# download test file containing HM450k sample data
+\donttest{
 h5 <- getdb_h5_test(dfp = tempdir())
+}
 }
 \seealso{
 get_rmdl()

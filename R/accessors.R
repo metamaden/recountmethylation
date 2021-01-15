@@ -12,10 +12,9 @@
 #' @param verbose Whether to show verbose messages (default FALSE).
 #' @param dfp Destination directory for downloads.
 #' @param burl Base URL string for RCurl query.
-#' @return Lists the basename paths and filenames of IDATs downloaded.
+#' @returns Lists the basename paths and filenames of IDATs downloaded.
 #' @examples
-#' gsmvi <- c("GSM2465267", "GSM2814572")
-#' gds_idatquery(gsmvi, dfp = file.path(tempdir(), "gds_idatquery_example"))
+#' query <- gds_idatquery(gsmvi = c("GSM2465267", "GSM2814572"))
 #' @export
 gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
   verbose = FALSE, dfp = "idats",
@@ -25,8 +24,7 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
   if(!dir.exists(dfp)){
     message("Making new dest dir dfp.")
     tdir <- try(dir.create(dfp))
-    if(!tdir){stop("There was an issue making the new dest dir dfp.")}
-  }
+    if(!tdir){stop("Error, there was an issue making the new dest dir dfp.")}}
   for(gsmi in gsmvi){
     url = paste0(burl, substr(gsmi, 1, nchar(gsmi)-3), 
                  paste(rep("n", 3), collapse = ""), "/", gsmi, "/suppl/")
@@ -83,11 +81,11 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
 #' "ftp://ftp.ncbi.nlm.nih.gov/geo/samples/").
 #' @param silent Whether to suppress warnings on download removal 
 #' (default TRUE).
-#' @return An RGChannelSet object
+#' @returns An RGChannelSet object
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' fpath <- file.path(tempdir(), "gds_idat2rg_example")
-#' rg <- gds_idat2rg(gsmvi, dfp = fpath)
+#' \donttest{rg <- gds_idat2rg(gsmvi, dfp = fpath)}
 #' @seealso gds_idatquery(), read.metharray()
 #' @export
 gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/", 
@@ -96,7 +94,7 @@ gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/",
   dn = "" # download idats to cwd
   bnv = c() # store the idat basenames
   rt <- try(gds_idatquery(gsmvi = gsmvi, ext = ext, dfp = dfp, burl = burl))
-  if(is(rt)[1] == "try-error"){stop("Process ended with message: ", rt[1])}
+  if(is(rt)[1]=="try-error"){stop("Error, process ended with message: ",rt[1])}
   rgdl = suppressWarnings(minfi::read.metharray(basenames = rt[["basenames"]]))
   if(rmdl){
     message("Removing downloaded IDATs...")
@@ -117,7 +115,7 @@ gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/",
 #' @param ci Column indices in dataset.
 #' @param dsn Name of dataset or group of dataset to connect with.
 #' @param dbn Path to h5 database file.
-#' @return HDF5 database connection object.
+#' @returns HDF5 database connection object.
 #' @examples
 #' # Get tests data pointer
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
@@ -126,7 +124,6 @@ gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/",
 #' # red signal, first 2 assay addr, 3 samples
 #' reds <- hread(1:2, 1:3, d = "redsignal", dbn = dbpath)
 #' dim(reds) # [1] 2 3
-#' @seealso h5read()
 #' @export
 hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
     return(rhdf5::h5read(dbn, dsn, index = list(ri, ci)))
@@ -141,7 +138,7 @@ hread <- function(ri, ci, dsn = "redsignal", dbn = "remethdb2.h5"){
 #' @param dbn Path to h5 HDF5 database file.
 #' @param dsn Name or group path to HDF5 dataset containing 
 #' the sample metadata and learned annotations.
-#' @return data.frame of available sample metadata.
+#' @returns data.frame of available sample metadata.
 #' @examples 
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn <- list.files(path)
@@ -170,7 +167,7 @@ data_mdpost <- function(dbn = "remethdb2.h5", dsn = "mdpost"){
 #' @param mi2 Match index of ds2 (either "rows" or "columns")
 #' @param subset.match If index lengths don't match, match on the 
 #' common subset instead
-#' @return A list of the matched datasets.
+#' @returns A list of the matched datasets.
 #' @examples
 #' # get 2 data matrices
 #' ds1 <- matrix(seq(1, 10, 1), nrow = 5)
@@ -200,25 +197,20 @@ matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
   }
   ii1 = ii1[order(match(ii1, ii2))] # match 1 to 2
   if(!identical(ii1, ii2)){
-      stop(paste0("Couldn't match provided indices. ",
-          "Are they of the same length?"))
-  }
+      stop(paste0("Error, couldn't match provided indices. ",
+          "Are they of the same length?"))}
   if(mi1 == "rows"){
       ds1m = ds1[rownames(ds1) %in% ii1,]
-      ds1m = ds1m[order(match(as.character(rownames(ds1m)), ii1)),]
-  }
+      ds1m = ds1m[order(match(as.character(rownames(ds1m)), ii1)),]}
   if(mi1 == "columns"){
       ds1m = ds1[, colnames(ds1) %in% ii1]
-      ds1m = ds1m[, order(match(as.character(colnames(ds1m)), ii1))]
-  }
+      ds1m = ds1m[, order(match(as.character(colnames(ds1m)), ii1))]}
   if(mi2 == "rows"){
       ds2m = ds2[rownames(ds2) %in% ii2,]
-      ds2m = ds2m[order(match(as.character(rownames(ds2m)), ii2)),]
-  }
+      ds2m = ds2m[order(match(as.character(rownames(ds2m)), ii2)),]}
   if(mi2 == "columns"){
       ds2m = ds2[, colnames(ds2) %in% ii2]
-      ds2m = ds2m[, order(match(as.character(colnames(ds2m)), ii2))]
-  }
+      ds2m = ds2m[, order(match(as.character(colnames(ds2m)), ii2))]}
   return(list(ds1 = ds1m, ds2 = ds2m))
 }
 
@@ -230,7 +222,7 @@ matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
 #' @param ldat List of raw signal data query results. Must include 2 
 #' data.frame objects named "redsignal" and "greensignal."
 #' @param verbose Whether to post status messages.
-#' @return Returns a RGChannelSet object from raw signal dataset queries.
+#' @returns Returns a RGChannelSet object from raw signal dataset queries.
 #' @examples 
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
 #' fn <- list.files(path)
@@ -245,16 +237,15 @@ matchds_1to2 <- function(ds1, ds2, mi1 = c("rows", "columns"),
 #' @export
 rgse <- function(ldat, verbose = FALSE){
     if(!("greensignal" %in% names(ldat) & "redsignal" %in% names(ldat))){
-        stop(paste0("Invalid datasets list passed."))
-    }
+        stop("Error, invalid datasets list passed.")}
     if(verbose){message("Matching probe IDs in signal matrices...")}
     rga <- ldat[["redsignal"]]; gga <- ldat[["greensignal"]]
     lm.rg <- matchds_1to2(rga, gga, "rows", "rows")
     lm.rg <- matchds_1to2(lm.rg[[1]], lm.rg[[2]], "columns", "columns")
     cgidmatch <- identical(rownames(lm.rg[[1]]), rownames(lm.rg[[2]]))
     gsmidmatch <- identical(colnames(lm.rg[[1]]), colnames(lm.rg[[2]]))
-    if(!cgidmatch){stop("Couldn't probe IDs.")}
-    if(!gsmidmatch){stop("Couldn't match GSM IDs for signal data.")}
+    if(!cgidmatch){stop("Error, couldn't probe IDs.")}
+    if(!gsmidmatch){stop("Error, couldn't match GSM IDs for signal data.")}
     if("metadata" %in% names(ldat)){
         gsmidv <- unique(c(colnames(lm.rg[[1]]), colnames(lm.rg[[2]])))
         if(verbose){message("Checking metadata...")}
@@ -269,8 +260,8 @@ rgse <- function(ldat, verbose = FALSE){
         rownames(mdp) <- mdp$gsm
         lm.pr <- matchds_1to2(mdp, lm.rg[[1]], "rows", "columns")
         mdmatchid <- identical(rownames(lm.pr[[1]]), colnames(lm.pr[[2]]))
-        if(!mdmatchid){stop("Couldn't match GSM IDs for md and signal data.")}
-    }
+        if(!mdmatchid){
+          stop("Error, couldn't match GSM IDs for md and signal data.")}}
     anno <- c("IlluminaHumanMethylation450k", "ilmn12.hg19")
     names(anno) <- c("array", "annotation")
     rgi <- minfi::RGChannelSet(Red = lm.rg[[1]], 
@@ -306,7 +297,7 @@ rgse <- function(ldat, verbose = FALSE){
 #' metadata for queried samples.
 #' @param md.dsn Name of metadata dataset in h5 file.
 #' @param verbose Whether to post status messages.
-#' @return Returns either an RGChannelSet or list of data.frame objects 
+#' @returns Returns either an RGChannelSet or list of data.frame objects 
 #'  from dataset query matches.
 #' @examples
 #' path <- system.file("extdata", "h5test", package = "recountmethylation")
@@ -325,7 +316,7 @@ getrg <- function(dbn, gsmv = NULL, cgv = NULL, data.type = c("se"),
     all.cg = TRUE, metadata = TRUE, md.dsn = "mdpost", 
     verbose = FALSE){
     if((length(gsmv) < 2 & !all.gsm) | (length(cgv) == 0 & !all.cg)){
-        stop("Invalid query, review GSM and probe ID args.")
+        stop("Error, invalid query, review GSM and probe ID args.")
     }
     ldat <- list() # datasets list
     for(d in dsv){
@@ -346,7 +337,7 @@ getrg <- function(dbn, gsmv = NULL, cgv = NULL, data.type = c("se"),
               gsmvp <- which(rnd %in% gsmv)
               if(verbose){message("Found ", length(gsmvp)," of ", 
                 length(gsmv), " GSM IDs.")}}
-            if(length(gsmvp) < 2){stop("Not enough valid GSM IDs found.")}
+            if(length(gsmvp)<2){stop("Error, not enough valid GSM IDs found.")}
         }
         ddat <- hread(ri = gsmvp, ci = cgvp, d, dbn)
         rownames(ddat) <- rnd[gsmvp]; colnames(ddat) <- cnd[cgvp]

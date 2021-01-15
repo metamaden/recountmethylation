@@ -31,6 +31,3 @@ dbpath <- file.path(path, fn)
 reds <- hread(1:2, 1:3, d = "redsignal", dbn = dbpath)
 dim(reds) # [1] 2 3
 }
-\seealso{
-h5read()
-}

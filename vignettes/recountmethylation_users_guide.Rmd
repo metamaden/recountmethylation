@@ -31,6 +31,7 @@ suppressMessages(library(GenomicRanges))
 suppressMessages(library(limma))
 suppressMessages(library(minfi))
 suppressMessages(library(ExperimentHub))
+suppressMessages(library(recountmethylation))
 knitr::opts_chunk$set(echo = TRUE, eval = TRUE, warning = FALSE, 
   message = FALSE)
 ```
@@ -57,9 +58,11 @@ contained in the `data_analyses` vignette.
 
 ## Disclaimer
 
-```{r disclaimer, echo = TRUE, message = TRUE}
-library(recountmethylation)
-```
+Databases accessed with `recountmethylation` contain data from GEO 
+(ncbi.nlm.nih.gov/geo/), a live public database where alterations to 
+online records can cause discrepancies with stored data over time. 
+We cannot guarantee the accuracy of stored data, and advise users 
+cross-check their findings with latest available records.
 
 ## Database files and access
 
@@ -68,27 +71,17 @@ functions, where the DNAm array platform type using the `platform` argument
 (see `?get_db` for details). Both HM450K and EPIC/HM850K platforms are 
 currently supported (see below for platform details). Note you will need 
 between 50-180 Gb of disk space to store a single database file. Files pair 
-sample metadata with assays including red and green channel signals, 
-methylated and unmethylated level signals, and DNAm fractions in 3 
-`HDF5-SummarizedExperiment` entities, and red and green signals in 
-an `HDF5` `h5` database. 
+sample metadata and assay data in various formats, including `HDF5-SummarizedExperiment` database directories, and `HDF5` database files 
+with the `.h5` extension. 
 
-The database files are contained at the file server located at [https://recount.bio/data/](https://recount.bio/data/). Details about the latest 
-available database files on the server files are as follows.
+The databases are located at 
+[https://recount.bio/data/](https://recount.bio/data/), 
+and file details are viewable as follows:
 
 ```{r, echo = TRUE, message = TRUE}
-url = "https://recount.bio/data/"
-sslver <- FALSE
-ftpuseopt <- FALSE
-dirlistopt <- FALSE
-dn <- RCurl::getURL(url, ftp.use.epsv = ftpuseopt, dirlistonly = dirlistopt,
-                    .opts = list(ssl.verifypeer = sslver))
-sm <- as.data.frame(servermatrix(dn, sslver), stringsAsFactors = FALSE)
-sdf <- as.data.frame(sm)
-tsv <- as.numeric(gsub("(.*_|\\.h5)", "", sdf[,1]))
-sdff <- sdf[which(tsv == max(tsv, na.rm = TRUE)),]
-rownames(sdff) <- NULL
-knitr::kable(sdff, align = "c")
+sm <- as.data.frame(smfilt(servermatrix()), 
+                    stringsAsFactors = FALSE)
+knitr::kable(sm, align = "c")
 ```
 
 ## ExperimentHub integration
@@ -128,7 +121,7 @@ the timeout duration with `options(timeout = new.time)`.
 
 Finally, you may attempt to download a server file using command line 
 calls to your system terminal or console. For instance, on a Mac you 
-might try `wget -r <file_name>`. If this doesn't work, you can again 
+might try `wget -r <file_url>`. If this doesn't work, you can again 
 attempt to increase the timeout duration and repeat the download attempt.
 
 # Background
@@ -142,8 +135,9 @@ Databases include human samples run on the Illumina Infinium HM450K BeadArray
 platform. HM450K is a popular 2-channel platform that probes over 480,000 CpG 
 loci genome-wide, with enriched coverage at CG islands, genes, and enhancers 
 @sandoval_validation_2011. The more recently released EPIC/HM850K platform 
-contains an expanded set of probes targeting over 850,000 CpG, and including 
-greater coverage of intergenic regions pidsley_critical_2016.
+contains an expanded probe set targeting over 850,000 CpGs, including 
+$>$90% of the HM450K probes, with greater coverage of potential intergenic 
+regulatory regions @pidsley_critical_2016.
 
 Array processing generates 2 intensity files (IDATs) per sample, one each for 
 the red and green color channels. These raw files also contain control signals 
@@ -359,11 +353,13 @@ any type I probes use data from 2 beads each.
 
 # Validate DNAm datasets
 
-This section demonstrates validation using the test databases. As the 
-disclaimer notes, it is good practice to validate data against the latest 
-available GEO files. This step may be most useful for newer samples published 
-close to the end compilation date (end of March 2019 for current version), 
-which may be more prone to revisions at initial publication.
+This section demonstrates validation using the test databases. Full code
+to reproduce this section is provided but not evaluated, as it involves a 
+download from the GEO servers. As the disclaimer notes, it is good practice
+to validate data against the latest available GEO files. This step may be 
+most useful for newer samples published close to the end compilation date 
+(end of March 2019 for current version), which may be more prone to 
+revisions at initial publication.
 
 ## Download and read IDATs from the GEO database server
 

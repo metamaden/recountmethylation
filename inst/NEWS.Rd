@@ -2,6 +2,16 @@
 \title{Recountmethylation News}
 \encoding{UTF-8}
 
+\section{Version 1.1.4}{
+  \itemize{
+    \item Improves User's Guide, fixes typos, new citation, adds disclaimer text, updates servermatrix() chunk.
+    \item Updates examples to further limit downloads. Function get_rmdl() uses download = FALSE, 
+    \item Updates Data Analyses vignette. Uses reduced dpi for images in Data Analyses vignette to limit package size. Uses updated metadata file name.
+    \item Compresses new metadata v.0.0.2 files to limit package size.
+    \item Uses uniform metadata file label for v.0.0.1 file.
+  }
+}
+
 \section{Version 1.1.3}{
   \itemize{
     \item Added v.0.0.2 database compilation files to server (recount.bio/data)

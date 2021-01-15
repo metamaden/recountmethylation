@@ -15,13 +15,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 output:
-  BiocStyle::pdf_document:
-    toc: yes
-    toc_depth: 3
   BiocStyle::html_document:
     code_folding: show
     toc: yes
     tocfloat: yes
+  BiocStyle::pdf_document:
+    toc: yes
+    toc_depth: 3
 ---
 
 ```{r setup, echo = FALSE}
@@ -77,8 +77,8 @@ provided sample metadata from the `recountmethylation` package files.
 
 ```{r, eval = TRUE}
 # get local metadata
-path <- system.file("extdata", "gsm_metadata", package = "recountmethylation")
-mdpath <- paste(path, list.files(path)[1], sep = "/")
+mdpath <- system.file("extdata", "gsm_metadata", "md_final_hm450k_0-0-1.rda", 
+                    package = "recountmethylation")
 md <- get(load(mdpath))
 ```
 
@@ -227,7 +227,7 @@ knitr::kable(dss, align = "c")
 Plot sample counts and MAD for each GSE record, with a vertical line at the 
 10-years MAD cutoff used for the group 2 filter.
 
-```{r, eval = TRUE, fig.width = 3.8, fig.height = 3.4}
+```{r, dpi = 65, eval = TRUE, fig.width = 3.8, fig.height = 3.4}
 plot(xdif, ngsm, ylab = "Study Size (Num. GSM)", 
      xlab = "Age Difference, MAD[Chron, Pred]")
 abline(v = 10, col = "red")
@@ -235,7 +235,7 @@ abline(v = 10, col = "red")
 
 Finally, plot the chronological and predicted ages for group 2 samples.
 
-```{r, eval = TRUE, fig.width = 3.4, fig.height = 3.1}
+```{r, dpi = 65, eval = TRUE, fig.width = 3.4, fig.height = 3.1}
 ggplot(mdff, aes(x = chron.age, y = predage)) +
   geom_point(size = 1.2, alpha = 0.2) + geom_smooth(method = "lm", size = 1.2) +
   theme_bw() + xlab("Chronological Age") + ylab("Epigenetic (DNAm) Age")
@@ -320,7 +320,7 @@ using the `geom_point` function. Color by storage type with the
 `scale_color_manual` function (FFPE samples are orange, frozen samples are 
 purple).
 
-```{r, eval = TRUE, fig.width = 4.3, fig.height = 3.1}
+```{r, dpi = 65, eval = TRUE, fig.width = 4.3, fig.height = 3.1}
 ggplot(ds, aes(x = meth.l2med, y = unmeth.l2med, color = storage)) + 
   geom_point(alpha = 0.35, cex = 3) + theme_bw() +
   scale_color_manual(values = c("ffpe" = "orange", "frozen" = "purple"))
@@ -330,7 +330,7 @@ Next, make separate violin plots for signals and groups using the `geom_violin`
 function with the same colors for each storage type. Draw horizontal median 
 lines by setting the `draw_quantiles` argument to 0.5.
 
-```{r, eval = TRUE, fig.width = 4.5, fig.height = 2.5}
+```{r, dpi = 65, eval = TRUE, fig.width = 4.5, fig.height = 2.5}
 vp <- matrix(nrow = 0, ncol = 2)
 vp <- rbind(vp, matrix(c(ds$meth.l2med, paste0("meth.", ds$storage)), 
   ncol = 2))
@@ -423,7 +423,7 @@ ds2$tissue <- as.factor(ms$sgroup)
 Make a scatter plot of log2 median signals by tissue type with the `geom_point` 
 function.
 
-```{r, eval = TRUE, fig.width = 4.5, fig.height = 3.1}
+```{r, dpi = 65, eval = TRUE, fig.width = 3.2, fig.height = 2}
 ggplot(ds2, aes(x = l2med.meth, y = l2med.unmeth, color = tissue)) + 
   geom_point(alpha = 0.3, cex = 3) + theme_bw()
 ```
@@ -717,7 +717,7 @@ to make violin plots for DNAm fraction means and variances. Store plots in
 the `lvp` list, then display them vertically using the `grid.arrange` function 
 from the gridExtra package.
 
-```{r, eval = TRUE, fig.width = 3.8, fig.height = 4.5}
+```{r, dpi = 65, eval = TRUE, fig.width = 3.8, fig.height = 4.5}
 lvp <- makevp(lfcg, ltxcg)
 grid.arrange(lvp[[1]], lvp[[2]], ncol = 1, bottom = "Tissue")
 ```
@@ -751,7 +751,7 @@ Make the 2 plots objects for means and variances with `hmplots()`, which wraps
 the `geom_tile` ggplot2 function. Finally, display plots horizontally with 
 `grid.arrange`.
 
-```{r, eval = TRUE, fig.width = 8.2, fig.height = 4.7}
+```{r, dpi = 65, eval = TRUE, fig.width = 8.2, fig.height = 4.7}
 cga <- get_cga(anno)
 lhmset <- hmsets(ltxcg, lfcg, cga)
 lhmplots <- hmplots(lhmset$hm.mean, lhmset$hm.var, lhmset$hm.size)

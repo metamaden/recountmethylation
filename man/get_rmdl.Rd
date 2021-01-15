@@ -53,6 +53,11 @@ and performs various quality checks to validate files and downloads.
 This function is wrapped in the getdb() set of functions (type `?getdb` for 
 details).
 }
+\examples{
+# prints file info from server:
+path <- get_rmdl(which.class = "test", which.type = "h5se", 
+show.files = TRUE, download = FALSE) 
+}
 \seealso{
 servermatrix(), getURL(), loadHDF5SummarizedExperiment(), h5ls()
 }
