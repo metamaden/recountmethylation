@@ -125,7 +125,7 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
     filt.class <- grepl(paste0(".*", which.class,".*"), smf[,1])
     which.fn<-which(filt.type&filt.class);dnc<-smf[which.fn, 1]
     if(!which.class == "test"){
-      dnc <- dnc[grepl(which.platform, smf[,1]) & !grepl("test", dnc)]}
+      dnc <- dnc[grepl(which.platform, dnc) & !grepl("test", dnc)]}
     if(length(dnc) > 1){
       tsv <- suppressWarnings(as.numeric(gsub("(.*_|\\.h5)", "", dnc)))
       tsv <- tsv[!is.na(tsv)];dnc <- dnc[which(tsv == max(tsv))[1]]

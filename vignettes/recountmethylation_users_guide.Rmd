@@ -136,7 +136,7 @@ platform. HM450K is a popular 2-channel platform that probes over 480,000 CpG
 loci genome-wide, with enriched coverage at CG islands, genes, and enhancers 
 @sandoval_validation_2011. The more recently released EPIC/HM850K platform 
 contains an expanded probe set targeting over 850,000 CpGs, including 
-$>$90% of the HM450K probes, with greater coverage of potential intergenic 
+more than 90% of the HM450K probes, with greater coverage of potential intergenic 
 regulatory regions @pidsley_critical_2016.
 
 Array processing generates 2 intensity files (IDATs) per sample, one each for 
@@ -358,7 +358,7 @@ to reproduce this section is provided but not evaluated, as it involves a
 download from the GEO servers. As the disclaimer notes, it is good practice
 to validate data against the latest available GEO files. This step may be 
 most useful for newer samples published close to the end compilation date 
-(end of March 2019 for current version), which may be more prone to 
+(through November 7, 2020 for current version), which may be more prone to 
 revisions at initial publication.
 
 ## Download and read IDATs from the GEO database server
