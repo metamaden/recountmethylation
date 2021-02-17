@@ -75,7 +75,7 @@ sample metadata and assay data in various formats, including `HDF5-SummarizedExp
 with the `.h5` extension. 
 
 The databases are located at 
-[https://recount.bio/data/](https://recount.bio/data/), 
+[https://methylation.recount.bio/](https://methylation.recount.bio/), 
 and file details are viewable as follows:
 
 ```{r, echo = TRUE, message = TRUE}

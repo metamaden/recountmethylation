@@ -10,7 +10,7 @@ get_rmdl(
   which.platform = c("hm450k", "epic"),
   fn = NULL,
   dfp = "downloads",
-  url = "https://recount.bio/data/",
+  url = "https://methylation.recount.bio/",
   show.files = FALSE,
   download = TRUE,
   sslver = FALSE,

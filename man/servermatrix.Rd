@@ -8,7 +8,7 @@ servermatrix(
   dn = NULL,
   sslver = FALSE,
   printmatrix = TRUE,
-  url = "https://recount.bio/data/",
+  url = "https://methylation.recount.bio/",
   verbose = FALSE
 )
 }
@@ -21,7 +21,7 @@ connection (default FALSE).}
 \item{printmatrix}{Whether to print the data matrix to console (default 
 TRUE).}
 
-\item{url}{Server website url (default "https://recount.bio/data/").}
+\item{url}{Server website url (default "https://methylation.recount.bio/").}
 
 \item{verbose}{Whether to show verbose messages (default FALSE).}
 }

@@ -14,7 +14,7 @@
 #' connection (default FALSE).
 #' @param printmatrix Whether to print the data matrix to console (default 
 #' TRUE).
-#' @param url Server website url (default "https://recount.bio/data/").
+#' @param url Server website url (default "https://methylation.recount.bio/").
 #' @param verbose Whether to show verbose messages (default FALSE).
 #' @returns Matrix of server files and file metadata
 #' @examples 
@@ -23,7 +23,7 @@
 #' @seealso get_rmdl, smfilt
 #' @export
 servermatrix <- function(dn = NULL, sslver = FALSE, printmatrix = TRUE, 
-                         url = "https://recount.bio/data/", verbose = FALSE){
+                         url = "https://methylation.recount.bio/", verbose = FALSE){
   if(verbose){message("Getting server data...")}
   if(is.null(dn)){dn <- RCurl::getURL(url,ftp.use.epsv=TRUE,dirlistonly=TRUE,
                                       .opts = list(ssl.verifypeer = sslver))}
@@ -112,7 +112,7 @@ smfilt <- function(sm, typesdf = NULL){
 get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
                      which.type = c("h5se", "h5"),
                      which.platform = c("hm450k", "epic"), fn = NULL, 
-                     dfp="downloads", url = "https://recount.bio/data/", 
+                     dfp="downloads", url = "https://methylation.recount.bio/", 
                      show.files = FALSE, download = TRUE, sslver = FALSE, 
                      verbose = TRUE){
   if(verbose){message("Retrieving data dirnames from server...")}
