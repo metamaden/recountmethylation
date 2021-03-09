@@ -107,23 +107,6 @@ rhdf5::h5ls(fpath)
 Note that whether downloads use the hubs or `getdb` functions, caching 
 is implemented to check for previously downloaded database files.
 
-## Troubleshooting tips for large file downloads
-
-If repeated attempts to download the database compilation files fail, there
- are several options worth trying. First, ensure your internet connection 
- is stable and there is sufficient space at the download destination for 
- the database file. 
-
-Second, try increasing your timeout duration beyond the default before 
-repeating the download attempt with `getdb`. Check the current timeout 
-for an R session with `getOptions('timeout')`, then manually increase 
-the timeout duration with `options(timeout = new.time)`.
-
-Finally, you may attempt to download a server file using command line 
-calls to your system terminal or console. For instance, on a Mac you 
-might try `wget -r <file_url>`. If this doesn't work, you can again 
-attempt to increase the timeout duration and repeat the download attempt.
-
 # Background
 
 This section includes essential background about DNAm array platforms, assays 
@@ -441,6 +424,71 @@ identical(summary(geo.bm), summary(h5se.bm))
 ```{r, eval = FALSE}
 identical(rownames(geo.bm), rownames(h5se.bm))
 ```
+
+# Troubleshooting and tips
+
+This section describes how to address potential issues with accessing the
+database files or working with the `DelayedArray` based objects locally.
+
+## Issue: large file downloads don't complete
+
+If repeated attempts to download the database compilation files fail, you
+may try the following:
+
+* First ensure your internet connection is stable and there is sufficient 
+space at the download destination for the database file. 
+
+* Second, try increasing your timeout duration beyond the default before 
+repeating the download attempt with `getdb`. Check the current timeout 
+for an R session with `getOptions('timeout')`, then manually increase 
+the timeout duration with `options(timeout = new.time)`.
+
+* Finally, you may attempt to download a server file using command line 
+calls to your system terminal or console. For instance, on a Mac you 
+might try `wget -r <file_url>`. If this doesn't work, you can again 
+attempt to increase the timeout duration and repeat the download attempt.
+
+## Issue: unexpected function behaviors for `DelayedArray` inputs
+
+Unexpected function behaviors may arise when using `DelayedArray`-based inputs.
+These essentially arise from lacking interoperativity between normal matrices 
+and the `DelayedArray`-based matrices. Known examples include:
+
+* `minfi::detectionP()`: 
+
+Throws error for specific subsets of data, such as for queries of exactly 
+50 samples. 
+
+```{r, eval = FALSE}
+detectionP(rg[,1:50])
+"Error in .local(Red, Green, locusNames, controlIdx, TypeI.Red, TypeI.Green, dim(Red_grid) == dim(detP_sink_grid) are not all TRUE"
+```
+
+* `minfi::preprocessFunnorm()`: 
+
+Throws error when called for an `RGChannelSet` of type `HDF5-SummarizedExperiment`.
+
+```{r, eval = FALSE}
+preprocessFunnorm(rg)
+"Error: 'preprocessFunnorm()' only supports matrix-backed minfi objects.""
+```
+
+These and other related errors may be addressed by instantiating the data query, 
+or the data chunk, as a new non-`DelayedArray` object. For example, remake a 
+subset of the full `h5se` dataset, `rg`, as follows.
+
+```{r, eval = FALSE}
+rg.h5se <- loadHDF5SummarizedExperiment(rg.path) # full h5se RGChannelSet
+rg.sub <- rg.h5se[,c(1:20)] # subset samples of interest
+# re-make as non-DA object
+rg.new <- RGChannelSet(Red = getRed(rg.sub), 
+                       Green = getGreen(rg.sub),
+                       annotation = annotation(rg.sub))
+gr <- preprocessFunnorm(rg.new) # repeat preprocessing
+```
+
+Alternatively, non-`DelayedArray` `RGChannelSet` objects can be readily generated from
+the full `h5` `RGChannelSet` database with the provided function `getrg()`.
 
 # Get more help
 
