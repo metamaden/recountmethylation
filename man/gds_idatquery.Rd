@@ -35,5 +35,5 @@ anticipated string pattern to construct the URL path for the query.
 IDATs are detected from the supplement for a GSE record.
 }
 \examples{
-query <- gds_idatquery(gsmvi = c("GSM2465267", "GSM2814572"))
+query <- try(gds_idatquery(gsmvi = c("GSM2465267", "GSM2814572")))
 }

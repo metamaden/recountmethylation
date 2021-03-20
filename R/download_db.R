@@ -19,7 +19,7 @@
 #' @returns Matrix of server files and file metadata
 #' @examples 
 #' dn <- "remethdb-h5se_gr-test_0-0-1_1590090412 29-May-2020 07:28 -"
-#' sm <- servermatrix(dn)
+#' sm <- try(servermatrix(dn))
 #' @seealso get_rmdl, smfilt
 #' @export
 servermatrix <- function(dn = NULL, sslver = FALSE, printmatrix = TRUE, 
@@ -105,8 +105,8 @@ smfilt <- function(sm, typesdf = NULL){
 #' @returns New filepath to dir containing the downloaded data.
 #' @examples 
 #' # prints file info from server:
-#' path <- get_rmdl(which.class = "test", which.type = "h5se", 
-#' show.files = TRUE, download = FALSE) 
+#' path <- try(get_rmdl(which.class = "test", which.type = "h5se", 
+#' show.files = TRUE, download = FALSE))
 #' @seealso servermatrix(), getURL(), loadHDF5SummarizedExperiment(), h5ls()
 #' @export
 get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),

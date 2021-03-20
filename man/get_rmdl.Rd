@@ -55,8 +55,8 @@ details).
 }
 \examples{
 # prints file info from server:
-path <- get_rmdl(which.class = "test", which.type = "h5se", 
-show.files = TRUE, download = FALSE) 
+path <- try(get_rmdl(which.class = "test", which.type = "h5se", 
+show.files = TRUE, download = FALSE))
 }
 \seealso{
 servermatrix(), getURL(), loadHDF5SummarizedExperiment(), h5ls()

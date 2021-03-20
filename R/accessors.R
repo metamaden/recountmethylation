@@ -14,7 +14,7 @@
 #' @param burl Base URL string for RCurl query.
 #' @returns Lists the basename paths and filenames of IDATs downloaded.
 #' @examples
-#' query <- gds_idatquery(gsmvi = c("GSM2465267", "GSM2814572"))
+#' query <- try(gds_idatquery(gsmvi = c("GSM2465267", "GSM2814572")))
 #' @export
 gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
   verbose = FALSE, dfp = "idats",
@@ -85,7 +85,7 @@ gds_idatquery <- function(gsmvi, ext = "gz", expand = TRUE,
 #' @examples
 #' gsmvi <- c("GSM2465267", "GSM2814572")
 #' fpath <- file.path(tempdir(), "gds_idat2rg_example")
-#' \donttest{rg <- gds_idat2rg(gsmvi, dfp = fpath)}
+#' rg <- try(gds_idat2rg(gsmvi, dfp = fpath))
 #' @seealso gds_idatquery(), read.metharray()
 #' @export
 gds_idat2rg <- function(gsmvi, rmdl = TRUE, ext = "gz", dfp = "./idats/", 

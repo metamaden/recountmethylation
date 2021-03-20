@@ -35,7 +35,7 @@ h5se directories contain both an assays and an se.rds file.
 }
 \examples{
 dn <- "remethdb-h5se_gr-test_0-0-1_1590090412 29-May-2020 07:28 -"
-sm <- servermatrix(dn)
+sm <- try(servermatrix(dn))
 }
 \seealso{
 get_rmdl, smfilt
