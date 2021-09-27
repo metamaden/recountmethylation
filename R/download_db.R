@@ -19,7 +19,7 @@
 #' @returns Matrix of server files and file metadata
 #' @examples 
 #' dn <- "remethdb-h5se_gr-test_0-0-1_1590090412 29-May-2020 07:28 -"
-#' sm <- try(servermatrix(dn))
+#' sm <- get_servermatrix(dn = dn)
 #' @seealso get_rmdl, smfilt
 #' @export
 servermatrix <- function(dn = NULL, sslver = FALSE, printmatrix = TRUE, 
@@ -44,6 +44,40 @@ servermatrix <- function(dn = NULL, sslver = FALSE, printmatrix = TRUE,
   cond.se<-length(fniv[grepl("se",fniv)])==1;sv<-c(sv,paste(fniv,collapse=";"))
   if(!(cond.assays & cond.se)){fnexclude <- c(fnexclude, f)}}
   sm[grepl("h5se",sm[,1]),4]<-sv;sm<-sm[!sm[,1] %in% fnexclude,];return(sm)
+}
+
+#' get_servermatrix
+#' 
+#' Get a matrix of server files. If the RCurl call fails, a matrix is loaded
+#' from the stored package files at `sm_path`.
+#' 
+#' @param dn Server data returned from RCurl (default NULL).
+#' @param sslver Whether to use SSL certificate authentication for server 
+#' connection (default FALSE).
+#' @param printmatrix Whether to print the data matrix to console (default 
+#' TRUE).
+#' @param url Server website url (default "https://methylation.recount.bio/").
+#' @param verbose Whether to show verbose messages (default FALSE).
+#' @param sm_path Path to the servermatrix_rda dir containing the stored 
+#' servermatrix files (default: system.file...).
+#' @returns Matrix of server files and file metadata
+#' @examples 
+#' sm <- get_servermatrix(url = "")
+#' @seealso servermatrix, get_rmdl, smfilt
+#' @export
+get_servermatrix <- function(dn = NULL, sslver = FALSE, printmatrix = TRUE, 
+                             url = "https://methylation.recount.bio/", verbose = FALSE,
+                             sm_path = system.file("extdata", "servermatrix_rda", 
+                                                   package = "recountmethylation")){
+  sm <- try(servermatrix(dn = dn, sslver = sslver, printmatrix = printmatrix, 
+                         url = url, verbose = verbose), silent = T)
+  if(class(sm) == "try-error"|!is.matrix(sm)){
+    sm_fname <- list.files(sm_path)
+    smv <- as.numeric(gsub(".*_|\\..*", "", sm_fname))
+    sm_fname <- sm_fname[which(smv == max(smv))[1]]
+    sm <- get(load(file.path(sm_path, sm_fname)))
+  }
+  return(sm)
 }
 
 #' smfilt
@@ -116,7 +150,7 @@ get_rmdl <- function(which.class = c("rg", "gm", "gr", "test"),
                      show.files = FALSE, download = TRUE, sslver = FALSE, 
                      verbose = TRUE){
   if(verbose){message("Retrieving data dirnames from server...")}
-  sm <- servermatrix(dn = NULL);smf <- smfilt(sm)
+  sm <- get_servermatrix(dn = NULL);smf <- smfilt(sm)
   if(show.files){message("Printing server matrix: ");print(smf)}
   if(is.null(fn)){ # clean query results
     str1 <- ifelse(which.type == "h5", "\\.", ".*")

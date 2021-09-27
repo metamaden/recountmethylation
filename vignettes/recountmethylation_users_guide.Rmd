@@ -79,7 +79,7 @@ The databases are located at
 and file details are viewable as follows:
 
 ```{r, echo = TRUE, message = TRUE}
-sm <- try(as.data.frame(smfilt(servermatrix()), stringsAsFactors = FALSE))
+sm <- try(as.data.frame(smfilt(get_servermatrix()), stringsAsFactors = FALSE))
 if(class(sm) == "data.frame"){knitr::kable(sm, align = "c")}
 ```
 

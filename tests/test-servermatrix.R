@@ -1,14 +1,8 @@
-testthat::context("Servermatrix properties")
+testthat::context("Test the server matrix properties")
 
 testthat::test_that("Properties of server matrix returned from get_rmdl 
     and servermatrix", {
-    url = "https://recount.bio/data/"
-    show.files = FALSE
-    sslver = FALSE
-    ftpuseopt <- dirlistopt <- ifelse(show.files, FALSE, TRUE) # rcurl setup
-    dn <- RCurl::getURL(url, ftp.use.epsv = ftpuseopt, dirlistonly = dirlistopt,
-                      .opts = list(ssl.verifypeer = sslver))
-    sm <- recountmethylation::servermatrix(dn = dn, sslver = sslver)
+    sm <- recountmethylation::get_servermatrix()
     testthat::expect_true(is(sm, "matrix"))
     testthat::expect_equal(ncol(sm), 4)
     testthat::expect_true(is(sm[,1], "character"))
