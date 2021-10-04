@@ -71,12 +71,13 @@ get_servermatrix <- function(dn = NULL, sslver = FALSE, printmatrix = TRUE,
                                                    package = "recountmethylation")){
   sm <- try(servermatrix(dn = dn, sslver = sslver, printmatrix = printmatrix, 
                          url = url, verbose = verbose), silent = T)
-  if(class(sm) == "try-error"|!is.matrix(sm)){
+  if(!is(sm, "matrix")){
     sm_fname <- list.files(sm_path)
     smv <- as.numeric(gsub(".*_|\\..*", "", sm_fname))
     sm_fname <- sm_fname[which(smv == max(smv))[1]]
     sm <- get(load(file.path(sm_path, sm_fname)))
   }
+  if(!is(sm, "matrix")){stop("Error, sm is not a matrix object.")}
   return(sm)
 }
 
