@@ -1,5 +1,5 @@
 Package: recountmethylation
-Version: 1.5.1
+Version: 1.4.1
 Title: Access and analyze DNA methylation database compilations
 Authors@R: c(person(c("Sean", "K"), "Maden", role = c("cre", "aut"),
         email = "maden@ohsu.edu", comment = c(ORCID = "0000-0002-2212-4894")),
