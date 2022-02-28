@@ -1,0 +1,271 @@
+---
+title: "Nearest neighbors analysis for DNAm arrays"
+author: "Sean K. Maden"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '3'
+  BiocStyle::pdf_document:
+    toc: yes
+    toc_depth: 3
+  BiocStyle::html_document:
+    code_folding: show
+    toc: yes
+    tocfloat: yes
+package: recountmethylation
+bibliography: bibliography.bib
+vignette: > 
+  %\VignetteIndexEntry{recountmethylation User's Guide}
+  %\VignetteDepends{RCurl}
+  %\usepackage[UTF-8]{inputenc} 
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r chunk_settings, eval = T, echo = F, warning = F, message = F}
+library(basilisk); library(reticulate); library(HDF5Array); library(ggplot2)
+knitr::opts_chunk$set(eval = FALSE, echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r setup, eval = T, echo = F}
+si.dpath <- system.file("extdata", "sitest", package = "recountmethylation")
+# get object paths
+#bval.fpath <- file.path(si.dpath, "bval_100.csv")
+#md.fpath <- file.path(si.dapth, "mdf_sitest.rda")
+# load objects
+#bval <- get(load(bval.fpath))
+#md <- get(load(md.fpath))
+# get(load("si_vignette_env.Rda"))
+bval.fpath <- "bval_100.csv"
+md.fpath <- "mdf_sitest.rda"
+fhtable.fpath <- "bval_100_fh10.csv"
+md <- get(load(md.fpath))
+bval <- read.csv(bval.fpath, row.names = 1)
+fhtable <- read.csv(fhtable.fpath, row.names = 1, header = F)
+source("dnam_search_index.R")
+```
+
+This vignette provides instructions to construct and analyze a search index of DNAm array data. The index is made using the `hnswlib` Python library, and the `basilisk` and `reticulate` R/Bioconductor libraries are used to manage Python environments and functions. These methods should be widely usedful for genomics and epigenomics analyses, especially for very large datasets.
+
+# Background: search indexes for biological data
+
+The search index has a similar function to the index of a book. Rather than storing the full/uncompressed data, only the between-entity relations are stored, which enables rapid entity lookup and nearest neighbors analysis while keeping stored file sizes manageable. Many methods for search index construction are available. The Hierarchical Navigable Small World (HNSW) graph method, used below, is fairly new (@malkov_efficient_2018) and was among the overall top performing methods benchmarked in [ANN benchmarks](https://github.com/erikbern/ann-benchmarks) (@aumuller_ann-benchmarks_2018). HNSW is implemented by the `hnswlib` Python library, which also includes helpful docstrings and a ReadMe to apply the method in practice.
+
+ While prior work showed the utility of indexing several types of biomedical data for research, to our knowledge this is the first time support has been provided for R users to make and analyze search indexes of DNAm array data. This vignette walks through a small example using a handful DNAm array samples from blood. Interested users can further access a comprehensive [index]("https://recount.bio/data/sidict-hnsw__bval-gseadj-fh10k__all-blood-2-platforms.pickle") of pre-compiled DNAm array data from blood samples on the [`recountmethylation` server](https://recount.bio/data/). These data were available in the Gene Expression Omnibus (GEO) by March 31, 2021, and they include 13,835 samples run on either the HM450K or EPIC platform.
+
+# Index samples on dimension-reduced data
+
+This section shows how to make a new search index using sample DNAm array data after performing dimensionality reduction on the data using feature hashing (a.k.a. "the hashing trick", @weinberger_feature_2010).
+
+## Virtual environment setup
+
+First, use the `setup_sienv()` function to set up a Python virtual environment named "dnam_si_vignette" which contains the required dependencies. Since this function is not exported, use `:::` to call it. For greater reproducibility, specify exact dependency versions e.g. like "numpy==1.20.1". Install the `hnswlib` (v0.5.1) library to manage search index construction and access. install `pandas` (v1.2.2) and `numpy` (v1.20.1) for data manipulations, and `mmh3` (v3.0.0) for feature hashing.
+
+```{r}
+recountmethylation:::setup_sienv(env.name = "dnam_si_vignette")
+```
+
+## Perform dimensionality reduction on DNAm data
+
+Search index efficiency pairs well with dimensionality reduction to enable very rapid queries on large datasets. This section shows how to reduce a dataset of DNAm fractions prior to indexing. 
+
+First, save DNAm fractions (Beta-values) from a `SummarizedExperiment` object, ensuring sample data is in rows and probes are in columns.
+
+```{r}
+set.seed(1)
+gr.fname <- "gr-noob_h5se_hm450k-epic-merge_0-0-3"
+gr <- HDF5Array::loadHDF5SummarizedExperiment(gr.fname)
+md <- as.data.frame(colData(gr))
+# identify samples from metadata
+gseid <- "GSE67393"
+gsmv <- md[md$gse == gseid,]$gsm # get study samples
+gsmv <- gsmv[sample(length(gsmv), 10)]
+# get random samples by group label
+mdf <- md[md$blood.subgroup=="PBMC",]
+gsmv <- c(gsmv, mdf[sample(nrow(mdf), 20),]$gsm)
+mdf <- md[md$blood.subgroup=="whole_blood",]
+gsmv <- c(gsmv, mdf[sample(nrow(mdf), 20),]$gsm)
+# norm bvals for probe subset
+num.cg <- 100
+grf <- gr[,gr$gsm %in% gsmv]; dim(grf)
+bval <- getBeta(grf[sample(nrow(grf), num.cg),])
+bval <- t(bval) # get transpose
+# save bval table
+bval.fpath <- paste0("bval_",num.cg,".csv")
+write.csv(bval, file = bval.fpath) 
+```
+
+Next, call `get_fh()` to perform feature hashing on the DNAm data. For this example, we set the reduced dimensions using `ndim = 100`.
+
+```{r}
+# get example table and labels
+num.dim <- 10 # target reduced dimensions
+fhtable.fpath <- "bval_100_fh10.csv"
+get_fh(csv_savepath = fhtable.fpath, csv_openpath = bval.fpath, ndim = num.dim)
+```
+
+If `ndim` is high, the data is less reduced/compressed but more closely resembles the original uncompressed data, while the opposite is true at lower `ndim`. The exact target dimensions to ultimately use is up to user discretion. In practice, 10,000 dimensions yields a good tradeoff between compression and uncompressed data simliarity for HM450K arrays.
+
+## Make a new HNSW search index
+
+Now use the `make_si()` function to make a new search index using `hnswlib`. This function takes the hashed features file name/path and makes a new search index and search index dictionary. Note, we set the extension `.pickle` since this is the save format for the new index objects. 
+
+```{r, eval = T}
+si.fname.str <- "new_search_index"
+si.fname <- paste0(si.fname.str, ".pickle")
+sidict.fname <- paste0(si.fname.str, "_dict.pickle")
+make_si(fh_csv_fpath = fhtable.fpath, si_fname = si.fname, si_dict_fname = sidict.fname)
+```
+
+The tuning parameters `space_val`, `efc_val`, `m_val`, and `ef_val` were selected to work well for DNAm array data, and further details about these parameters can be found in the `hnswlib` package docstrings and ReadMe.
+
+# Query nearest neighbors in the search index
+
+This section shows an example analysis of nearest neighbors returned from a series of queries varying k from 1 to 20 neighbors. 
+
+## Get nearest neighbors from search index queries
+
+Next we can query samples from study GSE67393 (@inoshita_sex_2015). Query the search index using `query_si()`, which passes valid query data to the `.knn_query` method in `hnswlib`. First get the IDs for a subset of 10 of the samples frome the study GSE67393, which were included in the search index. 
+
+```{r, eval = T}
+gsei.str <- "GSE67393"
+gsmv.gsei <- rownames(md[md$gse==gsei.str,])
+which.gsmv <- which(rownames(bval) %in% gsmv.gsei)
+query.gsmv <- rownames(bval[which.gsmv,])[seq(10)]
+```
+
+Now specify a vector of k values, `lkval`, where k is the number of nearest neighbors to return. For example, if a search index has 100 dimensions, the query data for a sample should have exactly 100 dimensions. Also note k cannot exceed the total indexed entities, which is 10 for this example. 
+
+```{r, eval = T}
+lkval <- c(1,5,10,20) # vector of query k values 
+```
+
+Finally, use `query_si()` to run the query. The path `fhtable.fpath` to the hashed feature table "bval_100_fh10.csv" is specified, which is where the query function extracts the sample data for each query.
+
+```{r, eval = T}
+dfnn <- query_si(sample_idv = query.gsmv, fh_csv_fname = fhtable.fpath,
+                 index_dict_fname = sidict.fname, lkval = lkval)
+```
+
+
+## Inspect query results
+
+The query results were assigned to `dfnn`, which we can now inspect. First show its dimensions.
+
+```{r, eval = T}
+dim(dfnn)
+```
+
+`dfnn` has 10 rows, corresponding to the 10 queried sample IDs, and 5 columns. The first column shows the IDs for the queried samples. Columns 2-5 show the results of individual queries, where column names designate the k value for a query as `k=...`.
+
+```{r, eval = T}
+colnames(dfnn)
+```
+
+Now consider the query results for the sample in the first row, called "GSM1646161.1607013450.hlink.GSM1646161_9611518054_R01C01". Check the results of the first 3 queries for this sample (k = 1, 5, or 10).
+
+```{r, eval = T}
+unlist(strsplit(dfnn[1,"k=1"], ";"))
+```
+
+When k = 1, the sample ID is returned. This is because the query uses the same hashed features data as was used to make the search index, and the search is for a subset of the indexed samples. 
+
+```{r, eval = T}
+unlist(strsplit(dfnn[1,"k=5"], ";"))
+```
+
+This shows that samples are returned in the order of descending similarity to the queried data. For k = 5, the first sample returned is the same as k = 1, followed by the next 4 nearest neighboring samples.
+
+```{r, eval = T}
+unlist(strsplit(dfnn[1,"k=10"], ";"))
+```
+
+For k = 10, the first 5 neighbors are the same as for k = 5, followed by the next 5 nearest neighbors.
+
+# Plot metadata labels among nearest neighbors
+
+This section shows some ways to visualize the results of nearest neighbors queries using the `ggplot2` package.
+
+## Metadata label frequency among neighbors from a single query
+
+Now analyze the type of samples among returned nearest neighbors. Use the `md` object to map labels to returned sample IDs for a single query, e.g. the first row where k = 5.
+
+```{r, eval = T}
+gsmvi <- unlist(strsplit(dfnn[1, "k=5"], ";"))
+blood.typev <- md[gsmvi,]$blood.subgroup
+table(blood.typev)
+```
+
+We see there are 4 whole blood samples, and 1 labeled other/NOS which corresponds to the label for the queried sample.
+
+## Distribution of neighbors labeled whole blood across queries
+
+Now get the distribution of labels across samples for a single k value. We'll show the distribution of samples with the label "whole_blood" from the variable "blood.subgroup", focusing on nearest neighbors returned from the first query with k = 20.
+
+```{r, eval = T}
+dist.wb <- unlist(lapply(seq(nrow(dfnn)), function(ii){
+  gsmvi <- unlist(strsplit(dfnn[ii,"k=20"], ";"))
+  length(which(md[gsmvi,]$blood.subgroup=="whole_blood"))
+}))
+```
+
+Now plot the results for whole blood. Use a composite of a violin plot and boxplot showing the distribution median and any outliers. Remove the x-axis title and scale the y-axis to show percentages.
+
+```{r, eval = T}
+dfp <- data.frame(num.samples = dist.wb)
+dfp$perc.samples <- 100*dfp$num.samples/20
+dfp$type <- "whole_blood"
+ggplot(dfp, aes(x = type, y = perc.samples)) + 
+  geom_violin() + geom_boxplot(width = 0.2) + theme_bw() +
+  ylab("Percent of neighbors") + theme(axis.title.x = element_blank()) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1))
+```
+
+# Distributions of multiple labels and queries
+
+Repeat the above for all mapped metadata labels. Specify the three metadata labels of interest for the `blood.subgroup` variable (e.g. "whole_blood", "PBMC", "other/NOS"), then calculate the number of samples for each label in each query, assigning results to `dfp`.
+
+```{r, eval = T}
+# specify labels of interest
+ugroupv <- c("whole_blood", "PBMC", "other/NOS")
+# function to get samples by label
+get_dfgrp <- function(ugroupv){
+  do.call(rbind, lapply(c("whole_blood", "PBMC", "other/NOS"), function(ugroupi){
+    num.grp <- length(which(md[ugroupv,]$blood.subgroup==ugroupi))
+    data.frame(num.samples = num.grp, type = ugroupi)
+  }))
+}
+# get samples by label across queries
+dfp <- do.call(rbind, lapply(seq(nrow(dfnn)), function(ii){
+  get_dfgrp(unlist(strsplit(dfnn[ii,"k=20"], ";")))
+}))
+```
+
+Format variables in `dfp` for plotting, then make the composite violin and boxplots showing distributions of the three labels, or percent of samples having the label, across queries.
+
+```{r, eval = T}
+# format dfp variables for plots
+dfp$perc.samples <- 100*dfp$num.samples/20
+# reorder on medians
+medianv <- unlist(lapply(c("whole_blood", "PBMC", "other/NOS"), function(groupi){
+  median(dfp[dfp$type==groupi,]$perc.samples)}))
+# define legend groups
+dfp$`Sample\ntype` <- factor(dfp$type, levels = c("whole_blood", "PBMC", "other/NOS")[order(medianv)])
+
+# make new composite plot
+ggplot(dfp, aes(x = `Sample\ntype`, y = perc.samples, fill = `Sample\ntype`)) + 
+  geom_violin() + geom_boxplot(width = 0.2) + theme_bw() +
+  ylab("Percent of neighbors") + theme(axis.title.x = element_blank()) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1))
+```
+
+# Session Info
+
+```{r, eval = T}
+utils::sessionInfo()
+```
+
+# Works Cited
+

@@ -1,0 +1,216 @@
+---
+title: "Determine population ancestry from DNAm arrays"
+author: "Sean K. Maden"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+package: recountmethylation
+bibliography: bibliography.bib
+vignette: >
+  %\VignetteIndexEntry{Determine population ancestry from DNAm arrays} 
+  %\VignetteDepends{RCurl} 
+  %\usepackage[UTF-8]{inputenc}  
+  %\VignetteEncoding{UTF-8} 
+  %\VignetteEngine{knitr::rmarkdown}
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '3'
+  BiocStyle::pdf_document:
+    toc: yes
+    toc_depth: 3
+  BiocStyle::html_document:
+    code_folding: show
+    toc: yes
+    tocfloat: yes
+---
+
+```{r chunk_settings, eval = T, echo = F}
+knitr::opts_chunk$set(eval = FALSE, echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r setup, eval = T, echo = F}
+# get the system load paths
+dpath <- system.file("extdata", "glint_files", 
+                     package = "recountmethylation")  # local path to example data
+res1.fname <- "glint_results_tutorialdata.epistructure.pcs.txt" 
+res1.fpath <- file.path(dpath, res1.fname)
+res1 <- read.table(res1.fpath, sep = "\t")            # read in example dataset #1
+res2.fpath <- file.path(dpath, "glint_results_minfidata.epistructure.pcs.txt")
+res2 <- read.table(res2.fpath, sep = "\t")            # read in example dataset #2
+```
+
+This notebook describes how to obtain the `GLINT` software suite for DNAm analysis, and how to run `GLINT` with the `EPISTRUCTURE` method for inferring population genetic ancestry/descent from HM450K DNAm array probes. These command line tools are called using a conda virtual environment managed from an R session with the `basilisk` Bioconductor package. Code in this notebook should work for Mac and Linux-like environments. Consult @rahmani_genome-wide_2017 for more details about the `EPISTRUCTURE` method.
+
+# Obtain the `GLINT` software
+
+First, obtain the latest version of `GLINT` online by downloading the [source](https://github.com/cozygene/glint/releases) from GitHub.
+
+Also ensure the `basilisk` Bioconductor/R package is installed. We'll use this to conveniently 
+manage conda virtual environments to run `GLINT` from an R session.
+
+```{r}
+BiocManager::install("basilisk")
+library(basilisk)
+```
+
+# Virtual environment setup
+
+Next, set up a virtual environment using conda. This step is crucial for reproducible research, as it enables control over which software versions to use in a session. This enables running software that is older or no longer maintained, a fairly common task in computational sciences.
+
+Using `basilisk`, set up a Python 2 environment with seven dependencies (`numpy`, `pandas`, `scipy`, `scikit-learn`, `matplotlib`, `statsmodels`, and `cvxopt`) for which we specify the version using the form "packagename==version" (e.g. "numpy==1.15").
+
+```{r}
+env.name <- "glint_env"          # name the new virtual environment
+pkg.name <- "recountmethylation" # set env properties
+pkgv <- c("python==2.7",         # python version (v2.7)
+          "numpy==1.15",         # numpy version (v1.15)
+          "pandas==0.22",        # pandas version (v0.22)
+          "scipy==1.2",          # scipy version (v1.2)
+          "scikit-learn==0.19",  # scikit-learn (v0.19)
+          "matplotlib==2.2",     # matplotlib (v2.2)
+          "statsmodels==0.9",    # statsmodels (v0.9)
+          "cvxopt==1.2")         # cvxopt (v1.2)
+glint_env <- BasiliskEnvironment(envname = env.name, pkgname = pkg.name, 
+                                 packages = pkgv)
+proc <- basiliskStart(glint_env) # define run process
+on.exit(basiliskStop(proc))      # define exit process
+```
+
+This makes a `BasiliskEnvironment` object, `glint_env`, with a starting process called `proc` and a session end process specified with `on.exit()`. 
+
+# Process example DNAm array data
+
+This section shows how to run `GLINT` on an example dataset, with the `EPISTRUCTURE` method enabled. It includes info about the required data formats and shows how to adjust for covariates.
+
+To run `GLINT` on DNAm array stored as a `SummarizedExperiment` object, first access the test HM450K `MethylSet` from the `minfiData` package.
+
+```{r}
+library(minfiData)
+ms <- get(data("MsetEx")) # load example MethylSet
+```
+
+Now load the explanatory CpG probe vector for `EPISTRUCTURE`. This small subset of 4,913 HM450K array probes was found by @rahmani_genome-wide_2017 to be strongly correlated with SNPs informing population ancestry and genetic structure. Access them from `recountmethylation` as follows.
+
+```{r}
+dpath <- system.file("extdata", "glint_files", 
+                     package = "recountmethylation") # get the dir path
+cgv.fpath <- file.path(dpath, "glint_epistructure_explanatory-cpgs.rda")
+glint.cgv <- get(load(cgv.fpath)) # load explanatory probes
+```
+
+Subset `ms`, a `MethylSet`, to include just the 4,913 explanatory probes. This will save considerable disk space and memory for processing very large datasets.
+
+```{r}
+mf <- ms[rownames(ms) %in% glint.cgv,] # filter ms on explanatory probes
+dim(mf)                                # mf dimensions: [1] 4913    6
+```
+
+Next, identify desired model covariates from sample metadata, then convert to numeric/float format (required by `GLINT`). Specify the variables "age" and "sex" corresponding to columns in the file `covariates_minfidata.txt`.
+
+```{r}
+# get covar -- all vars should be numeric/float
+covar <- as.data.frame(colData(mf)[,c("age", "sex")]) # get sample metadata
+covar[,"sex"] <- ifelse(covar[,"sex"] == "M", 1, 0)   # relabel sex for glint
+# write covariates matrix
+covar.fpath <- file.path("covariates_minfidata.txt")  # specify covariate table path
+# write table colnames, values
+write.table(covar, file = covar.fpath, sep = "\t", row.names = T, 
+            col.names = T, append = F, quote = F)     # write covariates table
+```
+
+Now calculate the DNAm fractoins or "Beta-values". Impute any missing values with row medians, and write the final file to `bval_minfidata.txt`.
+
+```{r}
+bval.fpath <- file.path("bval_minfidata.txt")     # specify dnam fractions table name
+mbval <- t(apply(as.matrix(getBeta(mf)),1,function(ri){
+  ri[is.na(ri)] <- median(ri,na.rm=T)             # impute na's with row medians
+  return(round(ri, 4))
+})); rownames(mbval) <- rownames(mf)              # assign probe ids to row names
+write.table(mbval, file = bval.fpath, sep = sepsym, 
+            row.names = T, col.names = T, append = F, 
+            quote = F)                            # write dnam fractions table
+```
+
+Next, set the system commands to make command line calls from R. Define these manually as strings to be passed to the `system()` function, specifying the paths to the new `minfiData` example files.
+
+```{r}
+glint.dpath <- "glint-1.0.4"                         # path to the main glint app dir
+glint.pypath <- file.path(glint.dpath, "glint.py")   # path to the glint .py script
+data.fpath <- file.path("bval_minfidata.txt")        # path to the DNAm data table
+covar.fpath <- file.path("covariates_minfidata.txt") # path to the metadata table
+out.fstr <- file.path("glint_results_minfidata")     # base string for ouput results files
+covarv <- c("age", "sex")                            # vector of valid covariates
+covar.str <- paste0(covarv, collapse = " ")          # format the covariates vector
+cmd.str <- paste0(c("python", glint.pypath, 
+                    "--datafile", data.fpath, 
+                    "--covarfile", covar.fpath, 
+                    "--covar", covar.str, 
+                    "--epi", "--out", out.fstr), 
+                  collapse = " ")                    # get the final command line call
+```
+
+The commands stored as `cmd.str` include the path to the latest `GLINT` version, 
+`glint.path`, the paths to the `datafile.txt` and `covariates.txt` tutorial files, 
+the variable names `age` and `gender` which are our covariates of interest and correspond to column names in `covariates.txt`. We also used the `--epi` flag to ensure the `EPISTRUCTURE` method is run.
+
+Now run `GLINT` with `basiliskRun()`. This should relay system outputs back to our console, which are included as comments in the below code chunk.
+
+```{r}
+basiliskRun(proc, function(cmd.str){system(cmd.str)}, cmd.str = cmd.str) # run glint
+# this returns:
+# INFO      >>> python glint-1.0.4/glint.py --datafile bval_minfidata.txt --covarfile covariates_minfidata.txt --covar age sex --epi --out glint_results_minfidata
+# INFO      Starting GLINT...
+# INFO      Validating arguments...
+# INFO      Loading file bval_minfidata.txt...
+# INFO      Checking for missing values in the data file...
+# INFO      Validating covariates file...
+# INFO      Loading file covariates_minfidata.txt...
+# INFO      New covariates were found: age, sex.
+# INFO      Running EPISTRUCTURE...
+# INFO      Removing non-informative sites...
+# INFO      Including sites...
+# INFO      Include sites: 4913 CpGs from the reference list of 4913 CpGs will be included...
+# WARNING   Found no sites to exclude.
+# INFO      Using covariates age, sex.
+# INFO      Regressing out covariates...
+# INFO      Running PCA...
+# INFO      The first 1 PCs were saved to glint_results_minfidata.epistructure.pcs.txt.
+# INFO      Added covariates epi1.
+# Validating all dependencies are installed...
+# All dependencies are installed
+# [1] 0
+```
+
+Since we declared `--out glint_results_minfidata`, results files are saved with the 
+beginning string "glint_results_minfidata" appended. Logs were saved to the file with the `*.glint.log` extension, while data were saved to the file with the `*.epistructure.pcs.txt` extension. 
+
+Now inspect the output results data file `glint_results_minfidata.epistructure.pcs.txt`.
+
+```{r}
+out.fpath <- paste0(out.fpath, ".epistructure.pcs.txt")
+res2 <- read.table(out.fpath, sep = "\t")
+```
+```{r, eval = T}
+colnames(res2) <- c("sample", "epistructure.pc")
+dim(res2)
+res2
+```
+
+The first results column reflects sample IDs from the columns in `bval_minfidata.txt`. Remaining columns show the `EPISTRUCTURE` population components. While just one population component calculated in this example, experiment datasets may generate outputs with more than one population component and thus several component columns.
+
+# Further reading 
+
+For more details about `GLINT`, see the software [documentation](https://glint-epigenetics.readthedocs.io/en/latest/) and GitHub [repo](https://github.com/cozygene/glint). Additional [tutorial files](https://github.com/cozygene/glint/releases) are also available. 
+
+Consult @rahmani_genome-wide_2017 for more details about the `EPISTRUCTURE` method, including the discovery of explanatory CpG probes associated with population structure SNPs. 
+
+For more details about setting up virtual environments from R, consult the `basilisk` package [documentation](https://www.bioconductor.org/packages/release/bioc/html/basilisk.html).
+
+# Session Info
+
+```{r, eval = T}
+utils::sessionInfo()
+```
+
+# Works Cited
+

@@ -1,0 +1,71 @@
+---
+title: "Construct and analyze a search index of DNAm array data"
+author: "Sean K. Maden"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_depth: '3'
+  BiocStyle::pdf_document:
+    toc: yes
+    toc_depth: 3
+  BiocStyle::html_document:
+    code_folding: show
+    toc: yes
+    tocfloat: yes
+package: recountmethylation
+bibliography: bibliography.bib
+vignette: > 
+  %\VignetteIndexEntry{recountmethylation User's Guide}
+  %\VignetteDepends{RCurl}
+  %\usepackage[UTF-8]{inputenc} 
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r chunk_settings, eval = T}
+library(basilisk); library(reticulate); # library(minfiData)
+knitr::opts_chunk$set(eval = FALSE, echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+```{r setup, eval = T}
+# get the system load paths
+
+```
+
+This vignette describes how to construct a search index from DNAm array data, and how to perform nearest neighbors analysis from querying the search index. The index will use the hierarchical small world graph (HNSW) method implemented in the `hnswlib` Python library in a virtual environment managed from an R session using the `basilisk` R/Bioconductor library. These methods should be useful for most epigenetics researchers, especially for analysis of very large datasets or comphrehensive analyses across multiple studies or data sources.
+
+# Background
+
+The search index acts like the index of a text, where the nearest neighbors of a sample are rapidly obtained by pre-compiling the between-sample relationships. Many methods for search index construction are available, and the HNSW method was highly ranked on ANN benchmarks, a comprehensive benchmark of the most commonly used search index methods. 
+
+This is, to our knowledge, the first application of the HNSW algorithm to index DNAm array data. Interested users can find an index of blood samples compiled from the Gene Expression Omnibus in March 2021 here.
+
+# Get the dependencies
+
+
+
+# Virtual environment setup
+
+```{r}
+# define env attributes
+env.name <- "dnam_si"
+pkgv <- c("hnswlib==0.5.1", "pandas==1.2.2", "numpy==1.20.1", 
+          "mmh3==3.0.0", "h5py==3.2.1")
+# define dependencies to download
+my_env <- BasiliskEnvironment(envname = env.name, 
+                              pkgname = "recountmethylation",
+                              packages = pkgv)
+# run env first time setup
+proc <- basiliskStart(my_env); on.exit(basiliskStop(proc))
+```
+
+# Session Info
+
+```{r, eval = T}
+utils::sessionInfo()
+```
+
+# Works Cited
+

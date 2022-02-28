@@ -2,6 +2,17 @@
 \title{Recountmethylation News}
 \encoding{UTF-8}
 
+\section{Version 1.5.1}{
+  \itemize{
+    \item Adds QC functions for BeadArray metrics and log M/U signals
+    \item Adds data and accessor function for cross-reactive CpGs
+    \item Adds vignette showing how to do power analysis with pwrEWAS
+    \item Adds vignette showing how to infer genetic ancestry using GLINT/EPISTRUCTURE
+    \item Adds vignette showing how to do nearest neighbors search using a search index
+    \item Adds functions for feature hashing, search index construction, and KNN search
+  }
+}
+
 \section{Version 1.1.4}{
   \itemize{
     \item Improves User's Guide, fixes typos, new citation, adds disclaimer text, updates servermatrix() chunk.
