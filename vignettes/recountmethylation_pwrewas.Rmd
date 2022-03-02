@@ -31,10 +31,10 @@ knitr::opts_chunk$set(eval = FALSE, echo = TRUE, warning = FALSE, message = FALS
 
 ```{r setup, eval = T, echo = F}
 # get the system load paths
-dpath <- system.file(package = "recountmethylation", "inst", "extdata", "pwrewas_files")
+dpath <- system.file("extdata", "pwrewas_files", package = "recountmethylation")
 # load example summary statistics
-dfpwr <- get(load(dpath, "dfpwr_test_pwrewas.rda"))
-lpwr <- get(load(dpath, "lpwr-results_pwrewas-example.rda"))
+dfpwr <- get(load(file.path(dpath, "dfpwr_test_pwrewas.rda")))
+lpwr <- get(load(file.path(dpath, "lpwr-results_pwrewas-example.rda")))
 ```
 
 This notebook describes how to run power analyses for DNAm arrays on user-defined datasets with the `pwrEWAS` method. The original `pwrEWAS` method is available as a Bioconductor [package](https://www.bioconductor.org/packages/release/bioc/html/pwrEWAS.html). There was need to make the original method extensible to new user-provided datasets, and this vignette describes how to do this with a lightly modified power analysis function, `pwrEWAS_itable()`.
