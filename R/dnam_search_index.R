@@ -55,7 +55,8 @@ setup_sienv <- function(env.name = "dnam_si_hnswlib",
 #' get_fh(csv_savepath = "bval_fn.csv", csv_openpath = of_fpath, ndim = 100)
 #' @export
 get_fh <- function(csv_savepath, csv_openpath, ndim = 1000, lstart = 1){
-  message("Starting basilisk process..."); proc <- setup_sienv()
+  message("Starting basilisk process...")
+  proc <- recountmethylation:::setup_sienv()
   pyscript.path <- system.file("python", package = "recountmethylation")
   pyscript.path <- file.path(pyscript.path, "dnam_search_index.py")
   message("Doing feature hashing...")
@@ -102,17 +103,19 @@ get_fh <- function(csv_savepath, csv_openpath, ndim = 1000, lstart = 1){
 #' make_si(fh_csv_fpath)
 #' @export
 make_si <- function(fh_csv_fpath, si_fname = "new_search_index.pickle", 
-                    si_dict_fname = "new_index_dict.pickle", threads = 4, space_val = 'l2', 
-                    efc_val = 2000, m_val = 1000, ef_val = 2000){
-  message("Starting basilisk process..."); proc <- setup_sienv()
+                    si_dict_fname = "new_index_dict.pickle", threads = 4, 
+                    space_val = 'l2', efc_val = 2000, m_val = 1000, ef_val = 2000){
+  message("Starting basilisk process...")
+  proc <- recountmethylation:::setup_sienv()
   pyscript.path <- system.file("python", package = "recountmethylation")
   pyscript.path <- file.path(pyscript.path, "dnam_search_index.py")
   basilisk::basiliskRun(proc, function(pyscript.path, fh_csv_fpath, si_fname, 
                                        si_dict_fname, threads, space_val, 
                                        efc_val, m_val, ef_val){
-    message("Sourcing Python functions..."); reticulate::source_python(pyscript.path)
+    message("Sourcing Python functions...")
+    reticulate::source_python(pyscript.path)
     message("Making search index...")
-    make_si(fname = fh_csv_fpath, index_name = si_fname, 
+    make_hnsw_si(fname = fh_csv_fpath, index_name = si_fname, 
             dindex_name = si_dict_fname, threads = as.integer(threads), 
             efc_val = as.integer(efc_val), m_val = as.integer(m_val), 
             ef_val = as.integer(ef_val))
@@ -138,10 +141,16 @@ make_si <- function(fh_csv_fpath, si_fname = "new_search_index.pickle",
 #' sample(s). The `query_si()` function returns verbose output, which can be 
 #' silenced with suppressMessages()`.
 #' 
-#' @param query_data Vector of feature hashed data comprising the query with 
-#' same length (for a vector) or ncol (for a table) as in the queried search 
-#' index data (required, numeric vector, matrix, or data frame).
-#' @param si_fname Name/path of queried search index (required, string).
+#' @param sample_idv Vector of valid sample IDs, or GSM IDs, which are included
+#' in the rownames of the hashed features table at fh_csv_fpath (requried, 
+#' vector of char strings).
+#' @param fh_csv_fpath Path to the hashed features table, which includes rownames
+#' corresponding to sample ID strings in the sample_idv vector (required, char).
+#' @param si_fname Base filename of the search index object, used to find the 
+#' search index and index dict files, which are expected to be located at
+#' si_fapth (required, char).
+#' @param si_fpath Path to the directory containing the search index and index
+#' dict files (required, char).
 #' @param lkval Vector of K nearest neighbors to return per query (optional, 
 #' int, c(1,2)).
 #' @returns
@@ -194,23 +203,31 @@ make_si <- function(fh_csv_fpath, si_fname = "new_search_index.pickle",
 #' # Provided k '3' > n si samples, skipping...
 #' # Returning query results...
 #' @export
-query_si <- function(sample_idv, fh_csv_fname, index_dict_fname, 
-  lkval = c(1,2)){
-  if(!file.exists(index_dict_fname)){
-    stop("Error: didn't find si dict '",index_dict_fname,"'")}
-  message("Starting basilisk process..."); proc <- setup_sienv()
+query_si <- function(sample_idv, fh_csv_fpath, 
+                     si_fname = "new_search_index", 
+                     si_fpath = ".", lkval = c(1,2)){
+  message("Checking index and table locations...")
+  if(!file.exists(fh_csv_fpath)){
+    stop("Error: didn't find fh table at location:\n'",fh_csv_fpath,"'")}
+  si_hnsw_fpath <- file.path(si_fpath, paste0(si_fname, ".pickle"))
+  if(!file.exists(si_hnsw_fpath)){
+    stop("Error: didn't find search index at location:\n'",v,"'")}
+  si_dict_fpath <- file.path(si_fpath, paste0(si_fname, "_dict.pickle"))
+  if(!file.exists(si_dict_fpath)){
+    stop("Error: didn't find index dict at location:\n'",si_dict_fpath,"'")}
+  message("Starting basilisk process...")
+  proc <- recountmethylation:::setup_sienv()
   lkval <- lapply(lkval, as.integer) # format query k values list
   pyscript.path <- system.file("python", package = "recountmethylation")
   pyscript.path <- file.path(pyscript.path, "dnam_search_index.py")
   query_result <- basilisk::basiliskRun(proc, function(pyscript.path, 
-    sample_idv, lk, index_dict_fname, fh_csv_fname){
+    sample_idv, lkval, si_dict_fpath, fh_csv_fpath){
     message("Sourcing Python functions...")
     reticulate::source_python(pyscript.path)
     message("Querying the search index...")
     dfk <- make_dfk_sampleid(sample_idv = sample_idv, lk = lkval, 
-      index_dict_fname = index_dict_fname, fh_csv_fname = fh_csv_fname)
+      index_dict_fname = si_dict_fpath, fh_csv_fname = fh_csv_fpath)
     return(dfk)}, pyscript.path = pyscript.path, sample_idv = sample_idv, 
-    lk = lkval, index_dict_fname = index_dict_fname, 
-    fh_csv_fname = fh_csv_fname)
+    lkval = lkval, si_dict_fpath = si_dict_fpath, fh_csv_fpath = fh_csv_fpath)
   return(query_result)
 }

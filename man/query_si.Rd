@@ -4,17 +4,31 @@
 \alias{query_si}
 \title{query_si}
 \usage{
-query_si(sample_idv, fh_csv_fname, index_dict_fname, lkval = c(1, 2))
+query_si(
+  sample_idv,
+  fh_csv_fpath,
+  si_fname = "new_search_index",
+  si_fpath = ".",
+  lkval = c(1, 2)
+)
 }
 \arguments{
+\item{sample_idv}{Vector of valid sample IDs, or GSM IDs, which are included
+in the rownames of the hashed features table at fh_csv_fpath (requried, 
+vector of char strings).}
+
+\item{fh_csv_fpath}{Path to the hashed features table, which includes rownames
+corresponding to sample ID strings in the sample_idv vector (required, char).}
+
+\item{si_fname}{Base filename of the search index object, used to find the 
+search index and index dict files, which are expected to be located at
+si_fapth (required, char).}
+
+\item{si_fpath}{Path to the directory containing the search index and index
+dict files (required, char).}
+
 \item{lkval}{Vector of K nearest neighbors to return per query (optional, 
 int, c(1,2)).}
-
-\item{query_data}{Vector of feature hashed data comprising the query with 
-same length (for a vector) or ncol (for a table) as in the queried search 
-index data (required, numeric vector, matrix, or data frame).}
-
-\item{si_fname}{Name/path of queried search index (required, string).}
 }
 \value{
 
