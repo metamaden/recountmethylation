@@ -116,7 +116,7 @@ def make_fhmatrix_specifylabels(labels_list, wf_name, of_name,
                     print("Finished with line number "+str(li))
     return None
 
-def make_si(fname, index_name, dindex_name, space_val = 'l2', threads = 10, 
+def make_hnsw_si(fname, index_name, dindex_name, space_val = 'l2', threads = 10, 
     efc_val = 2000, m_val = 1000, ef_val = 2000):
     """ Makes a new search index from a csv table
 
@@ -191,7 +191,7 @@ def query_si(query_data, si_fname, si_labels = [], kval = 2):
         return kval_labels, kval_distances
     return NULL
 
-def make_dfk_sampleid(sample_idv, lk = [1,2], fh_csv_fname = "bval_fn.csv",
+def make_dfk_sampleid(sample_idv, lk = [1,2], fh_csv_fname = "bval_100_fh10.csv",
     index_dict_fname = "new_index_dict.pickle"):
     """ make_dfk_sampleid
 
@@ -199,14 +199,16 @@ def make_dfk_sampleid(sample_idv, lk = [1,2], fh_csv_fname = "bval_fn.csv",
     Use a vector gsmv to identify samples for the query, from metadata.
     
     Arguments:
-        * gsm : Vector or list of sample ID strings, corresponding to sample ID
-            labels in the first column of the hashed features table 
-            `fh_csv_fname`, and sample names in the queried search index 
-            (requried, list/vector of strings).
+        * sample_idv : Vector or list of sample ID strings, corresponding to 
+            sample ID labels in the rownames/first column of the hashed features 
+            table at `fh_csv_fname`, which can correspond to sample names in the 
+            queried search index (requried, list/vector of strings).
         * lk : List of k nearest neighbors to query (required, list of int 
-                values, 1000).
-        * index_dict_fname: Name of the search index file (required, string, ).
-        * fh_csv_fname: Name/path of the hashed features csv to read (required, string, )
+            values, 1000).
+        * index_dict_fname: Name/path of the search index file (required, 
+            string).
+        * fh_csv_fname: Name/path of the hashed features csv to read (required, 
+            string, )
     Returns:
         * dfk_final
 
@@ -216,7 +218,7 @@ def make_dfk_sampleid(sample_idv, lk = [1,2], fh_csv_fname = "bval_fn.csv",
     with open(fh_csv_fname, "r") as of:
         for line in of:
             lline = line.split(",")
-            sample_id = lline[0].replace('"', '')
+            sample_id = lline[0].replace('"', '').split(".")[0]
             if sample_id in sample_idv:
                 print("Getting index data for sample: '{0}'".format(sample_id))
                 fhdict[sample_id] = [float(fhi.replace("\n", "")) 
@@ -227,10 +229,8 @@ def make_dfk_sampleid(sample_idv, lk = [1,2], fh_csv_fname = "bval_fn.csv",
     dim_si_keylabv = len([ii for ii in si_dict['strlabels']])
     dfk = pd.DataFrame()
     dfk["sample_id"] = fhdict.keys()
-    print("Beginning queries of k neighbors from lk...")
-    ldfk = []
     for ii, ki in enumerate(lk):
-        print('ii = ', str(ii), ", ki = ", str(ki))
+        print("Querying ",ki," neighbors from lk...")
         if ki <= dim_si_keylabv:
             kval_str_labels, kval_labels, kval_distances = query_si(
                 query_data = dfi, si_fname = index_dict_fname, 
@@ -239,7 +239,6 @@ def make_dfk_sampleid(sample_idv, lk = [1,2], fh_csv_fname = "bval_fn.csv",
             kli_format = [";".join(ii) for ii in kval_str_labels]
             dfki = pd.DataFrame(kli_format)
             dfk['k=' + str(ki)] = [ii for ii in dfki[0]]
-            ldfk.append(dfk)
         else:
             print("Provided k '{0}' > n si samples, skipping...".format(ki))
     print("Returning query results...")

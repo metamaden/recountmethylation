@@ -9,12 +9,6 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 bibliography: bibliography.bib
 csl: cell-numeric.csl
 package: recountmethylation
-vignette: > 
-  %\VignetteIndexEntry{recountmethylation User's Guide}
-  %\VignetteDepends{RCurl}
-  %\usepackage[UTF-8]{inputenc} 
-  %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown}
 output:
   BiocStyle::html_document:
     code_folding: show
@@ -23,6 +17,12 @@ output:
   BiocStyle::pdf_document: 
     toc: yes
     toc_depth: 2
+vignette: > 
+  %\VignetteIndexEntry{recountmethylation User's Guide}
+  %\VignetteDepends{RCurl}
+  %\usepackage[UTF-8]{inputenc} 
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
 ---
 
 ```{r setup, echo = FALSE, warning = FALSE}

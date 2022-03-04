@@ -17,7 +17,7 @@ output:
 package: recountmethylation
 bibliography: bibliography.bib
 vignette: > 
-  %\VignetteIndexEntry{recountmethylation User's Guide}
+  %\VignetteIndexEntry{Power analysis for DNAm arrays}
   %\VignetteDepends{RCurl}
   %\usepackage[UTF-8]{inputenc} 
   %\VignetteEncoding{UTF-8}
@@ -25,13 +25,17 @@ vignette: >
 ---
 
 ```{r chunk_settings, eval = T, echo = F}
-library(knitr); library(ggplot2)
-knitr::opts_chunk$set(eval = FALSE, echo = TRUE, warning = FALSE, message = FALSE)
+library(knitr)
+library(ggplot2)
+library(recountmethylation)
+knitr::opts_chunk$set(eval = FALSE, echo = TRUE, 
+                      warning = FALSE, message = FALSE)
 ```
 
 ```{r setup, eval = T, echo = F}
 # get the system load paths
-dpath <- system.file("extdata", "pwrewas_files", package = "recountmethylation")
+dpath <- system.file(package = "recountmethylation", 
+                     "extdata", "pwrewas_files")
 # load example summary statistics
 dfpwr <- get(load(file.path(dpath, "dfpwr_test_pwrewas.rda")))
 lpwr <- get(load(file.path(dpath, "lpwr-results_pwrewas-example.rda")))
@@ -44,7 +48,7 @@ This notebook describes how to run power analyses for DNAm arrays on user-define
 Source the revised function from GitHub with `source_url()`. This runs the script `pwrEWAS_revised.R`, producing a series of callable functions in the active R session.
 
 ```{r}
-revised_function_url <- paste0("https://github.com/metamaden/pwrEWAS/",                               "blob/master/inst/revised_functions/pwrEWAS_revised.R?raw=TRUE")
+revised_function_url <- paste0("https://github.com/metamaden/pwrEWAS/", "blob/master/inst/revised_functions/pwrEWAS_revised.R?raw=TRUE")
 devtools::source_url(revised_function_url)
 ```
 
@@ -54,10 +58,12 @@ devtools::source_url(revised_function_url)
 
 ```{r}
 library(minfiData)
-data("MsetEx"); ms <- MsetEx                        # load MethylSet
-bval <- getBeta(ms)                                 # get DNAm fractions
+data("MsetEx") # load MethylSet
+ms <- MsetEx 
+bval <- getBeta(ms) # get DNAm fractions
+# get the summary data frame
 dfpwr <- data.frame(mu = rowMeans(bval, na.rm = T),
-                    var = rowVars(bval, na.rm = T)) # get the summary data frame
+                    var = rowVars(bval, na.rm = T)) 
 ```
 ```{r, eval = T, message = T}
 head(dfpwr)
