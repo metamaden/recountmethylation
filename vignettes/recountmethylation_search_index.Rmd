@@ -34,7 +34,7 @@ knitr::opts_chunk$set(eval = FALSE, echo = TRUE,
                       warning = FALSE, message = FALSE)
 ```
 
-```{r setup, eval = T, echo = F}
+```{r setup, echo = F}
 si.dpath <- system.file("extdata", "sitest", package = "recountmethylation")
 # get object paths
 bval.fpath <- file.path(si.dpath, "bval_100.csv")
@@ -112,7 +112,7 @@ If `ndim` is high, the data is less reduced/compressed but more closely resemble
 
 Now use the `make_si()` function to make a new search index using `hnswlib`. This function takes the hashed features file name/path and makes a new search index and search index dictionary. Note, we set the extension `.pickle` since this is the save format for the new index objects. 
 
-```{r, eval = T}
+```{r}
 si.fname.str <- "new_search_index"
 si.fpath <- file.path(si.dpath, paste0(si.fname.str, ".pickle"))
 sidict.fpath <- file.path(si.dpath, paste0(si.fname.str, "_dict.pickle"))
@@ -130,20 +130,20 @@ This section shows an example analysis of nearest neighbors returned from a seri
 
 Next we can query samples from study GSE67393 (@inoshita_sex_2015). Query the search index using `query_si()`, which passes valid query data to the `.knn_query` method in `hnswlib`. First get the IDs for a subset of 10 of the samples frome the study GSE67393, which were included in the search index. 
 
-```{r, eval = T}
+```{r}
 query.gsmv <- c("GSM1506297", "GSM1646161", "GSM1646175", 
           "GSM1649753", "GSM1649758", "GSM1649762")
 ```
 
 Now specify a vector of k values, `lkval`, where k is the number of nearest neighbors to return. For example, if a search index has 100 dimensions, the query data for a sample should have exactly 100 dimensions. Also note k cannot exceed the total indexed entities, which is 10 for this example. 
 
-```{r, eval = T}
+```{r}
 lkval <- c(1,5,10,20) # vector of query k values 
 ```
 
 Finally, use `query_si()` to run the query. The path `fhtable.fpath` to the hashed feature table "bval_100_fh10.csv" is specified, which is where the query function extracts the sample data for each query.
 
-```{r, eval = T}
+```{r}
 si_fpath <- system.file("extdata", "sitest", package = "recountmethylation")
 dfnn <- query_si(sample_idv = query.gsmv, fh_csv_fpath = fhtable.fpath,
                  si_fname = "new_search_index", si_fpath = si_fpath, 
@@ -155,31 +155,31 @@ dfnn <- query_si(sample_idv = query.gsmv, fh_csv_fpath = fhtable.fpath,
 
 The query results were assigned to `dfnn`, which we can now inspect. First show its dimensions.
 
-```{r, eval = T}
+```{r}
 dim(dfnn)
 ```
 
 `dfnn` has 10 rows, corresponding to the 10 queried sample IDs, and 5 columns. The first column shows the IDs for the queried samples. Columns 2-5 show the results of individual queries, where column names designate the k value for a query as `k=...`.
 
-```{r, eval = T}
+```{r}
 colnames(dfnn)
 ```
 
 Now consider the query results for the sample in the first row, called "GSM1646161.1607013450.hlink.GSM1646161_9611518054_R01C01". Check the results of the first 3 queries for this sample (k = 1, 5, or 10).
 
-```{r, eval = T}
+```{r}
 unlist(strsplit(dfnn[1,"k=1"], ";"))
 ```
 
 When k = 1, the sample ID is returned. This is because the query uses the same hashed features data as was used to make the search index, and the search is for a subset of the indexed samples. 
 
-```{r, eval = T}
+```{r}
 unlist(strsplit(dfnn[1,"k=5"], ";"))
 ```
 
 This shows that samples are returned in the order of descending similarity to the queried data. For k = 5, the first sample returned is the same as k = 1, followed by the next 4 nearest neighboring samples.
 
-```{r, eval = T}
+```{r}
 unlist(strsplit(dfnn[1,"k=10"], ";"))
 ```
 
@@ -193,7 +193,7 @@ This section shows some ways to visualize the results of nearest neighbors queri
 
 Now analyze the type of samples among returned nearest neighbors. Use the `md` object to map labels to returned sample IDs for a single query, e.g. the first row where k = 5.
 
-```{r, eval = T}
+```{r}
 gsmvi <- unlist(strsplit(dfnn[1, "k=5"], ";"))
 blood.typev <- md[gsmvi,]$blood.subgroup
 ```
@@ -204,7 +204,7 @@ We see there are 4 whole blood samples, and 1 labeled other/NOS which correspond
 
 Now get the distribution of labels across samples for a single k value. We'll show the distribution of samples with the label "whole_blood" from the variable "blood.subgroup", focusing on nearest neighbors returned from the first query with k = 20.
 
-```{r, eval = T}
+```{r}
 dist.wb <- unlist(lapply(seq(nrow(dfnn)), function(ii){
   gsmvi <- unlist(strsplit(dfnn[ii,"k=20"], ";"))
   length(which(md[gsmvi,]$blood.subgroup=="whole_blood"))
@@ -213,7 +213,7 @@ dist.wb <- unlist(lapply(seq(nrow(dfnn)), function(ii){
 
 Now plot the results for whole blood. Use a composite of a violin plot and boxplot showing the distribution median and any outliers. Remove the x-axis title and scale the y-axis to show percentages.
 
-```{r, eval = T}
+```{r}
 dfp <- data.frame(num.samples = dist.wb)
 dfp$perc.samples <- 100*dfp$num.samples/20
 dfp$type <- "whole_blood"
@@ -227,7 +227,7 @@ ggplot(dfp, aes(x = type, y = perc.samples)) +
 
 Repeat the above for all mapped metadata labels. Specify the three metadata labels of interest for the `blood.subgroup` variable (e.g. "whole_blood", "PBMC", "other/NOS"), then calculate the number of samples for each label in each query, assigning results to `dfp`.
 
-```{r, eval = T}
+```{r}
 # specify labels of interest
 ugroupv <- c("whole_blood", "PBMC", "other/NOS")
 # function to get samples by label
@@ -245,7 +245,7 @@ dfp <- do.call(rbind, lapply(seq(nrow(dfnn)), function(ii){
 
 Format variables in `dfp` for plotting, then make the composite violin and boxplots showing distributions of the three labels, or percent of samples having the label, across queries.
 
-```{r, eval = T}
+```{r}
 # format dfp variables for plots
 dfp$perc.samples <- 100*dfp$num.samples/20
 # reorder on medians
