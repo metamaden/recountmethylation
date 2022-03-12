@@ -48,11 +48,11 @@ setup_sienv <- function(env.name = "dnam_si_hnswlib",
 #' @returns Path to new hashed featuers table.
 #' @examples
 #' # get example bval csv
-#' of_fpath <- system.file("extdata", "fhtest", 
+#' # of_fpath <- system.file("extdata", "fhtest", 
 #'          package = "recountmethylation")
-#' of_fpath <- file.path(of_fpath, "tbval_test.csv")
+#' # of_fpath <- file.path(of_fpath, "tbval_test.csv")
 #' # write new hashed features results
-#' get_fh(csv_savepath = "bval_fn.csv", csv_openpath = of_fpath, ndim = 100)
+#' # get_fh(csv_savepath = "bval_fn.csv", csv_openpath = of_fpath, ndim = 100)
 #' @export
 get_fh <- function(csv_savepath, csv_openpath, ndim = 1000, lstart = 1){
   message("Starting basilisk process...")
@@ -97,10 +97,10 @@ get_fh <- function(csv_savepath, csv_openpath, ndim = 1000, lstart = 1){
 #' @returns Boolean, TRUE if new search index and dictionary created, FALSE if 
 #' creating the new search index and dictionary files failed, otherwise NULL.
 #' @example 
-#' fh_csv_fpath <- system.file("extdata", "fhtest", 
-#' package = "recountmethylation")
-#' fh_csv_fpath <- file.path(fh_csv_fpath, "bval_fn.csv")
-#' make_si(fh_csv_fpath)
+#' # fh_csv_fpath <- system.file("extdata", "fhtest", 
+#' # package = "recountmethylation")
+#' # fh_csv_fpath <- file.path(fh_csv_fpath, "bval_fn.csv")
+#' # make_si(fh_csv_fpath)
 #' @export
 make_si <- function(fh_csv_fpath, si_fname = "new_search_index.pickle", 
                     si_dict_fname = "new_index_dict.pickle", threads = 4, 
