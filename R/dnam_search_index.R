@@ -48,11 +48,11 @@ setup_sienv <- function(env.name = "dnam_si_hnswlib",
 #' @returns Path to new hashed featuers table.
 #' @examples
 #' # get example bval csv
-#' of_fpath <- system.file("extdata", "fhtest", 
-#'          package = "recountmethylation")
-#' of_fpath <- file.path(of_fpath, "tbval_test.csv")
+#' #of_fpath <- system.file("extdata", "fhtest", 
+#' #          package = "recountmethylation")
+#' #of_fpath <- file.path(of_fpath, "tbval_test.csv")
 #' # write new hashed features results
-#' get_fh(csv_savepath = "bval_fn.csv", csv_openpath = of_fpath, ndim = 100)
+#' #get_fh(csv_savepath = "bval_fn.csv", csv_openpath = of_fpath, ndim = 100)
 #' @export
 get_fh <- function(csv_savepath, csv_openpath, ndim = 1000, lstart = 1){
   message("Starting basilisk process...")
@@ -97,10 +97,10 @@ get_fh <- function(csv_savepath, csv_openpath, ndim = 1000, lstart = 1){
 #' @returns Boolean, TRUE if new search index and dictionary created, FALSE if 
 #' creating the new search index and dictionary files failed, otherwise NULL.
 #' @example 
-#' fh_csv_fpath <- system.file("extdata", "fhtest", 
-#' package = "recountmethylation")
-#' fh_csv_fpath <- file.path(fh_csv_fpath, "bval_fn.csv")
-#' make_si(fh_csv_fpath)
+#' #fh_csv_fpath <- system.file("extdata", "fhtest", 
+#' #package = "recountmethylation")
+#' #fh_csv_fpath <- file.path(fh_csv_fpath, "bval_fn.csv")
+#' #make_si(fh_csv_fpath)
 #' @export
 make_si <- function(fh_csv_fpath, si_fname = "new_search_index.pickle", 
                     si_dict_fname = "new_index_dict.pickle", threads = 4, 
@@ -157,24 +157,24 @@ make_si <- function(fh_csv_fpath, si_fname = "new_search_index.pickle",
 #' @example
 #' # file paths
 #' # fh table
-#' fh_csv_fname <- system.file("extdata", "fhtest", 
-#' package = "recountmethylation")
+#' #fh_csv_fname <- system.file("extdata", "fhtest", 
+#' #package = "recountmethylation")
 #' fh_csv_fname <- file.path(fh_csv_fname, "bval_fh10.csv")
 #' # si dict
-#' index_dict_fname <- system.file("extdata", "sitest", 
-#' package = "recountmethylation")
-#' index_dict_fname <- file.path(index_dict_fname, "new_index_dict.pickle")
+#' #index_dict_fname <- system.file("extdata", "sitest", 
+#' #package = "recountmethylation")
+#' #index_dict_fname <- file.path(index_dict_fname, "new_index_dict.pickle")
 #' 
 #' # set sample ids to query
-#' sample_idv <- c("GSM1038308.1548799666.hlink.GSM1038308_5958154021_R01C01",
-#'                 "GSM1038309.1548799666.hlink.GSM1038309_5958154021_R02C01")
+#' #sample_idv <- c("GSM1038308.1548799666.hlink.GSM1038308_5958154021_R01C01",
+#' #               "GSM1038309.1548799666.hlink.GSM1038309_5958154021_R02C01")
 #' # set a list of k nearest neighbors to query
-#' lkval <- c(1,2,3)
+#' #lkval <- c(1,2,3)
 #' 
 #' # get query results as a data frame (with verbose results messaging)
-#' dfk <- query_si(sample_idv = sample_idv, lkval = lkval, 
-#'                 fh_csv_fname = "bval_fn.csv", 
-#'                 index_dict_fname = "new_index_dict.pickle")
+#' #dfk <- query_si(sample_idv = sample_idv, lkval = lkval, 
+#'  #               fh_csv_fname = "bval_fn.csv", 
+#'  #               index_dict_fname = "new_index_dict.pickle")
 #' # returns:
 #' # Starting basilisk process...
 #' # Defining the virtual env dependencies...
