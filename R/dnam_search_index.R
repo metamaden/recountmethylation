@@ -157,24 +157,24 @@ make_si <- function(fh_csv_fpath, si_fname = "new_search_index.pickle",
 #' @example
 #' # file paths
 #' # fh table
-#' fh_csv_fname <- system.file("extdata", "fhtest", 
-#' package = "recountmethylation")
-#' fh_csv_fname <- file.path(fh_csv_fname, "bval_fh10.csv")
+#' # fh_csv_fname <- system.file("extdata", "fhtest", 
+#' # package = "recountmethylation")
+#' # fh_csv_fname <- file.path(fh_csv_fname, "bval_fh10.csv")
 #' # si dict
-#' index_dict_fname <- system.file("extdata", "sitest", 
-#' package = "recountmethylation")
-#' index_dict_fname <- file.path(index_dict_fname, "new_index_dict.pickle")
+#' # index_dict_fname <- system.file("extdata", "sitest", 
+#' # package = "recountmethylation")
+#' # index_dict_fname <- file.path(index_dict_fname, "new_index_dict.pickle")
 #' 
 #' # set sample ids to query
-#' sample_idv <- c("GSM1038308.1548799666.hlink.GSM1038308_5958154021_R01C01",
-#'                 "GSM1038309.1548799666.hlink.GSM1038309_5958154021_R02C01")
+#' # sample_idv <- c("GSM1038308.1548799666.hlink.GSM1038308_5958154021_R01C01",
+#' #               "GSM1038309.1548799666.hlink.GSM1038309_5958154021_R02C01")
 #' # set a list of k nearest neighbors to query
-#' lkval <- c(1,2,3)
+#' # lkval <- c(1,2,3)
 #' 
 #' # get query results as a data frame (with verbose results messaging)
-#' dfk <- query_si(sample_idv = sample_idv, lkval = lkval, 
-#'                 fh_csv_fname = "bval_fn.csv", 
-#'                 index_dict_fname = "new_index_dict.pickle")
+#' # dfk <- query_si(sample_idv = sample_idv, lkval = lkval, 
+#' #               fh_csv_fname = "bval_fn.csv", 
+#' #               index_dict_fname = "new_index_dict.pickle")
 #' # returns:
 #' # Starting basilisk process...
 #' # Defining the virtual env dependencies...
