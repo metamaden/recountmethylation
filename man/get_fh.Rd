@@ -28,9 +28,9 @@ columns. The input data table should have row names but not column names.
 }
 \examples{
 # get example bval csv
-of_fpath <- system.file("extdata", "fhtest", 
-         package = "recountmethylation")
-of_fpath <- file.path(of_fpath, "tbval_test.csv")
+# of_fpath <- system.file("extdata", "fhtest", 
+#        package = "recountmethylation")
+# of_fpath <- file.path(of_fpath, "tbval_test.csv")
 # write new hashed features results
-get_fh(csv_savepath = "bval_fn.csv", csv_openpath = of_fpath, ndim = 100)
+# get_fh(csv_savepath = "bval_fn.csv", csv_openpath = of_fpath, ndim = 100)
 }

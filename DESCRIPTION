@@ -42,4 +42,4 @@ Suggests:
 VignetteBuilder:
     knitr
 biocViews: DNAMethylation, Epigenetics, Microarray, MethylationArray, ExperimentHub
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2

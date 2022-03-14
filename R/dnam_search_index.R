@@ -5,7 +5,13 @@
 # Functions to manage search index construction from DNAm array data, including
 # dimension reduction with feature hashing and support for k nearest neighbors
 # search lookup. The HNSW implementation in the hnswlib Python library is used
-# for search index construction.
+# for search index construction. 
+# 
+# Due to the varying availability of the Python package depedencies across 
+# operating systems, to ensure package build success these functions aren't 
+# exported and must be called with "recountmethylation:::". For background and 
+# instructions about workign with search indices for DNAm arrays, see the package 
+# vignette "Nearest neighbors analysis for DNAm arrays."
 #
 
 #' setup_sienv
@@ -18,9 +24,8 @@
 #' @param pkgv Vector of the dependencies and their versions for the new
 #' virtual environment (required, format: "packagename==versionnum").
 #' @returns New basilisk environment object.
-#' @example
 setup_sienv <- function(env.name = "dnam_si_hnswlib", 
-                        pkgv = c("hnswlib==0.5.1", "pandas==1.2.2", 
+                        pkgv = c("python==3.7.1", "hnswlib==0.5.1", "pandas==1.2.2", 
                           "numpy==1.20.1", "mmh3==3.0.0", "h5py==3.2.1")){
   message("Defining the virtual env dependencies...")
   my_env <- basilisk::BasiliskEnvironment(envname = env.name, 
@@ -49,11 +54,10 @@ setup_sienv <- function(env.name = "dnam_si_hnswlib",
 #' @examples
 #' # get example bval csv
 #' # of_fpath <- system.file("extdata", "fhtest", 
-#'          package = "recountmethylation")
+#' #        package = "recountmethylation")
 #' # of_fpath <- file.path(of_fpath, "tbval_test.csv")
 #' # write new hashed features results
 #' # get_fh(csv_savepath = "bval_fn.csv", csv_openpath = of_fpath, ndim = 100)
-#' @export
 get_fh <- function(csv_savepath, csv_openpath, ndim = 1000, lstart = 1){
   message("Starting basilisk process...")
   proc <- recountmethylation:::setup_sienv()
@@ -96,12 +100,11 @@ get_fh <- function(csv_savepath, csv_openpath, ndim = 1000, lstart = 1){
 #' @param ef_val EF value for the index (required, int, 2000).
 #' @returns Boolean, TRUE if new search index and dictionary created, FALSE if 
 #' creating the new search index and dictionary files failed, otherwise NULL.
-#' @example 
+#' @examples 
 #' # fh_csv_fpath <- system.file("extdata", "fhtest", 
 #' # package = "recountmethylation")
 #' # fh_csv_fpath <- file.path(fh_csv_fpath, "bval_fn.csv")
 #' # make_si(fh_csv_fpath)
-#' @export
 make_si <- function(fh_csv_fpath, si_fname = "new_search_index.pickle", 
                     si_dict_fname = "new_index_dict.pickle", threads = 4, 
                     space_val = 'l2', efc_val = 2000, m_val = 1000, ef_val = 2000){
@@ -154,7 +157,7 @@ make_si <- function(fh_csv_fpath, si_fname = "new_search_index.pickle",
 #' @param lkval Vector of K nearest neighbors to return per query (optional, 
 #' int, c(1,2)).
 #' @returns
-#' @example
+#' @examples
 #' # file paths
 #' # fh table
 #' # fh_csv_fname <- system.file("extdata", "fhtest", 
@@ -202,7 +205,6 @@ make_si <- function(fh_csv_fpath, si_fname = "new_search_index.pickle",
 #' # ii =  2 , ki =  3
 #' # Provided k '3' > n si samples, skipping...
 #' # Returning query results...
-#' @export
 query_si <- function(sample_idv, fh_csv_fpath, 
                      si_fname = "new_search_index", 
                      si_fpath = ".", lkval = c(1,2)){
