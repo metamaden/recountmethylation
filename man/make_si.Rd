@@ -46,3 +46,9 @@ Make search index from table of hashed features. Additional details about
 the hnswlib search index parameters (e..g `space_val`, `efc_val`, `m_val`, 
 and `ef_val`) can be found in the Python package docstrings and ReadMe.
 }
+\examples{
+# fh_csv_fpath <- system.file("extdata", "fhtest", 
+# package = "recountmethylation")
+# fh_csv_fpath <- file.path(fh_csv_fpath, "bval_fn.csv")
+# make_si(fh_csv_fpath)
+}
