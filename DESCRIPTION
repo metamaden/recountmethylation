@@ -1,0 +1,47 @@
+Package: recountmethylation
+Version: 1.7.1
+Title: Access and analyze public DNA methylation array data compilations
+Authors@R: c(person(c("Sean", "K"), "Maden", role = c("cre", "aut"),
+        email = "maden@ohsu.edu", comment = c(ORCID = "0000-0002-2212-4894")),
+    person("Brian", "Walsh", role = "aut", comment = c("0000-0003-0913-1528")),
+    person("Kyle", "Ellrott", role = "aut", comment = c("0000-0002-6573-5900")),
+    person("Kasper D", "Hansen", role = "aut", email = "hansen@jhsph.edu", comment = c(ORCID = "0000-0003-0086-0687")),
+    person("Reid F", "Thompson", role = "aut", comment = c(ORCID = "0000-0003-3661-5296")),
+    person("Abhinav", "Nellore", role = "aut", email = "nellore@ohsu.edu", comment = c(ORCID = "0000-0001-8145-1484")))
+Description: Resources for cross-study analyses of public DNAm array data from NCBI GEO repo, produced 
+    using Illumina's Infinium HumanMethylation450K (HM450K) and MethylationEPIC (EPIC) platforms. 
+    Provided functions enable download, summary, and filtering of large compilation files. Vignettes 
+    detail background about file formats, example analyses, and more. Note the disclaimer on package 
+    load and consult the main manuscripts for further info.
+License: Artistic-2.0
+Encoding: UTF-8
+URL: https://github.com/metamaden/recountmethylation
+BugReports: https://github.com/metamaden/recountmethylation/issues
+LazyData: FALSE
+Depends: R (>= 4.1)
+Imports:
+    minfi,
+    HDF5Array,
+    rhdf5,
+    S4Vectors,
+    utils,
+    methods,
+    RCurl,
+    R.utils,
+    BiocFileCache,
+    IlluminaHumanMethylation450kmanifest
+Suggests:
+    knitr,
+    testthat,
+    ggplot2,
+    gridExtra,
+    rmarkdown,
+    BiocStyle,
+    GenomicRanges,
+    limma,
+    ExperimentHub,
+    AnnotationHub
+VignetteBuilder:
+    knitr
+biocViews: DNAMethylation, Epigenetics, Microarray, MethylationArray, ExperimentHub
+RoxygenNote: 7.1.2
