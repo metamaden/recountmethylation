@@ -38,31 +38,35 @@ knitr::opts_chunk$set(echo = TRUE, eval = TRUE, warning = FALSE,
 
 # Introduction and overview
 
-The `recountmethylation` package provides access to databases of DNA 
-methylation (DNAm) data from over 62,000 cumulative sample records with 
-IDATs in the Gene Expression Omnibus (GEO, available by November, 2020). 
-Samples were run using either of 2 Illumina BeadArray platform types, 
-either the older HM450K platform or the newer EPIC/HM850K platform. The
-database compilation files include mined, mapped, and model-based sample 
-metadata, and DNAm data in the form of either raw/unnormalized red and 
-green signals, raw/unnormalized methylated and unmethylated signals, or 
-normalized DNAm fractions (a.k.a. "Beta-values") @maden_human_2020. 
-Normalization was performed using the out-of-band signal correction (a.k.a. 
-"noob") method, a type of within-sample normalization @triche_low-level_2013.
+`recountmethylation` is an R/Bioconductor package providing resources to access
+and analyze compilations of public DNA methylation (DNAm) array data from the
+Gene Expression Omnibus (GEO). The database compilation files span two array 
+platforms and include mined, mapped, and model-based sample metadata. The DNAm 
+signals can be accessed in a variety of formats and data storage types. This 
+User's Guide shows how to use the `recountmethylation` package, including
+crucial background about the platforms and datatypes, and runnable examples using 
+2 small example files. Additional info and more advanced analysis examples are
+contained in other package vignettes.
 
-This User's Guide shows how to use the `recountmethylation` package to obtain, 
-load, and query the DNAm databases with 2 small example files. Background about 
-DNAm arrays, DNAm measurement, `SummarizedExperiment` objects, database file 
-types, and samples metadata is also provided. Further analysis examples are 
-contained in the `data_analyses` vignette.
+## Compilation releases
 
-## Disclaimer
+The `recountmethylation` resource now includes three compilation versions, 
+detailed in the table below. The initial versions only included samples run 
+using the HM450K platform, while newer versions also included samples run using
+the EPIC platform. These compilations currently include 93,306 samples run on the HM450K 
+platform, 38,122 samples run on the EPIC platform, and 131,428 total samples.
 
-Databases accessed with `recountmethylation` contain data from GEO 
-(ncbi.nlm.nih.gov/geo/), a live public database where alterations to 
-online records can cause discrepancies with stored data over time. 
-We cannot guarantee the accuracy of stored data, and advise users 
-cross-check their findings with latest available records.
+```{r}
+dft <- data.frame(release = c("first", "second", "third", "total"),
+                  version.label = c("0.0.1", "0.0.2", "0.0.3", "all"),
+                  date = c("11/20/2020", "01/06/2021", "12/21/2022", "12/21/2022"),
+                  hm450k.samples = c(35360, 50400, 7546, 
+                                     sum(c(35360, 50400, 7546))),
+                  epic.samples = c(0, 12650, 25472, 
+                                   sum(c(0, 12650, 25472))))
+dft$combined.samples <- dft$hm450k.samples + dft$epic.samples
+knitr::kable(dft, align = "c")
+```
 
 ## Database files and access
 
@@ -71,8 +75,8 @@ functions, where the DNAm array platform type using the `platform` argument
 (see `?get_db` for details). Both HM450K and EPIC/HM850K platforms are 
 currently supported (see below for platform details). Note you will need 
 between 50-180 Gb of disk space to store a single database file. Files pair 
-sample metadata and assay data in various formats, including `HDF5-SummarizedExperiment` database directories, and `HDF5` database files 
-with the `.h5` extension. 
+sample metadata and assay data in various formats, including `HDF5-SummarizedExperiment` 
+database directories, and `HDF5` database files with the `.h5` extension. 
 
 The databases are located at 
 [https://methylation.recount.bio/](https://methylation.recount.bio/), 
@@ -105,6 +109,19 @@ rhdf5::h5ls(fpath)         # load the h5 file
 
 Note that whether downloads use the hubs or `getdb` functions, caching 
 is implemented to check for previously downloaded database files.
+
+## Disclaimer
+
+Please note the following disclaimer, which also shows when `recountmethylation` 
+is loaded:
+
+```
+Databases accessed with `recountmethylation` contain data from GEO 
+(ncbi.nlm.nih.gov/geo/), a live public database where alterations to 
+online records can cause discrepancies with stored data over time. 
+We cannot guarantee the accuracy of stored data, and advise users 
+cross-check their findings with latest available records.
+```
 
 # Background
 
